@@ -16,6 +16,9 @@ LARGE_DIR = ROOT / "large"
 MANIFEST_PATH = ROOT / "stickers" / "manifest.json"
 SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".apng"}
 
+# ↓↓↓ 想要改图片说明，只改这一行（会被写进 manifest 的 alt，灯箱与无障碍朗读用）↓↓↓
+DEFAULT_ALT = "动画贺图收藏"
+
 
 def _image_dimensions(path: Path) -> tuple[int, int] | None:
     try:
@@ -49,7 +52,7 @@ def build_manifest() -> list[dict[str, str]]:
         entry = {
             "original": original,
             "filename": path.name,
-            "alt": "鲸鱼娘同人表情包",
+            "alt": DEFAULT_ALT,
         }
         preview = PREVIEW_DIR / f"{path.stem}.webp"
         if preview.is_file():
