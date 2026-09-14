@@ -3,8 +3,8 @@ name: Validate sticker manifest
 on:
   pull_request:
     paths:
-      - "media/**"
-      - "stickers/manifest.json"
+      - "data/**"
+      - "stickers/*.json"
       - "scripts/*.py"
       - ".github/workflows/**"
   workflow_dispatch:
@@ -30,5 +30,43 @@ jobs:
       - name: Generate previews
         run: python scripts/make_previews.py
 
-      - name: Validate sticker manifest
+      - name: Validate partition manifests
         run: python scripts/sync_stickers.py --check
+
+      - name: Check manifest entries point to existing files
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifests = sorted(Path("stickers").glob("manifest_*.json"))
+          if not manifests:
+              raise SystemExit("no partition manifest found")
+
+          # 冲突检查比的是"生成产物路径"（previews/、large/ 下的文件），
+          # 不是原始文件名：不同主题常有同名原图（各有一个 01.jpg），
+          # 产物名带 <主题>-<分区>- 前缀，所以同名原图本来就不冲突。
+          outputs = {}
+          errors = []
+          for path in manifests:
+              entries = json.loads(path.read_text(encoding="utf-8"))
+              print(f"{path.as_posix()}: {len(entries)} entries")
+              for entry in entries:
+                  for key in ("original", "preview", "large"):
+                      rel = entry.get(key)
+                      if not rel:
+                          continue
+                      target = Path(rel)
+                      if not target.is_file():
+                          errors.append(f"{path.name}: {key} missing -> {rel}")
+                          continue
+                      if key in ("preview", "large"):
+                          owner = outputs.setdefault(rel, path.name)
+                          if owner != path.name:
+                              errors.append(
+                                  f"{path.name}: generated file '{rel}' already claimed by {owner}"
+                              )
+          if errors:
+              raise SystemExit("\n".join(errors))
+          print("All manifest entries reference existing files, no stem collisions.")
+          PY

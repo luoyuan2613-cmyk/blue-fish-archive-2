@@ -14,8 +14,15 @@
     <link rel="apple-touch-icon" href="logo/favicon.png" />
     <meta name="msapplication-TileImage" content="logo/apple-touch-icon.png" />
     <link rel="stylesheet" href="styles.css" />
-    <!-- 与 app.js 并行下载表情清单,剪掉 HTML→JS→manifest 的串行等待 -->
-    <link rel="preload" href="stickers/manifest.json" as="fetch" type="application/json" />
+    <!-- 与 app.js 并行下载"起始主题的起始分区"清单（切主题/分区时才按需取别的），
+         剪掉 HTML→JS→manifest 的串行等待。跨域/凭据无关，故可用 crossorigin 预加载。 -->
+    <link
+      rel="preload"
+      href="stickers/manifest_manga-default.json"
+      as="fetch"
+      type="application/json"
+      crossorigin="anonymous"
+    />
     <!-- 字体来自 npmmirror CDN,预连接省一次跨域握手 -->
     <link rel="preconnect" href="https://registry.npmmirror.com" crossorigin />
   </head>
@@ -195,10 +202,12 @@
               <picture>
                 <!-- WebP 版本约 1/10 体积;不支持 WebP 的旧浏览器回退 PNG -->
                 <source
+                  id="hero-art-webp"
                   srcset="assets/001.webp"
                   type="image/webp"
                 />
                 <img
+                  id="hero-art-image"
                   src="assets/001.png"
                   width="422"
                   height="750"
@@ -266,6 +275,11 @@
             </div>
           </div>
           <span class="wall-squiggle" aria-hidden="true"></span>
+        </div>
+        <!-- 需求一：分区切换（分区表见 app.js PARTITIONS；清单由 sync_stickers.py 生成） -->
+        <div class="sticker-partitions" id="sticker-partitions">
+          <div class="partition-nav" id="partition-nav" role="group" aria-label="作品分区"></div>
+          <span class="partition-status" id="partition-status"></span>
         </div>
         <div class="sticker-grid" id="sticker-grid" aria-live="polite">
           <!-- 首屏骨架:manifest 到达前先摆好卡片位置,避免白墙忽然后弹出 -->

@@ -2,7 +2,8 @@
 # index.html、app.js、manifest.json 等每次发布都会变的文件保持默认(max-age=0),
 # 确保新部署立即生效,这里不需要覆盖。
 
-/media/*
+# 素材目录：data/<主题>/<分区>/，内容寻址，长期缓存
+/data/*
   Cache-Control: public, max-age=31536000, immutable
 
 /previews/*

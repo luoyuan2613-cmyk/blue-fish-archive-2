@@ -1,0 +1,254 @@
+[
+  {
+    "original": "data/manga/default/01.jpg",
+    "filename": "01.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-01.webp",
+    "large": "large/manga-default-01.webp",
+    "width": 480,
+    "height": 270
+  },
+  {
+    "original": "data/manga/default/02.jpg",
+    "filename": "02.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-02.webp",
+    "large": "large/manga-default-02.webp",
+    "width": 270,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/03.jpg",
+    "filename": "03.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-03.webp",
+    "large": "large/manga-default-03.webp",
+    "width": 263,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/04.jpg",
+    "filename": "04.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-04.webp",
+    "large": "large/manga-default-04.webp",
+    "width": 270,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/05.jpg",
+    "filename": "05.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-05.webp",
+    "large": "large/manga-default-05.webp",
+    "width": 270,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/07.jpg",
+    "filename": "07.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-07.webp",
+    "large": "large/manga-default-07.webp",
+    "width": 320,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/08.jpg",
+    "filename": "08.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-08.webp",
+    "large": "large/manga-default-08.webp",
+    "width": 320,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/09.jpg",
+    "filename": "09.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-09.webp",
+    "large": "large/manga-default-09.webp",
+    "width": 270,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/10.jpg",
+    "filename": "10.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-10.webp",
+    "large": "large/manga-default-10.webp",
+    "width": 270,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】 完结应援绘-β.jpg",
+    "filename": "【动画贺图】 完结应援绘-β.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】 完结应援绘-β.webp",
+    "large": "large/manga-default-【动画贺图】 完结应援绘-β.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】 完结应援绘.jpg",
+    "filename": "【动画贺图】 完结应援绘.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】 完结应援绘.webp",
+    "large": "large/manga-default-【动画贺图】 完结应援绘.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】 第11话-β版.jpg",
+    "filename": "【动画贺图】 第11话-β版.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】 第11话-β版.webp",
+    "large": "large/manga-default-【动画贺图】 第11话-β版.webp",
+    "width": 480,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】 第5话.jpg",
+    "filename": "【动画贺图】 第5话.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】 第5话.webp",
+    "large": "large/manga-default-【动画贺图】 第5话.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】 第5话（观后）.jpg",
+    "filename": "【动画贺图】 第5话（观后）.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】 第5话（观后）.webp",
+    "large": "large/manga-default-【动画贺图】 第5话（观后）.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第10話-β版.jpg",
+    "filename": "【动画贺图】第10話-β版.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第10話-β版.webp",
+    "large": "large/manga-default-【动画贺图】第10話-β版.webp",
+    "width": 480,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第10話.png",
+    "filename": "【动画贺图】第10話.png",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第10話.webp",
+    "large": "large/manga-default-【动画贺图】第10話.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第11話.png",
+    "filename": "【动画贺图】第11話.png",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第11話.webp",
+    "large": "large/manga-default-【动画贺图】第11話.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第12話.jpg",
+    "filename": "【动画贺图】第12話.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第12話.webp",
+    "large": "large/manga-default-【动画贺图】第12話.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第4話.jpg",
+    "filename": "【动画贺图】第4話.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第4話.webp",
+    "large": "large/manga-default-【动画贺图】第4話.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第5話-β版.jpg",
+    "filename": "【动画贺图】第5話-β版.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第5話-β版.webp",
+    "large": "large/manga-default-【动画贺图】第5話-β版.webp",
+    "width": 480,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第6話-β版.jpg",
+    "filename": "【动画贺图】第6話-β版.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第6話-β版.webp",
+    "large": "large/manga-default-【动画贺图】第6話-β版.webp",
+    "width": 480,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第6話.jpg",
+    "filename": "【动画贺图】第6話.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第6話.webp",
+    "large": "large/manga-default-【动画贺图】第6話.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第7話-β版.jpg",
+    "filename": "【动画贺图】第7話-β版.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第7話-β版.webp",
+    "large": "large/manga-default-【动画贺图】第7話-β版.webp",
+    "width": 480,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第7話.jpg",
+    "filename": "【动画贺图】第7話.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第7話.webp",
+    "large": "large/manga-default-【动画贺图】第7話.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第8話-β版.jpg",
+    "filename": "【动画贺图】第8話-β版.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第8話-β版.webp",
+    "large": "large/manga-default-【动画贺图】第8話-β版.webp",
+    "width": 480,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第8話.jpg",
+    "filename": "【动画贺图】第8話.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第8話.webp",
+    "large": "large/manga-default-【动画贺图】第8話.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/【动画贺图】第9話.jpg",
+    "filename": "【动画贺图】第9話.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-【动画贺图】第9話.webp",
+    "large": "large/manga-default-【动画贺图】第9話.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/高清观看版.jpg",
+    "filename": "高清观看版.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-高清观看版.webp",
+    "large": "large/manga-default-高清观看版.webp",
+    "width": 480,
+    "height": 270
+  }
+]

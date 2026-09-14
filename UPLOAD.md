@@ -3,13 +3,20 @@
 网站仓库：https://github.com/luoyuan2613-cmyk/blue-fish-archive-2
 线上地址：https://blue-fish-archive-2.luoyuan2613.workers.dev/
 
-**只需记住一件事：只动 `media/` 这一个文件夹，其余全部自动。**
+**只需记住一件事：只往素材目录里放图，其余全部自动。**
+
+- `data/manga/default/` → 「漫画主题 / 默认区」
+- `data/manga/cos/`     → 「漫画主题 / Cos区」
+- `data/whale/default/` → 「蓝鲸主题 / 默认区」
+- `data/whale/cos/`     → 「蓝鲸主题 / Cos区」
+
+新增主题或分区：**建目录 + 放图**即可（脚本自动发现）。前端 `app.js` 的 `THEMES` 里补一条同名分区即可显示标签。
 
 ---
 
 ## 方式一：网页上传（推荐，不用装任何东西）
 
-1. 打开 https://github.com/luoyuan2613-cmyk/blue-fish-archive-2/tree/main/media
+1. 打开对应目录，例如 `/tree/main/data/manga/cos`（主题/分区各一层）
 2. 右上角 **Add file → Upload files**
 3. 把图片拖进去 → 底部写一句说明（可留默认）→ **Commit changes**
 4. 等 1–2 分钟：GitHub Actions 自动生成缩略图、更新清单，Cloudflare 自动重新部署
@@ -38,7 +45,7 @@ git add -A && git commit -m "add images" && git push
 | 做法 | 操作 | 说明 |
 |---|---|---|
 | **A. 找我（最省事）** | 告诉我删哪张 | 我会把 `media/`、`previews/`、`large/`、清单四处一起清干净 |
-| **B. 自己删** | 在网页上删掉 `media/` 里的图，然后去 https://github.com/luoyuan2613-cmyk/blue-fish-archive-2/actions → 选 **Sync sticker manifest** → 右侧 **Run workflow** | 手动触发会让它重建；**只删图不触发，页面不会变**（删图不在自动触发路径里） |
+| **B. 自己删** | 在网页上删掉 `media/`（或 `cos/`）里的图，然后去 https://github.com/luoyuan2613-cmyk/blue-fish-archive-2/actions → 选 **Sync sticker manifest** → 右侧 **Run workflow** | 手动触发会重建两个分区的清单；**只删图不触发，页面不会变**（删图不在自动触发路径里） |
 
 ---
 

@@ -18,16 +18,16 @@ fish-gallery/
 ├── index.html          页面结构 + 全部文案（品牌占位点都在这里）
 ├── styles.css          样式（与原作一致，无需改动）
 ├── app.js              交互逻辑（与原作一致，无需改动）
-├── stickers/manifest.json   图片清单（由脚本生成，勿手改）
-├── media/              原图放这里 ← 你日常只需要操作这个目录
+├── stickers/manifest_<主题>-<分区>.json   每个「主题×分区」一份清单（脚本生成，勿手改）
+├── data/<主题>/<分区>/   ← 素材目录（唯一需要你操作的目录）
 ├── previews/           480px WebP 缩略图（脚本生成，瀑布流用）
 ├── large/              原尺寸 WebP（脚本生成，灯箱看图用）
 ├── assets/             首页立绘：deepseek_whale.png / .webp
 ├── logo/               favicon.png、apple-touch-icon.png、品牌标记 2 张
 ├── memes/              看板娘图片与音效
 ├── scripts/
-│   ├── make_previews.py    media/ → previews/ + large/
-│   └── sync_stickers.py    media/ → stickers/manifest.json（含宽高）
+│   ├── make_previews.py    data/<主题>/<分区>/ → previews/ + large/（产物名带主题-分区前缀）
+│   └── sync_stickers.py    data/<主题>/<分区>/ → 各自的分区清单（含宽高）
 └── .github/workflows/
     ├── sync-stickers.yml       推送后自动生成缩略图与清单并提交回仓库
     └── validate-stickers.yml   PR 时校验清单是否同步

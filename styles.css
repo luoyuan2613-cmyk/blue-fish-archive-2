@@ -3081,3 +3081,210 @@ h1 span::after {
     transform: translateY(4px) scaleX(1.08) scaleY(0.9);
   }
 }
+
+/* ===========================================================================
+ * 需求一：表情墙「独立分区切换」—— 分区标签条
+ * 分区表见 app.js PARTITIONS；每区一份清单（manifest_default / manifest_cos）
+ * =========================================================================== */
+.sticker-partitions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 22px 4px;
+}
+
+.partition-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 当前分区计数：做成一张小纸条，和下方瀑布流同一套贴纸语言 */
+.partition-status {
+  padding: 5px 12px;
+  color: var(--muted);
+  font-family: var(--body);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: var(--white);
+  border: 2px dashed var(--line);
+  border-radius: 8px 11px 9px 12px;
+  transform: rotate(-1.2deg);
+}
+
+.partition-status:empty {
+  display: none;
+}
+
+.partition-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  color: var(--deep);
+  background: var(--white);
+  border: 3px solid var(--white);
+  border-radius: 999px;
+  box-shadow: 3px 4px 0 var(--sticker-shadow);
+  font-family: var(--body);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  transition: transform 300ms var(--ease), box-shadow 300ms var(--ease),
+    background 300ms var(--ease), color 300ms var(--ease);
+}
+
+.partition-tab b {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+  background: var(--mist);
+  border-radius: 999px;
+  padding: 2px 7px;
+  transition: background 300ms var(--ease), color 300ms var(--ease);
+}
+
+.partition-tab:hover {
+  background: var(--mist);
+  transform: translateY(-2px);
+}
+
+.partition-tab:active {
+  transform: translate(1px, 1px) scale(0.99);
+}
+
+.partition-tab:focus-visible {
+  outline: 4px solid var(--coral);
+  outline-offset: 3px;
+}
+
+/* 当前分类：翻成深海色实心贴纸，和未选中的白底拉开层次 */
+.partition-tab.is-active {
+  color: var(--white);
+  background: var(--deep);
+  box-shadow: 2px 3px 0 var(--sticker-shadow);
+}
+
+.partition-tab.is-active b {
+  color: var(--deep);
+  background: var(--mist);
+}
+
+/* 切换分类时卡片带出一点"重新贴上去"的错峰动画（复用卡片自身的 --sticker-delay） */
+.sticker-grid .sticker-card.is-loaded {
+  animation: stickerReattach 420ms var(--ease) both;
+  animation-delay: var(--sticker-delay, 0ms);
+}
+
+@keyframes stickerReattach {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ===========================================================================
+ * 需求二：主题书签头
+ * 由 app.js 的 themeConfig 驱动；只有 1 个主题时容器不会进 DOM
+ * =========================================================================== */
+.theme-switcher {
+  position: fixed;
+  top: 50%;
+  left: max(10px, calc(50vw - 706px));
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transform: translateY(-50%);
+}
+
+.theme-tab {
+  --tab-rotate: 8deg;
+  writing-mode: vertical-rl;
+  padding: 20px 10px;
+  color: var(--white);
+  background: var(--deep);
+  border: 3px solid var(--white);
+  border-radius: 0 14px 14px 0;
+  box-shadow: 4px 5px 0 var(--sticker-shadow);
+  font-family: var(--body);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  opacity: 0.55;
+  transform: translateX(-7px) rotate(var(--tab-rotate));
+  transition: opacity 320ms var(--ease), transform 320ms var(--ease),
+    box-shadow 320ms var(--ease), background 320ms var(--ease);
+}
+
+.theme-tab:nth-child(even) {
+  --tab-rotate: -6deg;
+}
+
+.theme-tab:hover {
+  opacity: 0.88;
+  transform: translateX(-2px) rotate(0deg);
+}
+
+/* 当前主题：颜色加深、往外伸出来一截，和未激活的拉开区别 */
+.theme-tab.is-active {
+  opacity: 1;
+  background: var(--blue);
+  transform: translateX(4px) rotate(0deg);
+  box-shadow: 5px 6px 0 var(--sticker-shadow);
+}
+
+.theme-tab.is-switching {
+  transform: translateX(10px) scale(0.97);
+}
+
+.theme-tab:focus-visible {
+  outline: 4px solid var(--coral);
+  outline-offset: 3px;
+}
+
+/* 立绘切换时的淡出淡入，避免图片资源"硬跳" */
+.hero-art-window img {
+  transition: opacity 200ms var(--ease), transform 800ms var(--ease);
+}
+
+.hero-art-window.is-swapping img {
+  opacity: 0;
+}
+
+/* 窄屏：书签头转为横排，固定在底部居中，避免压住正文 */
+@media (max-width: 1180px) {
+  .theme-switcher {
+    top: auto;
+    bottom: 14px;
+    left: 50%;
+    flex-direction: row;
+    transform: translateX(-50%);
+  }
+
+  .theme-tab {
+    writing-mode: horizontal-tb;
+    padding: 9px 16px;
+    border-radius: 999px;
+    letter-spacing: 0.12em;
+    transform: translateY(6px);
+  }
+
+  .theme-tab:nth-child(even) {
+    --tab-rotate: 0deg;
+    transform: translateY(6px);
+  }
+
+  .theme-tab.is-active {
+    transform: translateY(0);
+  }
+}
+

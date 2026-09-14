@@ -1,4 +1,4 @@
-"""Generate or validate the static sticker manifest."""
+"""Generate or validate the static sticker manifests (one per theme/partition)."""
 
 from __future__ import annotations
 
@@ -10,11 +10,15 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_DIR = ROOT / "media"
 PREVIEW_DIR = ROOT / "previews"
 LARGE_DIR = ROOT / "large"
-MANIFEST_PATH = ROOT / "stickers" / "manifest.json"
 SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".apng"}
+
+# 素材目录约定：data/<主题>/<分区>/  →  stickers/manifest_<主题>-<分区>.json
+#   例：data/manga/cos/  →  stickers/manifest_manga-cos.json
+# 主题与分区都由目录结构自动发现（有图才生成清单），加分区只要建目录 + 放图，
+# 前端 app.js 的 THEMES 里补一条同名分区即可。
+DATA_DIR = ROOT / "data"
 
 # ↓↓↓ 想要改图片说明，只改这一行（会被写进 manifest 的 alt，灯箱与无障碍朗读用）↓↓↓
 DEFAULT_ALT = "动画贺图收藏"
@@ -28,14 +32,14 @@ def _image_dimensions(path: Path) -> tuple[int, int] | None:
         return None
 
 
-def build_manifest() -> list[dict[str, str]]:
-    if not SOURCE_DIR.is_dir():
-        raise FileNotFoundError(f"Sticker source directory not found: {SOURCE_DIR}")
+def build_manifest(source_dir: Path, theme: str, partition: str) -> list[dict[str, str]]:
+    if not source_dir.is_dir():
+        raise FileNotFoundError(f"Sticker source directory not found: {source_dir}")
 
     files = sorted(
         (
             path
-            for path in SOURCE_DIR.iterdir()
+            for path in source_dir.iterdir()
             if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS
         ),
         key=lambda path: path.name.casefold(),
@@ -43,6 +47,10 @@ def build_manifest() -> list[dict[str, str]]:
 
     manifest: list[dict[str, str]] = []
     seen_paths: set[str] = set()
+    # preview/large 的产物名必须带"主题-分区"前缀：
+    # 不同主题的分区常含同名文件（例如两个主题各有一个 01.jpg），
+    # 只用文件名做键会互相覆盖，导致 A 主题显示 B 主题的缩略图。
+    prefix = f"{theme}-{partition}"
     for path in files:
         original = path.relative_to(ROOT).as_posix()
         normalized = original.casefold()
@@ -54,10 +62,10 @@ def build_manifest() -> list[dict[str, str]]:
             "filename": path.name,
             "alt": DEFAULT_ALT,
         }
-        preview = PREVIEW_DIR / f"{path.stem}.webp"
+        preview = PREVIEW_DIR / f"{prefix}-{path.stem}.webp"
         if preview.is_file():
             entry["preview"] = preview.relative_to(ROOT).as_posix()
-        large = LARGE_DIR / f"{path.stem}.webp"
+        large = LARGE_DIR / f"{prefix}-{path.stem}.webp"
         if large.is_file():
             entry["large"] = large.relative_to(ROOT).as_posix()
         # 网格里实际显示的是 preview(与原图同比例)或原图本体,尺寸必须取自它,
@@ -70,6 +78,34 @@ def build_manifest() -> list[dict[str, str]]:
     return manifest
 
 
+def discover_partitions() -> list[dict[str, object]]:
+    """扫描 data/<主题>/<分区>/，返回有图片的分区列表（按主题、分区名排序）。"""
+    if not DATA_DIR.is_dir():
+        raise FileNotFoundError(f"Data directory not found: {DATA_DIR}")
+
+    partitions: list[dict[str, object]] = []
+    for theme_dir in sorted(p for p in DATA_DIR.iterdir() if p.is_dir()):
+        for part_dir in sorted(p for p in theme_dir.iterdir() if p.is_dir()):
+            has_image = any(
+                child.is_file() and child.suffix.lower() in SUPPORTED_EXTENSIONS
+                for child in part_dir.iterdir()
+            )
+            if not has_image:
+                continue
+            partitions.append(
+                {
+                    "theme": theme_dir.name,
+                    "partition": part_dir.name,
+                    "id": f"{theme_dir.name}-{part_dir.name}",
+                    "source": part_dir,
+                    "manifest": ROOT / "stickers" / f"manifest_{theme_dir.name}-{part_dir.name}.json",
+                }
+            )
+    if not partitions:
+        raise FileNotFoundError(f"No partition with images found under {DATA_DIR}")
+    return partitions
+
+
 def manifest_text(manifest: list[dict[str, str]]) -> str:
     return json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
 
@@ -79,32 +115,41 @@ def main() -> int:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="Fail when manifest.json is not synchronized with the source folder.",
+        help="Fail when any partition manifest is not synchronized with its source folder.",
     )
     args = parser.parse_args()
 
     try:
-        manifest = build_manifest()
-        expected = manifest_text(manifest)
-    except (FileNotFoundError, ValueError) as error:
+        partitions = discover_partitions()
+    except FileNotFoundError as error:
         print(error, file=sys.stderr)
         return 1
 
-    if args.check:
-        actual = MANIFEST_PATH.read_text(encoding="utf-8") if MANIFEST_PATH.is_file() else ""
-        if actual != expected:
-            print(
-                "stickers/manifest.json is out of date; run "
-                "python scripts/sync_stickers.py",
-                file=sys.stderr,
-            )
+    for partition in partitions:
+        source_dir = Path(partition["source"])
+        manifest_path = Path(partition["manifest"])
+        try:
+            entries = build_manifest(source_dir, str(partition["theme"]), str(partition["partition"]))
+            expected = manifest_text(entries)
+        except (FileNotFoundError, ValueError) as error:
+            print(f"[{partition['id']}] {error}", file=sys.stderr)
             return 1
-        print("Sticker manifest is synchronized.")
-        return 0
 
-    # newline="\n" 保证 Windows 上生成的也是 LF, 否则提交的 blob 在 Linux CI 的 --check 里对不上
-    MANIFEST_PATH.write_text(expected, encoding="utf-8", newline="\n")
-    print(f"Generated {len(manifest)} sticker entries.")
+        label = manifest_path.relative_to(ROOT).as_posix()
+        if args.check:
+            actual = manifest_path.read_text(encoding="utf-8") if manifest_path.is_file() else ""
+            if actual != expected:
+                print(
+                    f"{label} is out of date; run python scripts/sync_stickers.py",
+                    file=sys.stderr,
+                )
+                return 1
+            print(f"[{partition['id']}] {label} is synchronized ({len(entries)} entries).")
+        else:
+            # newline="\n" 保证 Windows 上生成的也是 LF, 否则提交的 blob 在 Linux CI 的 --check 里对不上
+            manifest_path.write_text(expected, encoding="utf-8", newline="\n")
+            print(f"[{partition['id']}] generated {label} with {len(entries)} entries.")
+
     return 0
 
 

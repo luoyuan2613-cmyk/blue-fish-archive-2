@@ -15,9 +15,75 @@ const actionStatus = document.querySelector('#action-status');
 const mascot = document.querySelector('#mascot');
 const mascotBubble = document.querySelector('#mascot-bubble');
 const mascotAudio = document.querySelector('#mascot-audio');
+const stickerPartitions = document.querySelector('#sticker-partitions');
+const partitionNav = document.querySelector('#partition-nav');
+const partitionStatus = document.querySelector('#partition-status');
+const heroArtImage = document.querySelector('#hero-art-image');
+const heroArtWebp = document.querySelector('#hero-art-webp');
 
 const isAnimatedSticker = (sticker) => /\.(gif|apng)$/i.test(sticker.original);
 
+/* ---------------------------------------------------------------------------
+ * 需求一：主题 → 分区 两层结构（主题之间互不混合）
+ *
+ * 数据层由目录结构决定（scripts/sync_stickers.py 自动发现）：
+ *   data/<主题>/<分区>/  →  stickers/manifest_<主题>-<分区>.json
+ *
+ * 前端 THEMES 与之一一对应：切换主题时，分区条会整体换成该主题自己的分区，
+ * 并加载该主题的清单。两个主题的分区永不混在一起。
+ * 新增分区：建目录 data/<主题>/<新分区>/ 放图，再在两个主题的 partitions 里各加一项。
+ * ------------------------------------------------------------------------- */
+const THEMES = [
+  {
+    id: 'manga',
+    name: '漫画主题',
+    label: '漫画',
+    partitions: [
+      { id: 'default', label: '默认区', manifest: 'stickers/manifest_manga-default.json' },
+      { id: 'cos', label: 'Cos区', manifest: 'stickers/manifest_manga-cos.json' },
+    ],
+  },
+  {
+    id: 'whale',
+    name: '蓝色大肥鱼主题',
+    label: '蓝鲸',
+    partitions: [
+      { id: 'default', label: '默认区', manifest: 'stickers/manifest_whale-default.json' },
+      { id: 'cos', label: 'Cos区', manifest: 'stickers/manifest_whale-cos.json' },
+    ],
+  },
+];
+
+// 清单缓存按"主题/分区"分键：主题切换后取的是另一份文件，互不干扰
+const partitionCache = new Map();
+const cacheKey = (themeId, partitionId) => `${themeId}/${partitionId}`;
+
+function getThemeById(id) {
+  return THEMES.find((theme) => theme.id === id) || THEMES[0];
+}
+
+const getActivePartitions = () => getThemeById(activeThemeId).partitions;
+
+function getActivePartition() {
+  const partitions = getActivePartitions();
+  return partitions.find((part) => part.id === currentPartition) || partitions[0];
+}
+
+async function fetchPartition(themeId, partitionId) {
+  const theme = getThemeById(themeId);
+  const partition = theme.partitions.find((part) => part.id === partitionId);
+  if (!partition) throw new Error(`unknown partition: ${themeId}/${partitionId}`);
+  const key = cacheKey(themeId, partitionId);
+  if (partitionCache.has(key)) return partitionCache.get(key);
+  const response = await fetch(partition.manifest, { cache: 'no-cache' });
+  if (!response.ok) throw new Error(`${partition.manifest} unavailable`);
+  const stickers = await response.json();
+  partitionCache.set(key, stickers);
+  return stickers;
+}
+
+let activeThemeId = THEMES[0].id;                    // 初始主题 = THEMES[0]（页面默认那套）
+let currentPartition = THEMES[0].partitions[0].id;   // 初始分区 = 该主题的第一个分区
 let stickerList = [];
 let activeIndex = -1;
 let activeSticker = null;
@@ -108,8 +174,13 @@ function createStickerCard(sticker, index) {
 }
 
 // 数字从上往下滚到总数,比直接蹦出一个数字更像"清点完毕"
+let countAnimationRun = 0;
+
 function animateStickerCount(total) {
   if (!stickerCount) return;
+  // 连点分类标签会连续触发多次动画；用世代令牌让旧动画自动让位，
+  // 否则多个 rAF 循环会同时往同一个节点写数字，出现"数字乱跳/停在 0"。
+  const run = ++countAnimationRun;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduceMotion || total < 2) {
     stickerCount.textContent = `已收录 ${total} 枚`;
@@ -118,6 +189,7 @@ function animateStickerCount(total) {
   const duration = 900;
   const startTime = performance.now();
   const tick = (now) => {
+    if (run !== countAnimationRun) return;
     const progress = Math.min(1, (now - startTime) / duration);
     const eased = 1 - (1 - progress) ** 3;
     stickerCount.textContent = `已收录 ${Math.round(total * eased)} 枚`;
@@ -125,33 +197,57 @@ function animateStickerCount(total) {
   };
   stickerCount.textContent = '已收录 0 枚';
   window.requestAnimationFrame(tick);
+  // 兜底：rAF 在后台标签页会被暂停（无头浏览器同样不派发），
+  // 若动画没能在预期时间内跑完，到点直接写终值，保证数字不会永远停在 0。
+  window.setTimeout(() => {
+    if (run === countAnimationRun) stickerCount.textContent = `已收录 ${total} 枚`;
+  }, duration + 240);
 }
 
 function renderStickers(stickers) {
-  stickerGrid.replaceChildren();
-  const uniqueStickers = [
+  // 渲染逻辑只认"传进来的这一批"，不掺任何分区/分类状态：
+  // 这样瀑布流核心逻辑（去重 / 卡片 / 计数）在切换数据源时完全复用。
+  stickerList = [
     ...new Map(
       stickers
         .filter((sticker) => sticker && sticker.original)
         .map((sticker) => [sticker.original, sticker]),
     ).values(),
   ];
-  stickerList = uniqueStickers;
-  const isEmpty = !uniqueStickers.length;
+  renderStickerGrid();
+}
+
+function renderStickerGrid(animateCount = true) {
+  if (!stickerGrid) return;
+  stickerGrid.replaceChildren();
+  const isEmpty = stickerList.length === 0;
 
   if (wallEmpty) wallEmpty.hidden = !isEmpty;
   if (stickerCount) {
     stickerCount.hidden = isEmpty;
-    if (!isEmpty) animateStickerCount(uniqueStickers.length);
+    if (isEmpty) {
+      stickerCount.textContent = '';
+    } else if (animateCount) {
+      animateStickerCount(stickerList.length);
+    } else {
+      stickerCount.textContent = `已收录 ${stickerList.length} 枚`;
+    }
   }
   if (isEmpty) return;
 
   const fragment = document.createDocumentFragment();
-  uniqueStickers.forEach((sticker, index) => {
+  stickerList.forEach((sticker, index) => {
     fragment.appendChild(createStickerCard(sticker, index));
   });
   stickerGrid.appendChild(fragment);
 }
+
+function updatePartitionStatus() {
+  if (!partitionStatus) return;
+  partitionStatus.textContent = stickerCount && !stickerCount.hidden ? stickerCount.textContent : '';
+}
+
+// 分类条：只渲染有内容的分类（空分类自动隐藏），全部为空则整条不显示
 
 function openLightbox(index) {
   showSticker(index, { prefetchOriginal: true });
@@ -552,15 +648,19 @@ function initMascot() {
 }
 
 async function loadStickers() {
+  // 初始只加载"当前主题 + 当前分区"这一份清单，其余等点击时才 fetch
+  const themeId = activeThemeId;
+  const partitionId = currentPartition;
   try {
-    const response = await fetch('stickers/manifest.json');
-    if (!response.ok) throw new Error('manifest unavailable');
-    const stickers = await response.json();
+    const stickers = await fetchPartition(themeId, partitionId);
+    if (themeId !== activeThemeId || partitionId !== currentPartition) return;  // 竞态保护
     renderStickers(stickers);
   } catch (error) {
-    renderStickers([]);
+    if (themeId !== activeThemeId || partitionId !== currentPartition) return;
+    renderStickers([]);        // 空数组 → 空状态；不影响其它主题/分区
   }
 }
+
 
 async function reloadStickers() {
   if (stickerCount) {
@@ -568,11 +668,319 @@ async function reloadStickers() {
     stickerCount.textContent = '整理中…';
   }
   if (wallEmpty) wallEmpty.hidden = true;
+  partitionCache.clear();                            // 手动重试 = 绕过缓存重新取
   await loadStickers();
 }
 
+/* ---------- 分区切换 ---------- */
+
+function setActivePartition(id) {
+  const partitions = getActivePartitions();
+  currentPartition = partitions.some((part) => part.id === id) ? id : partitions[0].id;
+  try {
+    window.localStorage.setItem(`fish-gallery-partition-${activeThemeId}`, currentPartition);
+  } catch (error) {
+    /* localStorage 不可用时忽略：只是不记忆分区 */
+  }
+  if (!partitionNav) return;
+  partitionNav.querySelectorAll('[data-partition]').forEach((button) => {
+    const isActive = button.dataset.partition === currentPartition;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
+function getSavedPartition(themeId) {
+  try {
+    return window.localStorage.getItem(`fish-gallery-partition-${themeId}`);
+  } catch (error) {
+    return null;
+  }
+}
+
+
+// 切换分区 = 换数据源：先关灯箱（否则灯箱仍停在上一个分区的图片上），
+// 再清空瀑布流容器、拉取目标分区清单、重新渲染。原有灯箱/复制/下载逻辑不用改，
+// 它们都只依赖 stickerList，而 stickerList 现在就是"当前分区的那一批"。
+async function setPartition(id) {
+  if (id === currentPartition) return;
+  if (lightbox && lightbox.classList.contains('is-open')) closeLightbox();
+  setActivePartition(id);
+  stickerGrid && stickerGrid.replaceChildren();      // 立即清空，避免旧分区图片残留
+  if (wallEmpty) wallEmpty.hidden = true;
+  if (stickerCount) {
+    stickerCount.hidden = false;
+    stickerCount.textContent = '整理中…';
+  }
+  await loadStickers();
+}
+
+function renderPartitionNav() {
+  if (!stickerPartitions || !partitionNav) return;
+  const partitions = getActivePartitions();
+  if (partitions.length <= 1) {          // 该主题只有一个分区时整条不显示
+    stickerPartitions.hidden = true;
+    return;
+  }
+  stickerPartitions.hidden = false;
+  partitionNav.replaceChildren();
+  partitions.forEach((partition) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'partition-tab';
+    button.dataset.partition = partition.id;
+    button.textContent = partition.label;
+    const isActive = partition.id === currentPartition;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+    button.addEventListener('click', () => setPartition(partition.id));
+    partitionNav.appendChild(button);
+  });
+}
+
+
 if (wallRetry) wallRetry.addEventListener('click', reloadStickers);
+
+// 计数是动画写入的（约 900ms），用 MutationObserver 让状态行跟着走，
+// 不必去改动 animateStickerCount 的内部实现。
+if (stickerCount && typeof MutationObserver === 'function') {
+  new MutationObserver(updatePartitionStatus).observe(stickerCount, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
+}
+
+/* ---------------------------------------------------------------------------
+ * 需求二：主题书签头
+ *
+ * themeConfig 就是"主题清单"。约定：
+ *  - 数组长度 <= 1 时，书签头完全不渲染（连容器都不出现在 DOM 里）
+ *  - vars 里的键必须对应 styles.css :root 的变量名，会通过
+ *    document.documentElement.style.setProperty 覆盖；切回默认主题时按快照还原
+ *  - art / logo / mascot 按主题替换；不写 logo/mascot 就沿用页面默认值
+ * ------------------------------------------------------------------------- */
+const themeConfig = [
+  {
+    id: 'manga',
+    name: '漫画主题',
+    label: '漫画',
+    matches: ['白圣女', '伊甸园', '黑牧师', '圣女'],
+    vars: {
+      '--ink': '#2e241d', '--deep': '#3d3226', '--blue': '#a8743f',
+      '--mist': '#efe3cf', '--paper': '#f8f3ea', '--gold': '#b08a5a',
+      '--coral': '#e0b7a4', '--line': 'rgba(46, 36, 29, 0.13)', '--muted': '#7d6b5b',
+      '--sticker-shadow': '#2a2119',
+      '--tape-coral': 'rgba(224, 183, 164, 0.86)',
+      '--tape-mist': 'rgba(239, 227, 207, 0.92)',
+    },
+    art: { png: 'assets/001.png', webp: 'assets/001.webp' },
+    alt: '白圣女与黑牧师立绘',
+    note: '白圣女 & 黑牧师',
+    artTag: '白圣女 · 黑牧师',
+    copy: { kicker: '白圣女的日常记录', lede: '记录可爱的圣女大人' },
+  },
+  {
+    id: 'whale',
+    name: '蓝色大肥鱼主题',
+    label: '蓝鲸',
+    matches: ['大肥鱼', '鲸鱼娘', 'DeepSeek'],
+    vars: {
+      '--ink': '#16213d', '--deep': '#202d52', '--blue': '#607aa9',
+      '--mist': '#dfe8f5', '--paper': '#f7f8fb', '--gold': '#b99a67',
+      '--coral': '#f1c7c5', '--line': 'rgba(22, 33, 61, 0.13)', '--muted': '#73809a',
+      '--sticker-shadow': '#182544',
+      '--tape-coral': 'rgba(241, 199, 197, 0.86)',
+      '--tape-mist': 'rgba(223, 232, 245, 0.92)',
+    },
+    art: { png: 'assets/theme-whale.png', webp: 'assets/theme-whale.webp' },
+    alt: '蓝色大肥鱼立绘',
+    note: '蓝色大肥鱼',
+    artTag: '档案 · NO.001',
+    copy: { kicker: '鲸鱼娘 DEEPSEEK', lede: '同人表情收藏' },
+  },
+];
+
+const THEME_STORAGE_KEY = 'fish-gallery-theme';
+// 默认主题 = 页面 HTML 里本来就写着的那个（第一项），首屏不产生任何视觉跳动
+function getDefaultTheme() {
+  return themeConfig[0];
+}
+
+function getActiveTheme() {
+  return themeConfig.find((theme) => theme.id === activeThemeId) || getDefaultTheme();
+}
+
+// 读取页面初始状态作为"基底快照"：切主题时先还原再覆盖，避免变量互相污染
+const baseThemeVars = (() => {
+  const declared = themeConfig[0]?.vars || {};
+  const names = new Set([
+    ...Object.keys(declared),
+    ...themeConfig.flatMap((theme) => Object.keys(theme.vars || {})),
+  ]);
+  const rootStyle = document.documentElement.style;
+  const snapshot = {};
+  names.forEach((name) => {
+    snapshot[name] = rootStyle.getPropertyValue(name).trim();
+  });
+  return snapshot;
+})();
+
+function restoreBaseVars() {
+  Object.entries(baseThemeVars).forEach(([name, value]) => {
+    if (value) document.documentElement.style.setProperty(name, value);
+    else document.documentElement.style.removeProperty(name);
+  });
+}
+
+function applyThemeVars(theme) {
+  restoreBaseVars();
+  const rootStyle = document.documentElement.style;
+  Object.entries(theme.vars || {}).forEach(([name, value]) => rootStyle.setProperty(name, value));
+}
+
+function setThemeImage(selector, src) {
+  const element = document.querySelector(selector);
+  if (element && src) element.setAttribute('src', src);
+}
+
+function swapHeroArt(theme, { animate = true } = {}) {
+  if (!heroArtImage) return;
+  const done = () => {
+    if (!theme.art) return;
+    heroArtImage.setAttribute('src', theme.art.png);
+    heroArtImage.setAttribute('alt', theme.alt || '');
+    if (heroArtWebp) {
+      if (theme.art.webp) heroArtWebp.setAttribute('srcset', theme.art.webp);
+      else heroArtWebp.removeAttribute('srcset');
+    }
+    const window_ = heroArtImage.closest('.hero-art-window');
+    if (window_) window_.classList.remove('is-swapping');
+  };
+  const window_ = heroArtImage.closest('.hero-art-window');
+  if (!animate || !window_) {
+    done();
+    return;
+  }
+  window_.classList.add('is-swapping');
+  window.setTimeout(done, 180);
+}
+
+function setThemeText(selector, text) {
+  if (!text) return;
+  const element = document.querySelector(selector);
+  if (element) element.textContent = text;
+}
+
+function applyTheme(id, { animate = true, skipPartitionReload = false } = {}) {
+  const theme = themeConfig.find((item) => item.id === id) || getDefaultTheme();
+  activeThemeId = theme.id;
+  document.documentElement.dataset.theme = theme.id;
+
+  applyThemeVars(theme);
+  swapHeroArt(theme, { animate });
+  if (theme.logo) {
+    setThemeImage('.wordmark .brand-logo-color', theme.logo.color);
+    setThemeImage('.site-footer .brand-logo-black', theme.logo.black);
+  }
+  if (theme.mascot) setThemeImage('.mascot-sticker img', theme.mascot);
+  if (theme.copy) {
+    setThemeText('.hero-kicker', theme.copy.kicker);
+    setThemeText('.hero-lede', theme.copy.lede);
+  }
+  if (theme.artTag) setThemeText('.art-tag', theme.artTag);
+  if (theme.note) setThemeText('.art-note', theme.note);
+
+  document.querySelectorAll('.theme-tab').forEach((tab) => {
+    const isActive = tab.dataset.theme === theme.id;
+    tab.classList.toggle('is-active', isActive);
+    tab.setAttribute('aria-pressed', String(isActive));
+  });
+
+  // 【主题 ↔ 分区联动】每个主题有自己的一套分区：
+  // 主题一变，分区条整体重建，并加载该主题自己的清单。
+  // 两个主题的清单是不同文件，永不混在一起。
+  const partitions = getActivePartitions();
+  const saved = getSavedPartition(theme.id);
+  const nextPartition = partitions.some((part) => part.id === saved) ? saved : partitions[0].id;
+  currentPartition = nextPartition;
+  renderPartitionNav();
+  setActivePartition(nextPartition);
+  if (!skipPartitionReload) loadStickers();
+
+  const defaultTheme = getDefaultTheme();
+  if (theme.id === defaultTheme.id) {
+    try {
+      window.localStorage.removeItem(THEME_STORAGE_KEY);
+    } catch (error) {
+      /* 隐私模式下 localStorage 不可用，忽略 */
+    }
+  } else {
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme.id);
+    } catch (error) {
+      /* 同上 */
+    }
+  }
+}
+
+// 主题书签头：只有 1 个主题时什么都不渲染（容器直接不进 DOM）
+function initThemeTabs() {
+  if (themeConfig.length <= 1) return;
+  const host = document.createElement('div');
+  host.className = 'theme-switcher';
+  host.setAttribute('role', 'group');
+  host.setAttribute('aria-label', '主题切换');
+
+  themeConfig.forEach((theme) => {
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = 'theme-tab';
+    tab.dataset.theme = theme.id;
+    tab.textContent = theme.label || theme.name;
+    tab.title = theme.name;
+    tab.setAttribute('aria-pressed', 'false');
+    tab.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (theme.id === activeThemeId) return;
+      // 二次确认：避免误触把整站配色、立绘、文案一起换掉
+      const confirmed = window.confirm(`切换到「${theme.name}」？\n\n会同时替换立绘与全站配色，可随时切回。`);
+      if (!confirmed) return;
+      tab.classList.add('is-switching');
+      window.setTimeout(() => {
+        applyTheme(theme.id);
+        tab.classList.remove('is-switching');
+      }, 140);
+    });
+    host.appendChild(tab);
+  });
+
+  const footer = document.querySelector('.site-footer');
+  if (footer && footer.parentNode) footer.parentNode.insertBefore(host, footer);
+  else document.body.appendChild(host);
+}
+
+function initTheme() {
+  let stored = null;
+  try {
+    stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+  } catch (error) {
+    stored = null;
+  }
+  const initial = themeConfig.some((theme) => theme.id === stored) ? stored : getDefaultTheme().id;
+  // 顺序要紧：先把书签头建出来，applyTheme 才能在它们身上标记选中态。
+  // （反过来的话，applyTheme 里那段 querySelectorAll('.theme-tab') 会扑空，
+  //   表现为"页面主题正确、但没有任何书签头是激活状态"。）
+  initThemeTabs();
+  applyTheme(initial, { animate: false, skipPartitionReload: true });   // 分区条与清单由文件末尾统一初始化
+  // 调试/自动化验证用：?theme=whale 可强制指定主题，且不写 localStorage
+  const forced = new URLSearchParams(window.location.search).get('theme');
+  if (forced && themeConfig.some((theme) => theme.id === forced)) applyTheme(forced, { animate: false });
+}
 
 initMascot();
 initNavScroll();
+initTheme();
+renderPartitionNav();
+setActivePartition(currentPartition);
 loadStickers();
