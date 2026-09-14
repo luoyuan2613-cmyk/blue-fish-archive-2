@@ -12,12 +12,15 @@
 /large/*
   Cache-Control: public, max-age=31536000, immutable
 
-# 稳定文件名的品牌素材,给短期缓存,换了素材后能较快更新
+# 稳定文件名的品牌素材: 缓存 10 分钟。
+# 注意(踩过的坑): 这几条原本是 7 天(604800), 导致换立绘/logo 后老访客长期看到旧图;
+# 更糟的是若某次部署期间文件 404, 浏览器会把"失败结果"按 7 天缓存下来,
+# 之后服务器恢复了访客页面依旧空白, 必须手动强刷才能好。10 分钟内可自愈。
 /logo/*
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=600
 
 /assets/*
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=600
 
 /memes/*
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=600
