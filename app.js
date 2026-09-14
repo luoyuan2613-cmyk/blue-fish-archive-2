@@ -1,0 +1,578 @@
+const stickerGrid = document.querySelector('#sticker-grid');
+const stickerCount = document.querySelector('#sticker-count');
+const wallEmpty = document.querySelector('#wall-empty');
+const wallRetry = document.querySelector('#wall-retry');
+const siteNav = document.querySelector('.site-nav');
+const lightbox = document.querySelector('#lightbox');
+const lightboxImage = document.querySelector('#lightbox-image');
+const lightboxMediaShell = document.querySelector('.lightbox-media-shell');
+const lightboxMeta = document.querySelector('#lightbox-meta');
+const lightboxPrev = document.querySelector('#lightbox-prev');
+const lightboxNext = document.querySelector('#lightbox-next');
+const copyButton = document.querySelector('#copy-button');
+const downloadButton = document.querySelector('#download-button');
+const actionStatus = document.querySelector('#action-status');
+const mascot = document.querySelector('#mascot');
+const mascotBubble = document.querySelector('#mascot-bubble');
+const mascotAudio = document.querySelector('#mascot-audio');
+
+const isAnimatedSticker = (sticker) => /\.(gif|apng)$/i.test(sticker.original);
+
+let stickerList = [];
+let activeIndex = -1;
+let activeSticker = null;
+let activeBlobPromise = null;
+
+const revealItems = document.querySelectorAll('[data-reveal]');
+revealItems.forEach((item) => {
+  if (item.dataset.delay) {
+    item.style.setProperty('--delay', `${item.dataset.delay}ms`);
+  }
+});
+
+if ('IntersectionObserver' in window) {
+  const revealObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    // rootMargin 提前约 640px 触发入场动画:元素还在视口外时动画就已开始,
+    // 滚到时不再有"卡半拍才开始动"的感觉。
+    { rootMargin: '640px 0px', threshold: 0.05 },
+  );
+  revealItems.forEach((item) => revealObserver.observe(item));
+} else {
+  revealItems.forEach((item) => item.classList.add('is-visible'));
+}
+
+function createStickerCard(sticker, index) {
+  const card = document.createElement('button');
+  card.className = 'sticker-card';
+  card.type = 'button';
+  card.style.setProperty('--tilt', `${index % 2 === 0 ? 0.4 : -0.4}deg`);
+  card.style.setProperty('--sticker-delay', `${Math.min(index, 16) * 58}ms`);
+  card.setAttribute('aria-label', '打开表情预览');
+
+  const inner = document.createElement('span');
+  inner.className = 'sticker-card-inner';
+
+  const source = sticker.preview || sticker.original;
+  const image = document.createElement('img');
+  image.src = source;
+  image.alt = '';
+  image.loading = 'lazy';
+  image.decoding = 'async';
+  // 预先声明宽高让浏览器在加载前就按正确宽高比占位,图片到达后高度不再变化,
+  // CSS columns 也就不会在每次加载时重新平衡列导致整墙抖动。
+  if (sticker.width > 0 && sticker.height > 0) {
+    image.width = sticker.width;
+    image.height = sticker.height;
+  }
+  let triedOriginal = false;
+  image.onload = () => card.classList.add('is-loaded');
+  image.onerror = () => {
+    if (sticker.preview && !triedOriginal) {
+      triedOriginal = true;
+      image.src = sticker.original;
+      return;
+    }
+    card.remove();
+  };
+  // 命中缓存时 load 事件可能早于监听注册,补一次判断
+  if (image.complete && image.naturalWidth > 0) {
+    card.classList.add('is-loaded');
+  }
+
+  inner.appendChild(image);
+  card.appendChild(inner);
+
+  // 每隔几张随手贴一段和纸胶带,整面墙更像手账本
+  const tapeSlot = index % 6;
+  if (tapeSlot === 1 || tapeSlot === 4) {
+    const tape = document.createElement('span');
+    tape.className = tapeSlot === 4 ? 'card-tape is-right' : 'card-tape';
+    tape.setAttribute('aria-hidden', 'true');
+    card.appendChild(tape);
+  }
+
+  if (isAnimatedSticker(sticker)) {
+    card.classList.add('is-animated');
+  }
+
+  card.addEventListener('click', () => openLightbox(index));
+  return card;
+}
+
+// 数字从上往下滚到总数,比直接蹦出一个数字更像"清点完毕"
+function animateStickerCount(total) {
+  if (!stickerCount) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion || total < 2) {
+    stickerCount.textContent = `已收录 ${total} 枚`;
+    return;
+  }
+  const duration = 900;
+  const startTime = performance.now();
+  const tick = (now) => {
+    const progress = Math.min(1, (now - startTime) / duration);
+    const eased = 1 - (1 - progress) ** 3;
+    stickerCount.textContent = `已收录 ${Math.round(total * eased)} 枚`;
+    if (progress < 1) window.requestAnimationFrame(tick);
+  };
+  stickerCount.textContent = '已收录 0 枚';
+  window.requestAnimationFrame(tick);
+}
+
+function renderStickers(stickers) {
+  stickerGrid.replaceChildren();
+  const uniqueStickers = [
+    ...new Map(
+      stickers
+        .filter((sticker) => sticker && sticker.original)
+        .map((sticker) => [sticker.original, sticker]),
+    ).values(),
+  ];
+  stickerList = uniqueStickers;
+  const isEmpty = !uniqueStickers.length;
+
+  if (wallEmpty) wallEmpty.hidden = !isEmpty;
+  if (stickerCount) {
+    stickerCount.hidden = isEmpty;
+    if (!isEmpty) animateStickerCount(uniqueStickers.length);
+  }
+  if (isEmpty) return;
+
+  const fragment = document.createDocumentFragment();
+  uniqueStickers.forEach((sticker, index) => {
+    fragment.appendChild(createStickerCard(sticker, index));
+  });
+  stickerGrid.appendChild(fragment);
+}
+
+function openLightbox(index) {
+  showSticker(index, { prefetchOriginal: true });
+  lightbox.classList.add('is-open');
+  lightbox.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  copyButton.focus();
+}
+
+function showSticker(index, { prefetchOriginal = false } = {}) {
+  const sticker = stickerList[index];
+  if (!sticker) return;
+  activeIndex = index;
+  activeSticker = sticker;
+  const animated = isAnimatedSticker(sticker);
+  // 静态图显示 WebP 大图层(几十~一两百 KB),动画图才加载原文件;
+  // 下载/复制仍指向原图,这里只优化「看」,不改变「取」。
+  lightboxImage.classList.remove('is-ready');
+  lightboxImage.src = animated
+    ? sticker.original
+    : sticker.large || sticker.preview || sticker.original;
+  if (lightboxImage.complete && lightboxImage.naturalWidth > 0) {
+    lightboxImage.classList.add('is-ready');
+  }
+  lightboxImage.alt = sticker.alt || '表情包大图预览';
+  downloadButton.href = sticker.original;
+  downloadButton.download = sticker.filename || 'sticker';
+  // 打开时预取原图,点「复制」就不用等下载;翻页浏览只按需取,
+  // 否则连翻十几张会把整包原图都拉一遍。写入授权窗口问题由 copyImage 的 promise-based 写入解决。
+  activeBlobPromise = prefetchOriginal
+    ? fetch(sticker.original)
+        .then((response) => response.blob())
+        .catch(() => null)
+    : null;
+  actionStatus.textContent = '';
+  lightboxMediaShell.classList.toggle('is-animated', animated);
+  updateLightboxMeta(sticker, index);
+  const hasNeighbours = stickerList.length > 1;
+  if (lightboxPrev) lightboxPrev.hidden = !hasNeighbours;
+  if (lightboxNext) lightboxNext.hidden = !hasNeighbours;
+  prefetchNeighbours(index);
+}
+
+function updateLightboxMeta(sticker, index) {
+  if (!lightboxMeta) return;
+  const format = (sticker.filename || sticker.original).split('.').pop().toUpperCase();
+  const size = sticker.width > 0 && sticker.height > 0 ? `${sticker.width}×${sticker.height}` : '';
+  lightboxMeta.textContent = [
+    `第 ${index + 1} / ${stickerList.length} 枚`,
+    format,
+    size,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
+// 预取左右邻居的大图,翻页时不用盯着空白等
+function prefetchNeighbours(index) {
+  if (stickerList.length < 2) return;
+  [-1, 1].forEach((step) => {
+    const neighbour = stickerList[(index + step + stickerList.length) % stickerList.length];
+    if (!neighbour || isAnimatedSticker(neighbour)) return;
+    const source = neighbour.large || neighbour.preview;
+    if (!source) return;
+    const preload = new Image();
+    preload.src = source;
+  });
+}
+
+function stepLightbox(step) {
+  if (stickerList.length < 2 || activeIndex < 0) return;
+  showSticker((activeIndex + step + stickerList.length) % stickerList.length);
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('is-open');
+  lightbox.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  window.setTimeout(() => {
+    if (!lightbox.classList.contains('is-open')) {
+      lightboxImage.removeAttribute('src');
+      lightboxImage.classList.remove('is-ready');
+    }
+  }, 650);
+}
+
+// Chrome/Edge 的剪贴板写入只接受 image/png:webp/jpg/gif 直接写会抛
+// NotAllowedError(实测 "Type image/webp not supported on write"),必须先转成 PNG。
+const MIME_BY_EXT = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  webp: 'image/webp',
+  gif: 'image/gif',
+  apng: 'image/apng',
+};
+
+function mimeFromFilename(filename) {
+  const ext = filename.split('.').pop().toLowerCase();
+  return MIME_BY_EXT[ext] || 'image/png';
+}
+
+function loadImageFromBlob(blob) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('image decode failed'));
+    };
+    image.src = url;
+  });
+}
+
+function imageToPngBlob(image) {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      reject(new Error('canvas unavailable'));
+      return;
+    }
+    context.drawImage(image, 0, 0);
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error('png encode failed'));
+    }, 'image/png');
+  });
+}
+
+async function copyImage() {
+  if (!activeSticker) return;
+
+  if (!navigator.clipboard || !window.ClipboardItem) {
+    actionStatus.textContent = '当前浏览器不支持复制图片，请下载原图';
+    return;
+  }
+
+  copyButton.disabled = true;
+  actionStatus.textContent = '正在准备图片…';
+
+  try {
+    const original = activeSticker.original;
+    const animated = isAnimatedSticker(activeSticker);
+    // 把「取原图 + 转 PNG」整个异步流程作为 Promise 传给 ClipboardItem:
+    // write() 在点击的用户激活任务里同步被授权,浏览器内部等待数据就绪。
+    // 实测:先 await 下载完再 write() 会因用户激活失效抛 NotAllowedError(大图必现),
+    // 而 promise-based 同步调用 write() 即使 5.6MB 原图也能成功。
+    const pngBlobPromise = (async () => {
+      let blob = activeBlobPromise ? await activeBlobPromise : null;
+      if (!blob) {
+        blob = await fetch(original).then((response) => response.blob());
+      }
+      // PNG 且非动画可直接复用;其余格式(webp/jpg/gif…)经 canvas 转 PNG。
+      // 动画图(GIF/APNG)只能取首帧,要保留动画请用「下载原图」。
+      const mime = blob.type || mimeFromFilename(original);
+      if (mime === 'image/png' && !animated) {
+        return blob;
+      }
+      const image = await loadImageFromBlob(blob);
+      return imageToPngBlob(image);
+    })();
+
+    await navigator.clipboard.write([
+      new ClipboardItem({ 'image/png': pngBlobPromise }),
+    ]);
+    actionStatus.textContent = animated
+      ? '已复制（动图已转为静态图）'
+      : '图片已复制';
+  } catch (error) {
+    actionStatus.textContent = '复制失败，请下载原图';
+  } finally {
+    copyButton.disabled = false;
+  }
+}
+
+copyButton.addEventListener('click', copyImage);
+lightboxImage.addEventListener('load', () => lightboxImage.classList.add('is-ready'));
+if (lightboxPrev) lightboxPrev.addEventListener('click', () => stepLightbox(-1));
+if (lightboxNext) lightboxNext.addEventListener('click', () => stepLightbox(1));
+document.querySelectorAll('[data-close-lightbox]').forEach((element) => {
+  element.addEventListener('click', closeLightbox);
+});
+document.addEventListener('keydown', (event) => {
+  if (!lightbox.classList.contains('is-open')) return;
+  if (event.key === 'Escape') {
+    closeLightbox();
+  } else if (event.key === 'ArrowLeft') {
+    stepLightbox(-1);
+  } else if (event.key === 'ArrowRight') {
+    stepLightbox(1);
+  }
+});
+
+// 滚过首屏后导航浮起成白色贴纸条
+function initNavScroll() {
+  if (!siteNav) return;
+  const sync = () => siteNav.classList.toggle('is-scrolled', window.scrollY > 26);
+  sync();
+  window.addEventListener('scroll', sync, { passive: true });
+}
+
+function initMascot() {
+  if (!mascot) return;
+  if (mascotAudio) mascotAudio.volume = 0.42;
+
+  const holdDelay = 420;
+  const dragThreshold = 7;
+  const clickComboWindow = 620;
+  const shortAudioCooldown = 120;
+  const storageKey = 'deepseek-mascot-position';
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let offsetX = 0;
+  let offsetY = 0;
+  let hasDragged = false;
+  let holdTimer = null;
+  let audioStopTimer = null;
+  let bopResetTimer = null;
+  let comboResetTimer = null;
+  let completedHold = false;
+  let comboCount = 0;
+  let lastClickAt = 0;
+  let lastShortAudioAt = 0;
+
+  function clampPosition(x, y) {
+    const rect = mascot.getBoundingClientRect();
+    const padding = 10;
+    return {
+      x: Math.min(Math.max(padding, x), window.innerWidth - rect.width - padding),
+      y: Math.min(Math.max(padding, y), window.innerHeight - rect.height - padding),
+    };
+  }
+
+  function setPosition(x, y, persist = false) {
+    const position = clampPosition(x, y);
+    mascot.style.left = `${position.x}px`;
+    mascot.style.top = `${position.y}px`;
+    mascot.style.right = 'auto';
+    mascot.style.bottom = 'auto';
+    if (persist) {
+      localStorage.setItem(storageKey, JSON.stringify(position));
+    }
+  }
+
+  function restorePosition() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey));
+      if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
+        setPosition(saved.x, saved.y);
+      }
+    } catch (error) {
+      localStorage.removeItem(storageKey);
+    }
+  }
+
+  function clearHoldTimer() {
+    window.clearTimeout(holdTimer);
+    holdTimer = null;
+  }
+
+  function clearBopTimer() {
+    window.clearTimeout(bopResetTimer);
+    bopResetTimer = null;
+  }
+
+  function playMascotAudio({ full = false } = {}) {
+    if (!mascotAudio) return;
+    const now = performance.now();
+    if (!full && now - lastShortAudioAt < shortAudioCooldown) return;
+    window.clearTimeout(audioStopTimer);
+    mascotAudio.pause();
+    mascotAudio.currentTime = 0;
+    mascotAudio.play().catch(() => {});
+    if (full) {
+      lastShortAudioAt = 0;
+      return;
+    }
+    lastShortAudioAt = now;
+    audioStopTimer = window.setTimeout(() => {
+      mascotAudio.pause();
+      mascotAudio.currentTime = 0;
+    }, 320);
+  }
+
+  function updateCombo(fullAudio) {
+    const now = performance.now();
+    comboCount = fullAudio || now - lastClickAt > clickComboWindow
+      ? 1
+      : Math.min(comboCount + 1, 9);
+    lastClickAt = now;
+    window.clearTimeout(comboResetTimer);
+    comboResetTimer = window.setTimeout(() => {
+      comboCount = 0;
+    }, clickComboWindow);
+    return comboCount;
+  }
+
+  function bopMascot({ fullAudio = false } = {}) {
+    const combo = updateCombo(fullAudio);
+    const isCombo = !fullAudio && combo >= 2;
+    mascot.classList.remove('is-bopping', 'is-combo-bopping');
+    void mascot.offsetWidth;
+    mascot.classList.add(isCombo ? 'is-combo-bopping' : 'is-bopping', 'is-talking');
+    mascotBubble.textContent = fullAudio
+      ? '听完嘛'
+      : isCombo
+        ? `再戳×${combo}`
+        : '嘻';
+    playMascotAudio({ full: fullAudio });
+    clearBopTimer();
+    bopResetTimer = window.setTimeout(() => {
+      mascot.classList.remove('is-bopping', 'is-combo-bopping', 'is-talking');
+      mascotBubble.textContent = '戳我';
+    }, isCombo ? 480 : 740);
+  }
+
+  function startPress(event) {
+    if (pointerId !== null) return;
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+    const rect = mascot.getBoundingClientRect();
+    offsetX = event.clientX - rect.left;
+    offsetY = event.clientY - rect.top;
+    hasDragged = false;
+    completedHold = false;
+    mascot.setPointerCapture(pointerId);
+    clearBopTimer();
+    mascot.classList.remove('is-bopping', 'is-combo-bopping', 'is-talking');
+    mascot.classList.add('is-pressed');
+    mascotBubble.textContent = '别捏';
+    clearHoldTimer();
+    holdTimer = window.setTimeout(() => {
+      if (!hasDragged) {
+        completedHold = true;
+        mascot.classList.add('is-holding');
+        mascotBubble.textContent = '咕噜咕噜';
+      }
+    }, holdDelay);
+  }
+
+  function movePress(event) {
+    if (event.pointerId !== pointerId) return;
+    const distance = Math.hypot(event.clientX - startX, event.clientY - startY);
+    if (distance > dragThreshold) {
+      hasDragged = true;
+      clearHoldTimer();
+      mascot.classList.add('is-dragging');
+      mascot.classList.remove('is-holding', 'is-bopping', 'is-combo-bopping', 'is-talking');
+      mascotBubble.textContent = '搬家中';
+    }
+    if (hasDragged) {
+      setPosition(event.clientX - offsetX, event.clientY - offsetY);
+    }
+  }
+
+  function endPress(event) {
+    if (event.pointerId !== pointerId) return;
+    clearHoldTimer();
+    mascot.releasePointerCapture(pointerId);
+    pointerId = null;
+    mascot.classList.remove('is-pressed', 'is-holding', 'is-dragging');
+    if (hasDragged) {
+      const rect = mascot.getBoundingClientRect();
+      setPosition(rect.left, rect.top, true);
+      mascotBubble.textContent = '放好啦';
+      window.setTimeout(() => {
+        mascotBubble.textContent = '戳我';
+      }, 700);
+      return;
+    }
+    bopMascot({ fullAudio: completedHold });
+  }
+
+  restorePosition();
+  mascot.addEventListener('pointerdown', startPress);
+  mascot.addEventListener('pointermove', movePress);
+  mascot.addEventListener('pointerup', endPress);
+  mascot.addEventListener('pointercancel', endPress);
+  mascot.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      bopMascot();
+    }
+  });
+  window.addEventListener('resize', () => {
+    const rect = mascot.getBoundingClientRect();
+    setPosition(rect.left, rect.top, true);
+  });
+}
+
+async function loadStickers() {
+  try {
+    const response = await fetch('stickers/manifest.json');
+    if (!response.ok) throw new Error('manifest unavailable');
+    const stickers = await response.json();
+    renderStickers(stickers);
+  } catch (error) {
+    renderStickers([]);
+  }
+}
+
+async function reloadStickers() {
+  if (stickerCount) {
+    stickerCount.hidden = false;
+    stickerCount.textContent = '整理中…';
+  }
+  if (wallEmpty) wallEmpty.hidden = true;
+  await loadStickers();
+}
+
+if (wallRetry) wallRetry.addEventListener('click', reloadStickers);
+
+initMascot();
+initNavScroll();
+loadStickers();

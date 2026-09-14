@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#182340" />
+    <!-- 【替换点 1】站点描述 -->
+    <meta
+      name="description"
+      content="【站名】：【一句话简介，例如：我的插画与表情收藏】。"
+    />
+    <title>【白圣女与黑牧师展示馆】</title>
+    <link rel="icon" type="image/png" href="logo/favicon.png" />
+    <link rel="apple-touch-icon" href="logo/favicon.png" />
+    <meta name="msapplication-TileImage" content="logo/apple-touch-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- 与 app.js 并行下载表情清单,剪掉 HTML→JS→manifest 的串行等待 -->
+    <link rel="preload" href="stickers/manifest.json" as="fetch" type="application/json" />
+    <!-- 字体来自 npmmirror CDN,预连接省一次跨域握手 -->
+    <link rel="preconnect" href="https://registry.npmmirror.com" crossorigin />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="bubble bubble-one" aria-hidden="true"></div>
+    <div class="bubble bubble-two" aria-hidden="true"></div>
+    <div class="bubble bubble-three" aria-hidden="true"></div>
+    <div class="wave wave-one" aria-hidden="true"></div>
+    <div class="wave wave-two" aria-hidden="true"></div>
+    <div class="sea-band sea-band-a" aria-hidden="true">
+      <svg viewBox="0 0 1920 120" preserveAspectRatio="none">
+        <path d="M0 60 Q 80 30 160 60 T 320 60 T 480 60 T 640 60 T 800 60 T 960 60 T 1120 60 T 1280 60 T 1440 60 T 1600 60 T 1760 60 T 1920 60 V 160 H 0 Z" fill="none" stroke="rgba(96,122,169,0.16)" stroke-width="3" />
+        <path d="M0 78 Q 90 46 180 78 T 360 78 T 540 78 T 720 78 T 900 78 T 1080 78 T 1260 78 T 1440 78 T 1620 78 T 1800 78 T 1920 78" fill="none" stroke="rgba(96,122,169,0.12)" stroke-width="3" />
+        <path d="M0 96 Q 110 66 220 96 T 440 96 T 660 96 T 880 96 T 1100 96 T 1320 96 T 1540 96 T 1760 96 T 1920 96" fill="none" stroke="rgba(241,199,197,0.18)" stroke-width="3" />
+      </svg>
+    </div>
+    <div class="sea-band sea-band-b" aria-hidden="true">
+      <svg viewBox="0 0 1920 140" preserveAspectRatio="none">
+        <path d="M0 90 Q 85 50 170 90 T 340 90 T 510 90 T 680 90 T 850 90 T 1020 90 T 1190 90 T 1360 90 T 1530 90 T 1700 90 T 1920 90 V 180 H 0 Z" fill="rgba(223,232,245,0.24)" stroke="none" />
+        <path d="M0 22 Q 95 -8 190 22 T 380 22 T 570 22 T 760 22 T 950 22 T 1140 22 T 1330 22 T 1520 22 T 1710 22 T 1920 22" fill="none" stroke="rgba(96,122,169,0.16)" stroke-width="3" />
+      </svg>
+    </div>
+    <div class="hero-wave" aria-hidden="true">
+      <svg viewBox="0 0 600 160" preserveAspectRatio="none">
+        <path d="M0 62 Q 75 26 150 62 T 300 62 T 450 62 T 600 62" fill="none" stroke="rgba(241,199,197,0.45)" stroke-width="6" stroke-linecap="round" />
+        <path d="M0 96 Q 80 60 160 96 T 320 96 T 480 96 T 600 96" fill="none" stroke="rgba(96,122,169,0.35)" stroke-width="7" stroke-linecap="round" />
+      </svg>
+    </div>
+    <!-- 水下光束:档案馆整体沉在海底,顶部打下来的几束光给画面定调 -->
+    <div class="sea-rays" aria-hidden="true">
+      <span class="sea-ray sea-ray-one"></span>
+      <span class="sea-ray sea-ray-two"></span>
+      <span class="sea-ray sea-ray-three"></span>
+    </div>
+    <div class="sea-floor" aria-hidden="true">
+      <svg class="sea-weed" viewBox="0 0 130 210" preserveAspectRatio="none">
+        <path class="sea-weed-strand" d="M24 210c-8-40 8-60 0-92-8-30 6-48 0-78" />
+        <path class="sea-weed-strand" d="M64 210c-8-34 8-54 0-84-8-28 6-46 0-70" />
+        <path class="sea-weed-strand" d="M100 210c-6-32 8-52 0-78-8-26 4-42 0-62" />
+        <path class="sea-weed-leaf" d="M24 120c-18 1-27-11-27-24 17 0 27 10 27 24Z" />
+        <path class="sea-weed-leaf sea-weed-leaf-alt" d="M22 176c16 1 25-10 25-22-16 0-25 9-25 22Z" />
+        <path class="sea-weed-leaf" d="M64 152c18 1 27-11 27-24-17 0-27 10-27 24Z" />
+        <path class="sea-weed-leaf sea-weed-leaf-alt" d="M100 98c-18 1-27-11-27-24 17 0 27 10 27 24Z" />
+      </svg>
+      <svg class="sea-starfish" viewBox="0 0 100 100">
+        <path class="sea-starfish-shape" d="M50 8 60 36 90 38 66 57 74 87 50 70 26 87 34 57 10 38 40 36Z" />
+        <circle class="sea-starfish-dot" cx="50" cy="40" r="3.2" />
+        <circle class="sea-starfish-dot" cx="30" cy="50" r="2.6" />
+        <circle class="sea-starfish-dot" cx="70" cy="50" r="2.6" />
+        <circle class="sea-starfish-dot" cx="40" cy="72" r="2.6" />
+        <circle class="sea-starfish-dot" cx="60" cy="72" r="2.6" />
+      </svg>
+      <svg class="sea-fish sea-fish-one" viewBox="0 0 74 46">
+        <path class="sea-fish-tail" d="M52 23c6-7 12-10 18-12-3 8-3 16 0 24-6-2-12-5-18-12Z" />
+        <path class="sea-fish-body" d="M4 23C12 10 34 6 48 15c4 3 6 6 6 8s-2 5-6 8C34 40 12 36 4 23Z" />
+        <circle class="sea-fish-eye" cx="20" cy="19" r="3.4" />
+      </svg>
+      <svg class="sea-fish sea-fish-two" viewBox="0 0 74 46">
+        <path class="sea-fish-tail" d="M52 23c6-7 12-10 18-12-3 8-3 16 0 24-6-2-12-5-18-12Z" />
+        <path class="sea-fish-body" d="M4 23C12 10 34 6 48 15c4 3 6 6 6 8s-2 5-6 8C34 40 12 36 4 23Z" />
+        <circle class="sea-fish-eye" cx="20" cy="19" r="3.4" />
+      </svg>
+      <svg class="sea-fish sea-fish-three" viewBox="0 0 74 46">
+        <path class="sea-fish-tail" d="M52 23c6-7 12-10 18-12-3 8-3 16 0 24-6-2-12-5-18-12Z" />
+        <path class="sea-fish-body" d="M4 23C12 10 34 6 48 15c4 3 6 6 6 8s-2 5-6 8C34 40 12 36 4 23Z" />
+        <circle class="sea-fish-eye" cx="20" cy="19" r="3.4" />
+      </svg>
+    </div>
+
+    <header class="site-nav" data-reveal>
+      <!-- 【替换点 2】导航站名与品牌标记（素材建议换名，见 README） -->
+      <a class="wordmark" href="#top" aria-label="回到首页">
+        <img class="brand-logo brand-logo-color" src="logo/deepseek_蓝鲸_彩色.png" alt="【白圣女与黑牧师展示馆】Logo" />
+        <span>【白圣女与黑牧师展示馆】</span>
+      </a>
+      <nav class="nav-links" aria-label="主导航">
+        <a href="#wall">表情墙</a>
+        <a href="#archive">来源</a>
+      </nav>
+      <div class="nav-right">
+        <div class="nav-social" aria-label="网站作者链接">
+          <a
+            class="nav-social-link"
+            href="#"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="访问【和武】的 Bilibili"
+            title="Bilibili · 【和武】"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M8.2 4.8 6.4 2.7M15.8 4.8l1.8-2.1M5.1 6.2h13.8a2 2 0 0 1 2 2v7.4a2 2 0 0 1-2 2H5.1a2 2 0 0 1-2-2V8.2a2 2 0 0 1 2-2Z" />
+              <path d="M8 10.2v3.2M16 10.2v3.2M7.7 15.2h8.6" />
+            </svg>
+          </a>
+          <a
+            class="nav-social-link"
+            href="#"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="访问【洛缘】的 GitHub"
+            title="GitHub · 【洛缘】"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 2.8a9.2 9.2 0 0 0-2.9 17.9c.46.08.63-.2.63-.44v-1.58c-2.56.56-3.1-1.08-3.1-1.08-.42-1.07-1.02-1.36-1.02-1.36-.84-.58.06-.57.06-.57.93.07 1.42.96 1.42.96.83 1.42 2.18 1.01 2.71.77.08-.6.33-1.01.59-1.25-2.04-.23-4.19-1.02-4.19-4.53 0-1 .36-1.82.96-2.46-.1-.24-.42-1.16.09-2.42 0 0 .78-.25 2.54.94A8.8 8.8 0 0 1 12 9.4c.78 0 1.57.1 2.3.31 1.76-1.19 2.54-.94 2.54-.94.51 1.26.19 2.18.09 2.42.6.64.96 1.46.96 2.46 0 3.52-2.15 4.3-4.2 4.53.34.29.63.85.63 1.72v2.56c0 .25.17.53.64.44A9.2 9.2 0 0 0 12 2.8Z" />
+            </svg>
+          </a>
+        </div>
+        <a class="nav-action" href="#wall">
+          <span>去看看</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="top" class="page-shell">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-stickers" aria-hidden="true">
+          <svg class="hero-sticker sticker-wave" viewBox="0 0 360 150" preserveAspectRatio="none">
+            <path class="sticker-wave-fill" d="M8 76C55 40 95 43 136 72c43 30 81 31 119 0 36-29 67-30 97-5v70H8Z" />
+            <path class="sticker-outline" d="M8 76C55 40 95 43 136 72c43 30 81 31 119 0 36-29 67-30 97-5" />
+            <path class="sticker-wave-line" d="M20 96c39-25 72-24 105 1 39 29 77 28 112 1 35-27 67-29 102-7" />
+            <path class="sticker-wave-line sticker-wave-line-light" d="M38 119c31-18 58-17 85 3 31 23 62 22 92 1 29-20 55-22 83-8" />
+          </svg>
+          <svg class="hero-sticker sticker-bow" viewBox="0 0 130 100">
+            <path class="sticker-bow-wing" d="M62 48C43 16 16 12 10 25c-6 14 13 34 48 35Z" />
+            <path class="sticker-bow-wing sticker-bow-wing-right" d="M68 48c19-32 46-36 52-23 6 14-13 34-48 35Z" />
+            <circle class="sticker-bow-knot" cx="65" cy="51" r="14" />
+            <path class="sticker-bow-tail" d="M57 62 42 91l23-16 23 16-15-29" />
+          </svg>
+          <svg class="hero-sticker sticker-chip" viewBox="0 0 130 130">
+            <rect class="sticker-chip-body" x="24" y="24" width="82" height="82" rx="18" />
+            <rect class="sticker-chip-core" x="43" y="43" width="44" height="44" rx="10" />
+            <path class="sticker-chip-circuit" d="M52 57h11l7-7M78 73H66l-8 8M50 74h7M74 56h7M24 49H9M24 68H5M24 87H12M106 49h15M106 68h19M106 87h12M49 24V9M68 24V5M87 24v10M49 106v15M68 106v19M87 106v-10" />
+            <circle class="sticker-chip-light" cx="65" cy="65" r="6" />
+          </svg>
+          <svg class="hero-sticker sticker-scan" viewBox="0 0 180 100">
+            <path class="sticker-scan-line" d="M18 18h35M18 18v27M162 18h-35M162 18v27M18 82h35M18 82V55M162 82h-35M162 82V55" />
+            <path class="sticker-scan-beam" d="M42 50h96" />
+            <circle class="sticker-scan-dot" cx="84" cy="50" r="5" />
+            <circle class="sticker-scan-dot sticker-scan-dot-two" cx="104" cy="50" r="3" />
+          </svg>
+          <svg class="hero-sticker sticker-apron" viewBox="0 0 150 170">
+            <path class="sticker-apron-shape" d="M54 18c5 13 37 13 42 0l14 18 20 11-17 20-4 83H41l-4-83-17-20 20-11Z" />
+            <path class="sticker-apron-line" d="M55 18c-2 19-5 35-12 49m52-49c2 19 5 35 12 49M42 117c20 8 46 8 66 0" />
+            <path class="sticker-apron-lace" d="M42 137h66M43 145h64M45 153h60" />
+            <circle class="sticker-apron-dot" cx="75" cy="77" r="5" />
+          </svg>
+          <svg class="hero-sticker sticker-shell" viewBox="0 0 130 130">
+            <path class="sticker-shell-shape" d="M65 112C33 112 12 94 12 67 12 38 36 15 65 15s53 23 53 52c0 27-21 45-53 45Z" />
+            <path class="sticker-shell-line" d="M65 111V17M37 101c9-18 13-40 12-70M93 101c-9-18-13-40-12-70M20 69c27-15 63-15 90 0" />
+          </svg>
+        </div>
+        <div class="hero-copy" data-reveal>
+          <!-- 【替换点 3】Hero 三行文案 -->
+          <p class="hero-kicker">【副标题 · 大写的英文或短句】</p>
+          <h1 id="hero-title">白圣女&黑牧师<br /><span>展示馆</span></h1>
+          <p class="hero-lede">【圣女美图收藏】</p>
+          <a class="hero-cta" href="#wall">
+            <span>进入表情墙</span>
+            <span class="cta-arrow" aria-hidden="true">↘</span>
+          </a>
+        </div>
+
+        <div class="hero-art-area" data-reveal data-delay="120">
+          <span class="sticker-spark spark-one" aria-hidden="true">✦</span>
+          <span class="sticker-spark spark-two" aria-hidden="true">✦</span>
+          <div class="hero-art-sticker">
+            <span class="tape tape-hero-left" aria-hidden="true"></span>
+            <span class="tape tape-hero-right" aria-hidden="true"></span>
+            <span class="art-tag" aria-hidden="true">【塞西莉娅】</span><!-- 【替换点 4】立绘标签与说明 -->
+            <div class="hero-art-window">
+              <picture>
+                <!-- WebP 版本约 1/10 体积;不支持 WebP 的旧浏览器回退 PNG -->
+                <source
+                  srcset="assets/deepseek_whale.webp"
+                  type="image/webp"
+                />
+                <img
+                  src="assets/deepseek_whale.png"
+                  width="422"
+                  height="750"
+                  alt="【立绘说明】"
+                />
+              </picture>
+            </div>
+          </div>
+          <span class="art-note">【白圣女】</span>
+        </div>
+
+        <aside class="source-panel" data-reveal data-delay="220" id="archive">
+          <h2>来源</h2><!-- 【替换点 5】来源区：按你的实际收录来源逐条填写；收录他人作品时此区与页脚声明不可删 -->
+          <div class="source-list">
+            <a
+              class="source-card"
+              href="#archive"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span class="source-icon" aria-hidden="true">↗</span>
+              <span class="source-body">
+                <strong>【塞西莉娅·白圣女形象原作】</strong>
+                <small>【和武叶佐乃·Twitter/X】</small>
+              </span>
+            </a>
+            <a
+              class="source-card"
+              href="#archive"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span class="source-icon" aria-hidden="true">↗</span>
+              <span class="source-body">
+                <strong>【劳伦斯·黑牧师形象原作】</strong>
+                <small>【和武叶佐乃·Twitter/X】</small>
+              </span>
+            </a>
+          </div>
+          <p class="license-note">【授权协议，例如 CC BY-NC-SA 4.0】<br />非商业使用 / 二创同协议授权</p>
+        </aside>
+      </section>
+
+      <section class="wall-section" id="wall" aria-labelledby="wall-title">
+        <div class="wall-divider" aria-hidden="true">
+          <svg class="divider-fish" viewBox="0 0 74 46">
+            <path class="sea-fish-tail" d="M52 23c6-7 12-10 18-12-3 8-3 16 0 24-6-2-12-5-18-12Z" />
+            <path class="sea-fish-body" d="M4 23C12 10 34 6 48 15c4 3 6 6 6 8s-2 5-6 8C34 40 12 36 4 23Z" />
+            <circle class="sea-fish-eye" cx="20" cy="19" r="3.4" />
+          </svg>
+          <span class="divider-bubbles"><i></i><i></i><i></i></span>
+          <svg class="divider-starfish" viewBox="0 0 100 100">
+            <path class="sea-starfish-shape" d="M50 8 60 36 90 38 66 57 74 87 50 70 26 87 34 57 10 38 40 36Z" />
+            <circle class="sea-starfish-dot" cx="50" cy="40" r="3.2" />
+            <circle class="sea-starfish-dot" cx="30" cy="50" r="2.6" />
+            <circle class="sea-starfish-dot" cx="70" cy="50" r="2.6" />
+          </svg>
+        </div>
+        <div class="wall-heading" data-reveal>
+          <div>
+            <span class="eyebrow">COMMUNITY STICKERS</span>
+            <div class="wall-title-row">
+              <h2 id="wall-title">同人表情墙</h2>
+              <span class="sticker-count" id="sticker-count">整理中…</span>
+            </div>
+          </div>
+          <span class="wall-squiggle" aria-hidden="true"></span>
+        </div>
+        <div class="sticker-grid" id="sticker-grid" aria-live="polite">
+          <!-- 首屏骨架:manifest 到达前先摆好卡片位置,避免白墙忽然后弹出 -->
+          <div class="skeleton-card" style="--skeleton-height: 214px" aria-hidden="true"></div>
+          <div class="skeleton-card" style="--skeleton-height: 168px" aria-hidden="true"></div>
+          <div class="skeleton-card" style="--skeleton-height: 246px" aria-hidden="true"></div>
+          <div class="skeleton-card" style="--skeleton-height: 186px" aria-hidden="true"></div>
+          <div class="skeleton-card" style="--skeleton-height: 228px" aria-hidden="true"></div>
+          <div class="skeleton-card" style="--skeleton-height: 156px" aria-hidden="true"></div>
+          <div class="skeleton-card" style="--skeleton-height: 238px" aria-hidden="true"></div>
+          <div class="skeleton-card" style="--skeleton-height: 178px" aria-hidden="true"></div>
+        </div>
+        <div class="wall-empty" id="wall-empty" hidden>
+          <svg class="wall-empty-art" viewBox="0 0 190 140" aria-hidden="true">
+            <path class="empty-bowl-wave" d="M16 60h158" />
+            <path class="empty-bowl" d="M30 62h130c-3 37-29 58-65 58S33 99 30 62Z" />
+            <path class="empty-bowl-line" d="M58 86c22 7 52 7 74 0" />
+            <circle class="empty-bubble" cx="66" cy="40" r="8" />
+            <circle class="empty-bubble empty-bubble-mid" cx="92" cy="24" r="5.5" />
+            <circle class="empty-bubble empty-bubble-small" cx="112" cy="42" r="3.6" />
+          </svg>
+          <strong>档案室还空着</strong>
+          <!-- 【替换点 7】空状态文案 -->
+          <p>这个收藏夹还空着。往 media/ 目录放几张图，刷新后就会出现在这里。</p>
+          <button class="retry-button" type="button" id="wall-retry">重新加载</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="rights" data-reveal>
+      <span class="divider-bubbles footer-bubbles" aria-hidden="true"><i></i><i></i><i></i></span>
+      <!-- 【替换点 6】页脚品牌与作者署名 -->
+      <span class="footer-brand">
+        <img class="brand-logo brand-logo-black" src="logo/deepseek_蓝鲸_黑色.png" alt="【白圣女与黑牧师展示馆】Logo" />
+        <span>【白圣女与黑牧师展示馆】</span>
+      </span>
+      <p>非官方整理 · 版权归原作者所有 ｜ 【和武叶佐乃】</p>
+      <a href="#top" aria-label="回到顶部">↑</a>
+    </footer>
+
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+      <div class="lightbox-backdrop" data-close-lightbox></div>
+      <div class="lightbox-panel" role="dialog" aria-modal="true" aria-label="表情预览">
+        <span class="tape tape-panel" aria-hidden="true"></span>
+        <button class="lightbox-close" type="button" aria-label="关闭预览" data-close-lightbox>×</button>
+        <button class="lightbox-nav lightbox-prev" id="lightbox-prev" type="button" aria-label="上一张表情">
+          <span aria-hidden="true">‹</span>
+        </button>
+        <button class="lightbox-nav lightbox-next" id="lightbox-next" type="button" aria-label="下一张表情">
+          <span aria-hidden="true">›</span>
+        </button>
+        <div class="lightbox-media-shell">
+          <img id="lightbox-image" src="" alt="表情包大图预览" />
+        </div>
+        <p class="lightbox-caption">
+          <span class="lightbox-meta" id="lightbox-meta"></span>
+          <span class="lightbox-hint" aria-hidden="true">← → 切换</span>
+        </p>
+        <div class="lightbox-actions">
+          <button class="action-button action-primary" id="copy-button" type="button">
+            <span>复制图片</span><span aria-hidden="true">⌘</span>
+          </button>
+          <a class="action-button action-secondary" id="download-button" href="" download>
+            <span>下载原图</span><span aria-hidden="true">↓</span>
+          </a>
+        </div>
+        <p class="action-status" id="action-status" role="status"></p>
+      </div>
+    </div>
+
+    <div class="mascot" id="mascot" role="button" tabindex="0" aria-label="戳一戳看板娘">
+      <span class="mascot-bubble" id="mascot-bubble">戳我</span>
+      <span class="mascot-sticker" aria-hidden="true">
+        <span class="mascot-body">
+          <picture>
+            <source srcset="memes/120302wg44ju245iDQ38xu.webp" type="image/webp" />
+            <img src="memes/120302wg44ju245iDQ38xu.png" alt="" draggable="false" />
+          </picture>
+        </span>
+      </span>
+    </div>
+    <audio id="mascot-audio" src="memes/xixi.aac" preload="none"></audio>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
