@@ -1,20 +1,182 @@
 [
   {
-    "original": "data/whale/cos/cos-placeholder-01.png",
-    "filename": "cos-placeholder-01.png",
+    "original": "data/whale/cos/03bbd1d88d1001e950c3a10cfe0e7bec55e797ab.jpg",
+    "filename": "03bbd1d88d1001e950c3a10cfe0e7bec55e797ab.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/whale-cos-cos-placeholder-01.webp",
-    "large": "large/whale-cos-cos-placeholder-01.webp",
-    "width": 339,
+    "preview": "previews/whale-cos-03bbd1d88d1001e950c3a10cfe0e7bec55e797ab.webp",
+    "large": "large/whale-cos-03bbd1d88d1001e950c3a10cfe0e7bec55e797ab.webp",
+    "width": 320,
     "height": 480
   },
   {
-    "original": "data/whale/cos/whale-cos-placeholder-01.png",
-    "filename": "whale-cos-placeholder-01.png",
+    "original": "data/whale/cos/0b6f3a2ad40735fa8cf59dbad8510fb30f240821.jpg",
+    "filename": "0b6f3a2ad40735fa8cf59dbad8510fb30f240821.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/whale-cos-whale-cos-placeholder-01.webp",
-    "large": "large/whale-cos-whale-cos-placeholder-01.webp",
-    "width": 339,
+    "preview": "previews/whale-cos-0b6f3a2ad40735fa8cf59dbad8510fb30f240821.webp",
+    "large": "large/whale-cos-0b6f3a2ad40735fa8cf59dbad8510fb30f240821.webp",
+    "width": 480,
+    "height": 453
+  },
+  {
+    "original": "data/whale/cos/128cee176d224f4ae19fa0104ff790529822d12d.jpg",
+    "filename": "128cee176d224f4ae19fa0104ff790529822d12d.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-128cee176d224f4ae19fa0104ff790529822d12d.webp",
+    "large": "large/whale-cos-128cee176d224f4ae19fa0104ff790529822d12d.webp",
+    "width": 480,
     "height": 480
+  },
+  {
+    "original": "data/whale/cos/1879d6ed54e736d12175580bdd504fc2d46269cc.jpg",
+    "filename": "1879d6ed54e736d12175580bdd504fc2d46269cc.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-1879d6ed54e736d12175580bdd504fc2d46269cc.webp",
+    "large": "large/whale-cos-1879d6ed54e736d12175580bdd504fc2d46269cc.webp",
+    "width": 360,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/1c46f16134a85edfa8372d200f540923dc5475f7.jpg",
+    "filename": "1c46f16134a85edfa8372d200f540923dc5475f7.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-1c46f16134a85edfa8372d200f540923dc5475f7.webp",
+    "large": "large/whale-cos-1c46f16134a85edfa8372d200f540923dc5475f7.webp",
+    "width": 360,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/27760c8a87d6277f4be2a83b6e381f30e824fcbf.jpg",
+    "filename": "27760c8a87d6277f4be2a83b6e381f30e824fcbf.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-27760c8a87d6277f4be2a83b6e381f30e824fcbf.webp",
+    "large": "large/whale-cos-27760c8a87d6277f4be2a83b6e381f30e824fcbf.webp",
+    "width": 270,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/395211305c6034a87a596b828d134954082376f7.jpg",
+    "filename": "395211305c6034a87a596b828d134954082376f7.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-395211305c6034a87a596b828d134954082376f7.webp",
+    "large": "large/whale-cos-395211305c6034a87a596b828d134954082376f7.webp",
+    "width": 320,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/80d3eb2209f790525d19943d4af3d7ca7bcbd52d.jpg",
+    "filename": "80d3eb2209f790525d19943d4af3d7ca7bcbd52d.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-80d3eb2209f790525d19943d4af3d7ca7bcbd52d.webp",
+    "large": "large/whale-cos-80d3eb2209f790525d19943d4af3d7ca7bcbd52d.webp",
+    "width": 268,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/8708332e07082838c7fd4617fe99a9014d08f1bf.jpg",
+    "filename": "8708332e07082838c7fd4617fe99a9014d08f1bf.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-8708332e07082838c7fd4617fe99a9014d08f1bf.webp",
+    "large": "large/whale-cos-8708332e07082838c7fd4617fe99a9014d08f1bf.webp",
+    "width": 268,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/8d824dff9925bc317ee6d29b18df8db1ca1370f7.jpg",
+    "filename": "8d824dff9925bc317ee6d29b18df8db1ca1370f7.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-8d824dff9925bc317ee6d29b18df8db1ca1370f7.webp",
+    "large": "large/whale-cos-8d824dff9925bc317ee6d29b18df8db1ca1370f7.webp",
+    "width": 360,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/94dff3de8db1cb136ed2ef109b54564e93584bf7.jpg",
+    "filename": "94dff3de8db1cb136ed2ef109b54564e93584bf7.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-94dff3de8db1cb136ed2ef109b54564e93584bf7.webp",
+    "large": "large/whale-cos-94dff3de8db1cb136ed2ef109b54564e93584bf7.webp",
+    "width": 474,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/9a5e80f4e0fe99259db7ba5372a85edf8cb171f7.jpg",
+    "filename": "9a5e80f4e0fe99259db7ba5372a85edf8cb171f7.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-9a5e80f4e0fe99259db7ba5372a85edf8cb171f7.webp",
+    "large": "large/whale-cos-9a5e80f4e0fe99259db7ba5372a85edf8cb171f7.webp",
+    "width": 480,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/9d1af8fab2fb4316d219a97966a4462309f7d32d.jpg",
+    "filename": "9d1af8fab2fb4316d219a97966a4462309f7d32d.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-9d1af8fab2fb4316d219a97966a4462309f7d32d.webp",
+    "large": "large/whale-cos-9d1af8fab2fb4316d219a97966a4462309f7d32d.webp",
+    "width": 270,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/a88dfc3c269759ee8656b3c8f4fb43166d22df2d.jpg",
+    "filename": "a88dfc3c269759ee8656b3c8f4fb43166d22df2d.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-a88dfc3c269759ee8656b3c8f4fb43166d22df2d.webp",
+    "large": "large/whale-cos-a88dfc3c269759ee8656b3c8f4fb43166d22df2d.webp",
+    "width": 338,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/a9803d539822720ecbc831f93dcb0a46f21fab2d.jpg",
+    "filename": "a9803d539822720ecbc831f93dcb0a46f21fab2d.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-a9803d539822720ecbc831f93dcb0a46f21fab2d.webp",
+    "large": "large/whale-cos-a9803d539822720ecbc831f93dcb0a46f21fab2d.webp",
+    "width": 267,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/ChatGPT Image 2026年9月3日 12_05_32.png",
+    "filename": "ChatGPT Image 2026年9月3日 12_05_32.png",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-ChatGPT Image 2026年9月3日 12_05_32.webp",
+    "large": "large/whale-cos-ChatGPT Image 2026年9月3日 12_05_32.webp",
+    "width": 480,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/ChatGPT Image 2026年9月3日 12_05_42.png",
+    "filename": "ChatGPT Image 2026年9月3日 12_05_42.png",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-ChatGPT Image 2026年9月3日 12_05_42.webp",
+    "large": "large/whale-cos-ChatGPT Image 2026年9月3日 12_05_42.webp",
+    "width": 480,
+    "height": 360
+  },
+  {
+    "original": "data/whale/cos/e2d07432c895d1431cbe792035f082025baf0766.jpg",
+    "filename": "e2d07432c895d1431cbe792035f082025baf0766.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-e2d07432c895d1431cbe792035f082025baf0766.webp",
+    "large": "large/whale-cos-e2d07432c895d1431cbe792035f082025baf0766.webp",
+    "width": 464,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/f999906c55fbb2fbfd2d8b11094a20a44623dc2d.jpg",
+    "filename": "f999906c55fbb2fbfd2d8b11094a20a44623dc2d.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-f999906c55fbb2fbfd2d8b11094a20a44623dc2d.webp",
+    "large": "large/whale-cos-f999906c55fbb2fbfd2d8b11094a20a44623dc2d.webp",
+    "width": 270,
+    "height": 480
+  },
+  {
+    "original": "data/whale/cos/fc1799a95edf8db1ed95af674f23dd54574e74f7.jpg",
+    "filename": "fc1799a95edf8db1ed95af674f23dd54574e74f7.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/whale-cos-fc1799a95edf8db1ed95af674f23dd54574e74f7.webp",
+    "large": "large/whale-cos-fc1799a95edf8db1ed95af674f23dd54574e74f7.webp",
+    "width": 480,
+    "height": 445
   }
 ]

@@ -1,83 +1,281 @@
 [
   {
-    "original": "data/manga/default/01.jpg",
-    "filename": "01.jpg",
+    "original": "data/manga/default/103348756_p17-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p17-白聖女と黒牧師イラストまとめⅥ.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-01.webp",
-    "large": "large/manga-default-01.webp",
+    "preview": "previews/manga-default-103348756_p17-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p17-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 423,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103348756_p18-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p18-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103348756_p18-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p18-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103348756_p19-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p19-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103348756_p19-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p19-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103348756_p20-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p20-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103348756_p20-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p20-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103348756_p21-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p21-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103348756_p21-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p21-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103348756_p22-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p22-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103348756_p22-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p22-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103348756_p23-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p23-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103348756_p23-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p23-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103348756_p24-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p24-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103348756_p24-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p24-白聖女と黒牧師イラストまとめⅥ.webp",
     "width": 480,
-    "height": 270
+    "height": 437
   },
   {
-    "original": "data/manga/default/02.jpg",
-    "filename": "02.jpg",
+    "original": "data/manga/default/103348756_p25-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p25-白聖女と黒牧師イラストまとめⅥ.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-02.webp",
-    "large": "large/manga-default-02.webp",
-    "width": 270,
+    "preview": "previews/manga-default-103348756_p25-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p25-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 340,
     "height": 480
   },
   {
-    "original": "data/manga/default/03.jpg",
-    "filename": "03.jpg",
+    "original": "data/manga/default/103348756_p26-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p26-白聖女と黒牧師イラストまとめⅥ.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-03.webp",
-    "large": "large/manga-default-03.webp",
-    "width": 263,
+    "preview": "previews/manga-default-103348756_p26-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p26-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 340,
     "height": 480
   },
   {
-    "original": "data/manga/default/04.jpg",
-    "filename": "04.jpg",
+    "original": "data/manga/default/103348756_p27-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p27-白聖女と黒牧師イラストまとめⅥ.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-04.webp",
-    "large": "large/manga-default-04.webp",
-    "width": 270,
+    "preview": "previews/manga-default-103348756_p27-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p27-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 327,
     "height": 480
   },
   {
-    "original": "data/manga/default/05.jpg",
-    "filename": "05.jpg",
+    "original": "data/manga/default/103348756_p28-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p28-白聖女と黒牧師イラストまとめⅥ.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-05.webp",
-    "large": "large/manga-default-05.webp",
-    "width": 270,
+    "preview": "previews/manga-default-103348756_p28-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p28-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 340,
     "height": 480
   },
   {
-    "original": "data/manga/default/07.jpg",
-    "filename": "07.jpg",
+    "original": "data/manga/default/103348756_p29-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p29-白聖女と黒牧師イラストまとめⅥ.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-07.webp",
-    "large": "large/manga-default-07.webp",
+    "preview": "previews/manga-default-103348756_p29-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p29-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 480,
+    "height": 340
+  },
+  {
+    "original": "data/manga/default/103348756_p30-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "filename": "103348756_p30-白聖女と黒牧師イラストまとめⅥ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103348756_p30-白聖女と黒牧師イラストまとめⅥ.webp",
+    "large": "large/manga-default-103348756_p30-白聖女と黒牧師イラストまとめⅥ.webp",
+    "width": 385,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103635061_p0-『白聖女と黒牧師』⑪.jpg",
+    "filename": "103635061_p0-『白聖女と黒牧師』⑪.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103635061_p0-『白聖女と黒牧師』⑪.webp",
+    "large": "large/manga-default-103635061_p0-『白聖女と黒牧師』⑪.webp",
+    "width": 377,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103635061_p1-『白聖女と黒牧師』⑪.jpg",
+    "filename": "103635061_p1-『白聖女と黒牧師』⑪.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103635061_p1-『白聖女と黒牧師』⑪.webp",
+    "large": "large/manga-default-103635061_p1-『白聖女と黒牧師』⑪.webp",
     "width": 320,
     "height": 480
   },
   {
-    "original": "data/manga/default/08.jpg",
-    "filename": "08.jpg",
+    "original": "data/manga/default/103635061_p2-『白聖女と黒牧師』⑪.jpg",
+    "filename": "103635061_p2-『白聖女と黒牧師』⑪.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-08.webp",
-    "large": "large/manga-default-08.webp",
-    "width": 320,
+    "preview": "previews/manga-default-103635061_p2-『白聖女と黒牧師』⑪.webp",
+    "large": "large/manga-default-103635061_p2-『白聖女と黒牧師』⑪.webp",
+    "width": 340,
     "height": 480
   },
   {
-    "original": "data/manga/default/09.jpg",
-    "filename": "09.jpg",
+    "original": "data/manga/default/103635061_p3-『白聖女と黒牧師』⑪.jpg",
+    "filename": "103635061_p3-『白聖女と黒牧師』⑪.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-09.webp",
-    "large": "large/manga-default-09.webp",
-    "width": 270,
+    "preview": "previews/manga-default-103635061_p3-『白聖女と黒牧師』⑪.webp",
+    "large": "large/manga-default-103635061_p3-『白聖女と黒牧師』⑪.webp",
+    "width": 340,
     "height": 480
   },
   {
-    "original": "data/manga/default/10.jpg",
-    "filename": "10.jpg",
+    "original": "data/manga/default/103635061_p4-『白聖女と黒牧師』⑪.jpg",
+    "filename": "103635061_p4-『白聖女と黒牧師』⑪.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-10.webp",
-    "large": "large/manga-default-10.webp",
-    "width": 270,
+    "preview": "previews/manga-default-103635061_p4-『白聖女と黒牧師』⑪.webp",
+    "large": "large/manga-default-103635061_p4-『白聖女と黒牧師』⑪.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103635061_p5-『白聖女と黒牧師』⑪.jpg",
+    "filename": "103635061_p5-『白聖女と黒牧師』⑪.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103635061_p5-『白聖女と黒牧師』⑪.webp",
+    "large": "large/manga-default-103635061_p5-『白聖女と黒牧師』⑪.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103950053_p0-クリスマス聖女様.jpg",
+    "filename": "103950053_p0-クリスマス聖女様.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103950053_p0-クリスマス聖女様.webp",
+    "large": "large/manga-default-103950053_p0-クリスマス聖女様.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/103950053_p1-クリスマス聖女様.jpg",
+    "filename": "103950053_p1-クリスマス聖女様.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-103950053_p1-クリスマス聖女様.webp",
+    "large": "large/manga-default-103950053_p1-クリスマス聖女様.webp",
+    "width": 415,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/105475273_p0-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "filename": "105475273_p0-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-105475273_p0-白聖女と黒牧師イラストまとめⅦ.webp",
+    "large": "large/manga-default-105475273_p0-白聖女と黒牧師イラストまとめⅦ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/105475273_p1-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "filename": "105475273_p1-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-105475273_p1-白聖女と黒牧師イラストまとめⅦ.webp",
+    "large": "large/manga-default-105475273_p1-白聖女と黒牧師イラストまとめⅦ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/105475273_p10-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "filename": "105475273_p10-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-105475273_p10-白聖女と黒牧師イラストまとめⅦ.webp",
+    "large": "large/manga-default-105475273_p10-白聖女と黒牧師イラストまとめⅦ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/105475273_p2-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "filename": "105475273_p2-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-105475273_p2-白聖女と黒牧師イラストまとめⅦ.webp",
+    "large": "large/manga-default-105475273_p2-白聖女と黒牧師イラストまとめⅦ.webp",
+    "width": 310,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/105475273_p3-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "filename": "105475273_p3-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-105475273_p3-白聖女と黒牧師イラストまとめⅦ.webp",
+    "large": "large/manga-default-105475273_p3-白聖女と黒牧師イラストまとめⅦ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/105475273_p4-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "filename": "105475273_p4-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-105475273_p4-白聖女と黒牧師イラストまとめⅦ.webp",
+    "large": "large/manga-default-105475273_p4-白聖女と黒牧師イラストまとめⅦ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/105475273_p5-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "filename": "105475273_p5-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-105475273_p5-白聖女と黒牧師イラストまとめⅦ.webp",
+    "large": "large/manga-default-105475273_p5-白聖女と黒牧師イラストまとめⅦ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/105475273_p6-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "filename": "105475273_p6-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-105475273_p6-白聖女と黒牧師イラストまとめⅦ.webp",
+    "large": "large/manga-default-105475273_p6-白聖女と黒牧師イラストまとめⅦ.webp",
+    "width": 340,
+    "height": 480
+  },
+  {
+    "original": "data/manga/default/105475273_p7-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "filename": "105475273_p7-白聖女と黒牧師イラストまとめⅦ.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-default-105475273_p7-白聖女と黒牧師イラストまとめⅦ.webp",
+    "large": "large/manga-default-105475273_p7-白聖女と黒牧師イラストまとめⅦ.webp",
+    "width": 340,
     "height": 480
   },
   {
@@ -241,14 +439,5 @@
     "large": "large/manga-default-【动画贺图】第9話.webp",
     "width": 340,
     "height": 480
-  },
-  {
-    "original": "data/manga/default/高清观看版.jpg",
-    "filename": "高清观看版.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/manga-default-高清观看版.webp",
-    "large": "large/manga-default-高清观看版.webp",
-    "width": 480,
-    "height": 270
   }
 ]
