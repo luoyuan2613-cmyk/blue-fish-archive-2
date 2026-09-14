@@ -46,7 +46,9 @@ git add -A && git commit -m "add images" && git push
 
 - **支持格式**：PNG / JPG / JPEG / GIF / WebP / APNG。GIF、APNG 不生成缩略图，直接播原图（会比较大）。
 - **单张别超 25MB**（Cloudflare 单文件上限）。你现在最大的一张是 5MB，安全。
-- **换图请改文件名**：`media/`、`previews/`、`large/` 里的文件是永久缓存，同名换内容老访客可能看到旧图。
+- **换图请改文件名**：`media/`、`previews/`、`large/` 里的文件是**永久缓存**，同名换内容老访客会一直看到旧图。
+  而 `assets/`（立绘）、`logo/`、`memes/`（看板娘）是 10 分钟缓存，换了素材稍等即可生效。
+  万一你看到的是空白/破图，先按 `Ctrl+Shift+R` 强刷一次（旧缓存可能还留着 404 结果）。
 - **文件名可以用中文**（现在就有「【动画贺图】第7話.jpg」这类），空格也能用，无需改名。
 - **图注（alt 文字）**：所有图的说明统一取自 `scripts/sync_stickers.py` 里的 `DEFAULT_ALT`，改那一行即可（当前是「动画贺图收藏」）。
 - **失败排查**：Actions 页面出现红叉，多半是清单不同步或某张图损坏。把报错发我，或点进那次运行看 `Generate manifest` / `Validate` 那一步的日志。
