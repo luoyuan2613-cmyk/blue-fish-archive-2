@@ -1,0 +1,23 @@
+# Wrangler 静态资源忽略清单
+#
+# 用于 Cloudflare Workers 构建（部署命令：npx wrangler deploy，assets.directory = "./"）。
+# 本文件让 wrangler 不要把下面这些内容当成要上传的静态资源。
+
+# 【根因】.git 里有超过 25 MiB 的 pack 对象，会触发
+# "X [ERROR] Asset too large. Cloudflare Workers supports assets with sizes of up to 25 MiB"
+# 导致每次自动部署都失败，线上只能停在手动部署的旧快照。
+.git
+
+# 不是网站内容，不需要公网可访问
+.github
+.assetsignore
+*.md
+scripts
+
+# 本地/编辑器遗留
+.claude
+__pycache__
+*.py[cod]
+*.log
+.DS_Store
+Thumbs.db
