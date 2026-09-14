@@ -16,6 +16,10 @@ so the in-page animation keeps playing from the original file.
 
 Generated names carry the theme/partition prefix so identical filenames in
 different themes never overwrite each other.
+
+Orphan cleanup: previews/large files whose source image no longer exists are
+deleted (default on) so that deleting an image doesn't leave stale artifacts
+behind — pass --no-prune to keep them.
 """
 
 from __future__ import annotations
@@ -69,7 +73,44 @@ def _to_webp(path: Path, target: Path, quality: int, max_dimension: int | None) 
     print(f"Generated {target.relative_to(ROOT).as_posix()}")
 
 
+def prune_orphans(partitions: list[dict[str, object]]) -> int:
+    """删除 previews/、large/ 里"已发现分区前缀"下、但源文件已不存在的产物。
+
+    只处理前缀仍被发现的分区：分区被整体删除/改名时会跳过（那种情况需手动清理，
+    以免因为目录暂时缺失误删整批产物）。
+    """
+    prefixes: set[str] = set()
+    expected: set[str] = set()
+    for entry in partitions:
+        prefix = f"{entry['theme']}-{entry['partition']}"
+        prefixes.add(prefix)
+        source_dir = Path(entry["source"])
+        if not source_dir.is_dir():
+            continue
+        for path in source_dir.iterdir():
+            if path.is_file() and path.suffix.lower() in RASTER_EXTENSIONS:
+                expected.add(f"{prefix}-{path.stem}.webp")
+
+    removed = 0
+    for directory in (PREVIEW_DIR, LARGE_DIR):
+        for path in sorted(directory.glob("*.webp")):
+            if path.name in expected:
+                continue
+            if not any(path.name.startswith(f"{prefix}-") for prefix in prefixes):
+                continue
+            path.unlink()
+            removed += 1
+            print(f"Pruned orphan {path.relative_to(ROOT).as_posix()}")
+    return removed
+
+
 def main() -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Generate WebP previews for all partitions.")
+    parser.add_argument("--no-prune", action="store_true", help="Do not delete orphaned previews/large files.")
+    args = parser.parse_args()
+
     partitions = discover_partitions()
     if not partitions:
         print(f"No partition with raster images found under {DATA_DIR}", file=sys.stderr)
@@ -108,7 +149,8 @@ def main() -> int:
                 _to_webp(path, large, LARGE_QUALITY, None)
                 generated += 1
 
-    print(f"Done. {generated} generated, {skipped} up to date.")
+    pruned = prune_orphans(partitions)
+    print(f"Done. {generated} generated, {skipped} up to date, {pruned} orphans pruned.")
     return 0
 
 

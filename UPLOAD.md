@@ -70,3 +70,55 @@ git add -A && git commit -m "add images" && git push
 
 设计风格（配色/字体）目前沿用原作，已出过三版预览图存于
 `D:\【杂物间】\design-preview\`，日后想改再说。
+
+---
+
+## 新增 / 重命名 主题与分区（操作手册）
+
+### 概念
+```
+data/<主题>/<分区>/   →   stickers/manifest_<主题>-<分区>.json
+```
+主题（如 `manga`、`whale`）各自拥有一套分区；前端 `app.js` 里有两份清单必须**同 id**：
+- `THEMES`（第 37 行附近）：管**分区**（每个主题有哪些分区、各自读哪份清单）
+- `themeConfig`（第 796 行附近）：管**外观**（配色 `vars`、立绘 `art`、文案 `copy`）
+
+> 目前这两份需要手动同步，是唯一容易漏改的地方（日后可合并成一份）。
+
+### 新增一个主题（例：`sakura`）
+1. 建目录 `data/sakura/default/`（需要就再加 `data/sakura/cos/`），把图放进去
+2. `app.js` → `THEMES` 追加：
+   ```js
+   { id: 'sakura', name: '樱花主题', label: '樱花', partitions: [
+       { id: 'default', label: '默认区', manifest: 'stickers/manifest_sakura-default.json' } ] },
+   ```
+3. `app.js` → `themeConfig` 追加**同 id** 的一项（`vars` 配色、`art` 立绘、`copy` 文案）
+4. 准备该主题的立绘 `assets/theme-sakura.png` + `.webp`（让 `art` 指向它）
+5. 本地跑 `python scripts/make_previews.py && python scripts/sync_stickers.py` → 强刷验证
+6. 提交推送：CI 自动生成清单与缩略图，Cloudflare 自动部署
+7. 顶部导航与作品墙顶部的分区入口会在切换主题时**自动换成该主题的分区**，无需额外配置
+
+### 新增一个分区（例：给漫画主题加 `fanart`）
+1. 建目录 `data/manga/fanart/` 放图
+2. `app.js` → `THEMES` 的 `manga.partitions` 追加：
+   `{ id: 'fanart', label: '同人区', manifest: 'stickers/manifest_manga-fanart.json' }`
+3. 分区是"每个主题各自拥有"的，所以想让鲸鱼主题也有，就重复第 1–2 步
+4. 跑脚本 → 验证 → 推送
+
+### 重命名一个分区（`cos` → `cosplay`）
+1. `git mv data/manga/cos data/manga/cosplay`（每个主题都要改）
+2. 删旧清单 `stickers/manifest_manga-cos.json`
+3. 跑 `python scripts/make_previews.py`（会**自动清理**旧前缀的孤儿缩略图/大图），再跑 `sync_stickers.py`
+4. `app.js` → `THEMES` 里把 `id` 与 `manifest` 路径一起改（`label` 按需改）
+5. 浏览器里旧的分区记忆（`localStorage: fish-gallery-partition-<主题>`）指向不存在的分区，会自动回退到第一个分区，无害
+
+### 重命名一个主题（`manga` → `bsm`）
+1. `git mv data/manga data/bsm`；删旧清单 `stickers/manifest_manga-*.json`
+2. 跑两个脚本（自动清理旧前缀产物并生成新清单）
+3. `app.js` **两处都改**：`THEMES` 的 `id` 与各分区 `manifest` 路径；`themeConfig` 的 `id`
+4. 主题的立绘/logo 路径写在 `themeConfig` 里，与目录名无关；想一起改名就同步改 `assets/` 文件与引用
+5. 验证、推送
+
+### 删图之后
+`make_previews.py` 默认会**清理孤儿产物**（源文件已不存在的缩略图/大图）。
+若某个分区被整体删空，其旧产物不会被自动清（避免误删），需要手动删 `previews/<主题>-<分区>-*` 与 `large/<主题>-<分区>-*`。

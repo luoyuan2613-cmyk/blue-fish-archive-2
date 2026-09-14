@@ -1,11 +1,65 @@
 [
   {
-    "original": "data/manga/cos/cos-placeholder-01.png",
-    "filename": "cos-placeholder-01.png",
+    "original": "data/manga/cos/QQ图片20230612171136.jpg",
+    "filename": "QQ图片20230612171136.jpg",
     "alt": "动画贺图收藏",
-    "preview": "previews/manga-cos-cos-placeholder-01.webp",
-    "large": "large/manga-cos-cos-placeholder-01.webp",
-    "width": 339,
+    "preview": "previews/manga-cos-QQ图片20230612171136.webp",
+    "large": "large/manga-cos-QQ图片20230612171136.webp",
+    "width": 480,
+    "height": 360
+  },
+  {
+    "original": "data/manga/cos/QQ图片20230612175036.jpg",
+    "filename": "QQ图片20230612175036.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-cos-QQ图片20230612175036.webp",
+    "large": "large/manga-cos-QQ图片20230612175036.webp",
+    "width": 360,
+    "height": 480
+  },
+  {
+    "original": "data/manga/cos/QQ图片20230612181727.jpg",
+    "filename": "QQ图片20230612181727.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-cos-QQ图片20230612181727.webp",
+    "large": "large/manga-cos-QQ图片20230612181727.webp",
+    "width": 444,
+    "height": 400
+  },
+  {
+    "original": "data/manga/cos/QQ图片20230612182125.jpg",
+    "filename": "QQ图片20230612182125.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-cos-QQ图片20230612182125.webp",
+    "large": "large/manga-cos-QQ图片20230612182125.webp",
+    "width": 480,
+    "height": 360
+  },
+  {
+    "original": "data/manga/cos/QQ图片20241024150914.jpg",
+    "filename": "QQ图片20241024150914.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-cos-QQ图片20241024150914.webp",
+    "large": "large/manga-cos-QQ图片20241024150914.webp",
+    "width": 218,
+    "height": 480
+  },
+  {
+    "original": "data/manga/cos/QQ图片20241024150958.jpg",
+    "filename": "QQ图片20241024150958.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-cos-QQ图片20241024150958.webp",
+    "large": "large/manga-cos-QQ图片20241024150958.webp",
+    "width": 355,
+    "height": 480
+  },
+  {
+    "original": "data/manga/cos/QQ图片20241024151018.jpg",
+    "filename": "QQ图片20241024151018.jpg",
+    "alt": "动画贺图收藏",
+    "preview": "previews/manga-cos-QQ图片20241024151018.webp",
+    "large": "large/manga-cos-QQ图片20241024151018.webp",
+    "width": 182,
     "height": 480
   }
 ]

@@ -3288,3 +3288,132 @@ h1 span::after {
   }
 }
 
+/* ===========================================================================
+ * 顶部导航里的分区入口（与作品墙顶部的分区条是同一套状态）
+ * =========================================================================== */
+.nav-partitions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-partition-link {
+  padding: 7px 14px;
+  color: var(--muted);
+  background: transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  transition: color 300ms var(--ease), background 300ms var(--ease),
+    transform 300ms var(--ease), box-shadow 300ms var(--ease);
+}
+
+.nav-partition-link:hover {
+  color: var(--blue);
+  background: var(--mist);
+  box-shadow: 2px 3px 0 rgba(24, 37, 68, 0.14);
+  transform: translateY(-2px);
+}
+
+/* 当前分区：做成翻过来的深海色小贴纸，和未选中的普通导航项区分开 */
+.nav-partition-link.is-active {
+  color: var(--white);
+  background: var(--deep);
+  box-shadow: 2px 3px 0 var(--sticker-shadow);
+}
+
+.nav-partition-link.is-active:hover {
+  color: var(--white);
+  background: var(--blue);
+}
+
+.nav-partition-link:focus-visible {
+  outline: 4px solid var(--coral);
+  outline-offset: 3px;
+}
+
+/* 导航被 .nav-links 的窄屏规则隐藏时，分区入口自然一起收起，不用另写规则 */
+
+/* 分区之间用一条浅浅的竖线隔开，避免和「收录区 / 来源」糊成一排 */
+.nav-partitions::before,
+.nav-partitions::after {
+  content: '';
+  width: 1px;
+  height: 15px;
+  background: var(--line);
+}
+
+/* ===========================================================================
+ * 一键回顶端：右侧中部悬浮（原先在页脚最下方，滚到页面底部才够得着）
+ * 位置与左侧的主题书签头左右对称：同样贴容器外缘、同样垂直居中。
+ * 右下角留给可拖拽的看板娘（.mascot: bottom 22px / right 22px），互不打架。
+ * =========================================================================== */
+.back-to-top {
+  position: fixed;
+  top: 50%;
+  right: max(10px, calc(50vw - 706px));
+  z-index: 12;                       /* 与主题书签头同级，低于看板娘(25)与灯箱(30) */
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  color: var(--deep);
+  background: var(--white);
+  border: 3px solid var(--white);
+  border-radius: 14px 17px 15px 18px;   /* 贴纸感的不规则圆角，与卡片同语言 */
+  box-shadow: 4px 5px 0 var(--sticker-shadow);
+  font-family: var(--body);
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0;
+  visibility: hidden;                 /* 隐藏时同时移出 Tab 焦点顺序 */
+  transform: translate(10px, -50%) rotate(-3deg);
+  transition: opacity 320ms var(--ease), transform 320ms var(--ease),
+    visibility 320ms var(--ease), background 320ms var(--ease),
+    color 320ms var(--ease), box-shadow 320ms var(--ease);
+}
+
+/* 滚动超过约一屏后才出现，避免首屏抢视线 */
+.back-to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -50%) rotate(-3deg);
+}
+
+.back-to-top:hover {
+  color: var(--white);
+  background: var(--deep);
+  box-shadow: 2px 3px 0 var(--sticker-shadow);
+  transform: translate(-2px, -50%) rotate(0deg);
+}
+
+.back-to-top:active {
+  transform: translate(0, -50%) scale(0.96);
+}
+
+.back-to-top:focus-visible {
+  outline: 4px solid var(--coral);
+  outline-offset: 4px;
+}
+
+/* 窄屏：贴近右边缘，尺寸收到 44px（Apple HIG 最小触控区域），不再外扩 */
+@media (max-width: 1180px) {
+  .back-to-top {
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    font-size: 19px;
+  }
+}
+
+/* 减少动效偏好：只做显隐，不做位移与旋转 */
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top,
+  .back-to-top.is-visible,
+  .back-to-top:hover {
+    transform: translate(0, -50%);
+    transition: opacity 120ms linear, visibility 120ms linear;
+  }
+}
+

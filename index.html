@@ -101,6 +101,8 @@
       </a>
       <nav class="nav-links" aria-label="主导航">
         <a href="#wall">收录区</a>
+        <!-- 分区入口：由 app.js 按「当前主题」渲染，随主题切换整体重建 -->
+        <span class="nav-partitions" id="nav-partitions" role="group" aria-label="作品分区"></span>
         <a href="#archive">来源</a>
       </nav>
       <div class="nav-right">
@@ -309,6 +311,11 @@
       </section>
     </main>
 
+    <!-- 一键回顶端：右侧中部悬浮，滚过约一屏后淡入（原先在页脚最下方，已移到这里） -->
+    <a class="back-to-top" id="back-to-top" href="#top" aria-label="回到顶部">
+      <span aria-hidden="true">↑</span>
+    </a>
+
     <footer class="site-footer" id="rights" data-reveal>
       <span class="divider-bubbles footer-bubbles" aria-hidden="true"><i></i><i></i><i></i></span>
       <!-- 【替换点 6】页脚品牌与作者署名 -->
@@ -317,7 +324,6 @@
         <span>【白圣女与黑牧师伊甸园】</span>
       </span>
       <p>非官方整理 · 版权归原作者所有 ｜ 【和武叶佐乃】</p>
-      <a href="#top" aria-label="回到顶部">↑</a>
     </footer>
 
     <div class="lightbox" id="lightbox" aria-hidden="true">

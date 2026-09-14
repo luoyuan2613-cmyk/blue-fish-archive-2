@@ -17,6 +17,7 @@ const mascotBubble = document.querySelector('#mascot-bubble');
 const mascotAudio = document.querySelector('#mascot-audio');
 const stickerPartitions = document.querySelector('#sticker-partitions');
 const partitionNav = document.querySelector('#partition-nav');
+const navPartitions = document.querySelector('#nav-partitions');   // 顶部导航里的分区入口
 const partitionStatus = document.querySelector('#partition-status');
 const heroArtImage = document.querySelector('#hero-art-image');
 const heroArtWebp = document.querySelector('#hero-art-webp');
@@ -449,6 +450,24 @@ document.addEventListener('keydown', (event) => {
 });
 
 // 滚过首屏后导航浮起成白色贴纸条
+// 一键回顶端：滚过约一屏才淡入（首屏不抢视线），点击平滑回顶并尊重"减少动效"偏好
+function initBackToTop() {
+  const button = document.querySelector('#back-to-top');
+  if (!button) return;
+  const sync = () => {
+    const threshold = Math.max(320, window.innerHeight * 0.8);
+    button.classList.toggle('is-visible', window.scrollY > threshold);
+  };
+  sync();
+  window.addEventListener('scroll', sync, { passive: true });
+  window.addEventListener('resize', sync);
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+}
+
 function initNavScroll() {
   if (!siteNav) return;
   const sync = () => siteNav.classList.toggle('is-scrolled', window.scrollY > 26);
@@ -682,12 +701,22 @@ function setActivePartition(id) {
   } catch (error) {
     /* localStorage 不可用时忽略：只是不记忆分区 */
   }
-  if (!partitionNav) return;
-  partitionNav.querySelectorAll('[data-partition]').forEach((button) => {
-    const isActive = button.dataset.partition === currentPartition;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
+  // 作品墙顶部的分区条 + 顶部导航的分区入口，两处一起高亮
+  if (partitionNav) {
+    partitionNav.querySelectorAll('[data-partition]').forEach((button) => {
+      const isActive = button.dataset.partition === currentPartition;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+  }
+  if (navPartitions) {
+    navPartitions.querySelectorAll('[data-partition]').forEach((link) => {
+      const isActive = link.dataset.partition === currentPartition;
+      link.classList.toggle('is-active', isActive);
+      if (isActive) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    });
+  }
 }
 
 function getSavedPartition(themeId) {
@@ -715,10 +744,32 @@ async function setPartition(id) {
   await loadStickers();
 }
 
+// 顶部导航里的分区入口：点击即切区，并锚到作品墙（既"跳转"又"切换"）。
+// 与作品墙顶部的分区条共用 currentPartition / setPartition，两处状态永远一致；
+// 切主题时由 applyTheme 调用重新渲染，因此显示的自然是对应主题的分区。
+function renderNavPartitionLinks() {
+  if (!navPartitions) return;
+  const partitions = getActivePartitions();
+  navPartitions.replaceChildren();
+  partitions.forEach((partition) => {
+    const link = document.createElement('a');
+    link.className = 'nav-partition-link';
+    link.href = '#wall';
+    link.dataset.partition = partition.id;
+    link.textContent = partition.label;
+    const isActive = partition.id === currentPartition;
+    link.classList.toggle('is-active', isActive);
+    if (isActive) link.setAttribute('aria-current', 'true');
+    link.addEventListener('click', () => setPartition(partition.id));
+    navPartitions.appendChild(link);
+  });
+}
+
 function renderPartitionNav() {
   if (!stickerPartitions || !partitionNav) return;
   const partitions = getActivePartitions();
-  if (partitions.length <= 1) {          // 该主题只有一个分区时整条不显示
+  renderNavPartitionLinks();             // 导航入口始终跟随主题渲染
+  if (partitions.length <= 1) {          // 该主题只有一个分区时，墙顶那条不显示
     stickerPartitions.hidden = true;
     return;
   }
@@ -980,6 +1031,7 @@ function initTheme() {
 
 initMascot();
 initNavScroll();
+initBackToTop();
 initTheme();
 renderPartitionNav();
 setActivePartition(currentPartition);
