@@ -4,7 +4,10 @@
 保留其全部设计与交互（深海贴纸风、防抖瀑布流、灯箱翻页、复制转 PNG、国内可达字体 CDN），
 已清空原作者的版权素材，替换为中立占位素材与占位文案。
 
-**当前状态：占位骨架，可直接本地预览；上线前必须完成下面的「上线前 checklist」。**
+**当前状态：已推送到 GitHub（`luoyuan2613-cmyk/blue-fish-archive-2`），CI 自动链路已验证通过；
+已换入 28 张真实素材；尚待完成：品牌文案替换 + 接入 Cloudflare Pages。**
+
+上线地址（连上 Cloudflare Pages 后生效）：`https://blue-fish-archive-2.pages.dev/`
 
 ---
 
@@ -58,6 +61,33 @@ python -m http.server 8000
 
 推到 GitHub 后，`.github/workflows/sync-stickers.yml` 会在 `media/**` 有变更时
 自动跑这两条脚本并把结果 commit 回仓库，**这一步之后你连命令都不用敲**。
+
+### ⚠️ 工作流的路径触发规则（实测踩过的坑）
+
+`sync-stickers.yml` **只在这些路径变化时触发**：
+
+```
+media/**    scripts/*.py    .github/workflows/sync-stickers.yml
+```
+
+`previews/**`、`large/**`、`stickers/manifest.json` **不在触发路径里**。因此：
+
+| 你的操作 | 会发生什么 |
+|---|---|
+| 只往 `media/` 加图 → push | ✅ 触发，CI 生成缩略图 + 清单并提交回仓库 |
+| 改了 `scripts/*.py` → push | ✅ 触发 |
+| 只推 `stickers/manifest.json`（手改清单） | ❌ 什么都不触发，远端保持你推上去的样子 |
+| 只删 `previews/` 或 `large/` 里的文件 | ❌ 不触发；这些孤儿文件会留在仓库里（不影响页面，因为页面只读 manifest） |
+
+**安全做法**：永远只通过「改 `media/`」来增删图，并在本地跑完那两条脚本后**一起**提交
+（这样 manifest 也不会不同步）。另外注意：CI 自己的提交只改了 `previews/`、`large/`、
+`stickers/manifest.json`，所以**不会**再次触发自己，不会形成死循环。
+
+### 已实测的链路（本仓库验证过）
+
+- ✅ push `media/` 新图 → Actions 自动生成 `previews/` + `large/` + 更新 manifest → 以
+  `github-actions[bot]` 身份提交回仓库（需仓库 Actions 权限为 **Read and write**，已开启）
+- ✅ 清单不同步时 CI 会失败（`--check` 退出码 1），可作为护栏
 
 ## 四、上线（GitHub + Cloudflare Pages）
 
