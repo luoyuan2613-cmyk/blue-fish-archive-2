@@ -7,6 +7,24 @@
   },
   "items": [
     {
+      "original": "data/manga/cos/02.jpg",
+      "filename": "02.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-02.webp",
+      "large": "large/manga-cos-02.webp",
+      "width": 270,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/04.jpg",
+      "filename": "04.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-04.webp",
+      "large": "large/manga-cos-04.webp",
+      "width": 270,
+      "height": 480
+    },
+    {
       "original": "data/manga/cos/QQ图片20230612171136.jpg",
       "filename": "QQ图片20230612171136.jpg",
       "alt": "动画贺图收藏",
@@ -68,6 +86,393 @@
       "large": "large/manga-cos-QQ图片20241024151018.webp",
       "width": 182,
       "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230846.jpg",
+      "filename": "QQ图片20260915230846.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230846.webp",
+      "large": "large/manga-cos-QQ图片20260915230846.webp",
+      "width": 320,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230905.jpg",
+      "filename": "QQ图片20260915230905.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230905.webp",
+      "large": "large/manga-cos-QQ图片20260915230905.webp",
+      "width": 480,
+      "height": 320
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230911.jpg",
+      "filename": "QQ图片20260915230911.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230911.webp",
+      "large": "large/manga-cos-QQ图片20260915230911.webp",
+      "width": 320,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230913.jpg",
+      "filename": "QQ图片20260915230913.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230913.webp",
+      "large": "large/manga-cos-QQ图片20260915230913.webp",
+      "width": 320,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230915.jpg",
+      "filename": "QQ图片20260915230915.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230915.webp",
+      "large": "large/manga-cos-QQ图片20260915230915.webp",
+      "width": 480,
+      "height": 320
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230916.jpg",
+      "filename": "QQ图片20260915230916.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230916.webp",
+      "large": "large/manga-cos-QQ图片20260915230916.webp",
+      "width": 320,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230918.jpg",
+      "filename": "QQ图片20260915230918.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230918.webp",
+      "large": "large/manga-cos-QQ图片20260915230918.webp",
+      "width": 480,
+      "height": 320
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230920.jpg",
+      "filename": "QQ图片20260915230920.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230920.webp",
+      "large": "large/manga-cos-QQ图片20260915230920.webp",
+      "width": 480,
+      "height": 320
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230921.jpg",
+      "filename": "QQ图片20260915230921.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230921.webp",
+      "large": "large/manga-cos-QQ图片20260915230921.webp",
+      "width": 480,
+      "height": 320
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230923.jpg",
+      "filename": "QQ图片20260915230923.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230923.webp",
+      "large": "large/manga-cos-QQ图片20260915230923.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230925.jpg",
+      "filename": "QQ图片20260915230925.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230925.webp",
+      "large": "large/manga-cos-QQ图片20260915230925.webp",
+      "width": 359,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230927.jpg",
+      "filename": "QQ图片20260915230927.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230927.webp",
+      "large": "large/manga-cos-QQ图片20260915230927.webp",
+      "width": 480,
+      "height": 360
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230928.jpg",
+      "filename": "QQ图片20260915230928.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230928.webp",
+      "large": "large/manga-cos-QQ图片20260915230928.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230932.jpg",
+      "filename": "QQ图片20260915230932.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230932.webp",
+      "large": "large/manga-cos-QQ图片20260915230932.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230934.jpg",
+      "filename": "QQ图片20260915230934.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230934.webp",
+      "large": "large/manga-cos-QQ图片20260915230934.webp",
+      "width": 363,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230936.jpg",
+      "filename": "QQ图片20260915230936.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230936.webp",
+      "large": "large/manga-cos-QQ图片20260915230936.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230938.jpg",
+      "filename": "QQ图片20260915230938.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230938.webp",
+      "large": "large/manga-cos-QQ图片20260915230938.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230940.jpg",
+      "filename": "QQ图片20260915230940.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230940.webp",
+      "large": "large/manga-cos-QQ图片20260915230940.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230944.jpg",
+      "filename": "QQ图片20260915230944.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230944.webp",
+      "large": "large/manga-cos-QQ图片20260915230944.webp",
+      "width": 320,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230946.jpg",
+      "filename": "QQ图片20260915230946.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230946.webp",
+      "large": "large/manga-cos-QQ图片20260915230946.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230948.jpg",
+      "filename": "QQ图片20260915230948.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230948.webp",
+      "large": "large/manga-cos-QQ图片20260915230948.webp",
+      "width": 323,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230950.jpg",
+      "filename": "QQ图片20260915230950.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230950.webp",
+      "large": "large/manga-cos-QQ图片20260915230950.webp",
+      "width": 220,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230952.jpg",
+      "filename": "QQ图片20260915230952.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230952.webp",
+      "large": "large/manga-cos-QQ图片20260915230952.webp",
+      "width": 232,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230953.jpg",
+      "filename": "QQ图片20260915230953.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230953.webp",
+      "large": "large/manga-cos-QQ图片20260915230953.webp",
+      "width": 320,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230957.jpg",
+      "filename": "QQ图片20260915230957.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230957.webp",
+      "large": "large/manga-cos-QQ图片20260915230957.webp",
+      "width": 358,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915230958.jpg",
+      "filename": "QQ图片20260915230958.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915230958.webp",
+      "large": "large/manga-cos-QQ图片20260915230958.webp",
+      "width": 364,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231000.jpg",
+      "filename": "QQ图片20260915231000.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231000.webp",
+      "large": "large/manga-cos-QQ图片20260915231000.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231003.jpg",
+      "filename": "QQ图片20260915231003.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231003.webp",
+      "large": "large/manga-cos-QQ图片20260915231003.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231005.jpg",
+      "filename": "QQ图片20260915231005.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231005.webp",
+      "large": "large/manga-cos-QQ图片20260915231005.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231006.jpg",
+      "filename": "QQ图片20260915231006.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231006.webp",
+      "large": "large/manga-cos-QQ图片20260915231006.webp",
+      "width": 270,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231009.jpg",
+      "filename": "QQ图片20260915231009.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231009.webp",
+      "large": "large/manga-cos-QQ图片20260915231009.webp",
+      "width": 246,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231011.jpg",
+      "filename": "QQ图片20260915231011.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231011.webp",
+      "large": "large/manga-cos-QQ图片20260915231011.webp",
+      "width": 360,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231013.jpg",
+      "filename": "QQ图片20260915231013.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231013.webp",
+      "large": "large/manga-cos-QQ图片20260915231013.webp",
+      "width": 319,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231014.jpg",
+      "filename": "QQ图片20260915231014.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231014.webp",
+      "large": "large/manga-cos-QQ图片20260915231014.webp",
+      "width": 241,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231016.jpg",
+      "filename": "QQ图片20260915231016.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231016.webp",
+      "large": "large/manga-cos-QQ图片20260915231016.webp",
+      "width": 320,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231018.jpg",
+      "filename": "QQ图片20260915231018.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231018.webp",
+      "large": "large/manga-cos-QQ图片20260915231018.webp",
+      "width": 480,
+      "height": 320
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231020.jpg",
+      "filename": "QQ图片20260915231020.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231020.webp",
+      "large": "large/manga-cos-QQ图片20260915231020.webp",
+      "width": 480,
+      "height": 474
+    },
+    {
+      "original": "data/manga/cos/QQ图片20260915231022.jpg",
+      "filename": "QQ图片20260915231022.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-QQ图片20260915231022.webp",
+      "large": "large/manga-cos-QQ图片20260915231022.webp",
+      "width": 363,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/小恋大魔王_2026-09-15_09-56-0115.jpg",
+      "filename": "小恋大魔王_2026-09-15_09-56-0115.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-小恋大魔王_2026-09-15_09-56-0115.webp",
+      "large": "large/manga-cos-小恋大魔王_2026-09-15_09-56-0115.webp",
+      "width": 286,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/小恋大魔王_2026-09-15_09-56-015.jpg",
+      "filename": "小恋大魔王_2026-09-15_09-56-015.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-小恋大魔王_2026-09-15_09-56-015.webp",
+      "large": "large/manga-cos-小恋大魔王_2026-09-15_09-56-015.webp",
+      "width": 283,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/小恋大魔王_2026-09-15_09-56-05.jpg",
+      "filename": "小恋大魔王_2026-09-15_09-56-05.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-小恋大魔王_2026-09-15_09-56-05.webp",
+      "large": "large/manga-cos-小恋大魔王_2026-09-15_09-56-05.webp",
+      "width": 308,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/小恋大魔王_2026-09-15_09-56-5.jpg",
+      "filename": "小恋大魔王_2026-09-15_09-56-5.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-小恋大魔王_2026-09-15_09-56-5.webp",
+      "large": "large/manga-cos-小恋大魔王_2026-09-15_09-56-5.webp",
+      "width": 270,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/高清观看版.jpg",
+      "filename": "高清观看版.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-高清观看版.webp",
+      "large": "large/manga-cos-高清观看版.webp",
+      "width": 480,
+      "height": 270
     }
   ]
 }

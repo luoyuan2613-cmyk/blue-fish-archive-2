@@ -923,6 +923,15 @@
       "height": 480
     },
     {
+      "original": "data/manga/default/2022-09-05 193554 TEIGI_3 ⋱♱⋰✨テレビアニメ化 ✨⋱♱⋰  『白聖女と黒牧師』アニメ 1566751977471504384 1.jpg",
+      "filename": "2022-09-05 193554 TEIGI_3 ⋱♱⋰✨テレビアニメ化 ✨⋱♱⋰  『白聖女と黒牧師』アニメ 1566751977471504384 1.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-default-2022-09-05 193554 TEIGI_3 ⋱♱⋰✨テレビアニメ化 ✨⋱♱⋰  『白聖女と黒牧師』アニメ 1566751977471504384 1.webp",
+      "large": "large/manga-default-2022-09-05 193554 TEIGI_3 ⋱♱⋰✨テレビアニメ化 ✨⋱♱⋰  『白聖女と黒牧師』アニメ 1566751977471504384 1.webp",
+      "width": 327,
+      "height": 480
+    },
+    {
       "original": "data/manga/default/2023-02-18 132726 TEIGI_3 『白聖女と黒牧師』最新話が月マガ基地にて更新されております。 1626815631847989248 1.jpg",
       "filename": "2023-02-18 132726 TEIGI_3 『白聖女と黒牧師』最新話が月マガ基地にて更新されております。 1626815631847989248 1.jpg",
       "alt": "动画贺图收藏",
@@ -2372,6 +2381,15 @@
       "height": 480
     },
     {
+      "original": "data/manga/default/9-15预览图.jpg",
+      "filename": "9-15预览图.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-default-9-15预览图.webp",
+      "large": "large/manga-default-9-15预览图.webp",
+      "width": 480,
+      "height": 335
+    },
+    {
       "original": "data/manga/default/90603692_p0-『白聖女と黒牧師』⑧.jpg",
       "filename": "90603692_p0-『白聖女と黒牧師』⑧.jpg",
       "alt": "动画贺图收藏",
@@ -2822,6 +2840,33 @@
       "height": 480
     },
     {
+      "original": "data/manga/default/F7Bh47gbEAA5py0.jpg",
+      "filename": "F7Bh47gbEAA5py0.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-default-F7Bh47gbEAA5py0.webp",
+      "large": "large/manga-default-F7Bh47gbEAA5py0.webp",
+      "width": 382,
+      "height": 480
+    },
+    {
+      "original": "data/manga/default/FVW2jOtUcAERDeW.jpg",
+      "filename": "FVW2jOtUcAERDeW.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-default-FVW2jOtUcAERDeW.webp",
+      "large": "large/manga-default-FVW2jOtUcAERDeW.webp",
+      "width": 343,
+      "height": 480
+    },
+    {
+      "original": "data/manga/default/【中川】.jpg",
+      "filename": "【中川】.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-default-【中川】.webp",
+      "large": "large/manga-default-【中川】.webp",
+      "width": 346,
+      "height": 480
+    },
+    {
       "original": "data/manga/default/【动画贺图】 完结应援绘-β.jpg",
       "filename": "【动画贺图】 完结应援绘-β.jpg",
       "alt": "动画贺图收藏",
@@ -2982,6 +3027,33 @@
       "large": "large/manga-default-【动画贺图】第9話.webp",
       "width": 340,
       "height": 480
+    },
+    {
+      "original": "data/manga/default/ノンクレジットED♬.jpg",
+      "filename": "ノンクレジットED♬.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-default-ノンクレジットED♬.webp",
+      "large": "large/manga-default-ノンクレジットED♬.webp",
+      "width": 480,
+      "height": 426
+    },
+    {
+      "original": "data/manga/default/🌹🌹🌹.jpg",
+      "filename": "🌹🌹🌹.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-default-🌹🌹🌹.webp",
+      "large": "large/manga-default-🌹🌹🌹.webp",
+      "width": 385,
+      "height": 480
+    },
+    {
+      "original": "data/manga/default/🎉TVアニメ化決定🎉.jpg",
+      "filename": "🎉TVアニメ化決定🎉.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-default-🎉TVアニメ化決定🎉.webp",
+      "large": "large/manga-default-🎉TVアニメ化決定🎉.webp",
+      "width": 480,
+      "height": 340
     }
   ]
 }

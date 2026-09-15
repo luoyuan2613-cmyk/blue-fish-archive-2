@@ -19,24 +19,24 @@ window.GALLERY_THEME_DATA = {
   /* ── 全站通用：不随主题切换而变 ───────────────────────────────────────── */
   site: {
     brand: {
-      name: '白圣女与黑牧师伊甸园',        // 顶栏站名 + 页脚站名（两处共用这一份）
-      title: '白圣女与黑牧师伊甸园',       // 浏览器标签页标题
+      name: '『和武叶佐乃の伊甸园』',        // 顶栏站名 + 页脚站名（两处共用这一份）
+      title: '『和武叶佐乃の伊甸园』',       // 浏览器标签页标题
       logo: {
         color: 'logo/deepseek_蓝鲸_彩色.png',   // 顶栏那个（歪着放的彩色 logo）
         black: 'logo/deepseek_蓝鲸_黑色.png',   // 页脚那个（黑色 logo）
-        alt: '白圣女与黑牧师伊甸园 Logo',
+        alt: '伊甸园 Logo',
       },
       // 可调属性：键名 = CSS 变量名，值 = 任意合法 CSS 值。
       // 不写 = 用 styles.css 里的默认值；写了就覆盖（手机上会自动按比例缩小）。
       style: {
-        '--brand-name-size': '13px',           // 站名字号
-        '--brand-name-weight': '800',          // 站名字重（粗细）
-        '--brand-name-spacing': '0.03em',      // 站名字距
+        '--brand-name-size': '20px',           // 站名字号
+        '--brand-name-weight': '1000',          // 站名字重（粗细）
+        '--brand-name-spacing': '0.05em',      // 站名字距
         '--brand-gap': '10px',                 // 顶栏 logo 与文字的间距
-        '--brand-logo-size': '36px',           // 顶栏 logo 边长
+        '--brand-logo-size': '60px',           // 顶栏 logo 边长
         '--brand-footer-gap': '9px',           // 页脚 logo 与文字的间距
         '--brand-footer-weight': '900',        // 页脚字重
-        '--brand-footer-logo-size': '31px',    // 页脚 logo 边长
+        '--brand-footer-logo-size': '52px',    // 页脚 logo 边长
       },
     },
   },
@@ -57,9 +57,10 @@ window.GALLERY_THEME_DATA = {
       },
       hero: {
         kicker: '白聖女と黒牧師',                               // 大标题上方那行小字
-        titleLines: ['白圣女', '&黑牧师', '伊甸园'],            // 左侧大标题的三行（按顺序）
+        titleLines: ['白圣女', '&黑牧师', 'in伊甸园'],            // 左侧大标题的三行（按顺序）
+        titleOffsets: ['-70px', '30px', '-30px'],               // 每行各自的左右偏移：负数往左、正数往右；不写就沿用 index.html 那三条
         lede: '记录可爱的圣女大人',                             // 大标题下方的副标题
-        cta: '迈入园区',                                        // 按钮文字（箭头是页面自带的）
+        cta: '入园',                                        // 按钮文字（箭头是页面自带的）
         art: {                                                  // 立绘
           png: 'assets/001.png',
           webp: 'assets/001.webp',
@@ -67,6 +68,14 @@ window.GALLERY_THEME_DATA = {
         },
         artTag: '白圣女 · 塞西莉娅',                            // 立绘左上角标签
         note: '黑牧师 · 劳伦斯',                                // 立绘右下角标签
+        // 大标题的可调属性（键名 = CSS 变量名，不写就用 styles.css 的默认值）
+        style: {
+          '--hero-title-size': 'clamp(3.1rem, 5vw, 5.7rem)',  // 字号（桌面）；想让手机单独小一点再加 --hero-title-size-mobile
+          '--hero-title-weight': '900',                       // 字重
+          '--hero-title-spacing': '2px',                      // 字距（每行内部）
+          '--hero-title-line-height': '1.08',                 // 行高
+          '--hero-title-gap': '15px',                         // 三行之间的间距
+        },
       },
       partitions: [                                             // 该主题的分区（顶部分区条）
         { id: 'default', label: '默认区', manifest: 'stickers/manifest_manga-default.json' },
@@ -75,7 +84,7 @@ window.GALLERY_THEME_DATA = {
     },
     {
       id: 'whale',
-      name: '蓝色大肥鱼主题',      // 切换确认框里显示（想改成"童话般的你主题"就改这一行）
+      name: '童话般的你主题',      // 切换确认框里显示（想改成"童话般的你主题"就改这一行）
       label: '童话',               // 左侧主题书签上显示
       vars: {
         '--ink': '#16213d', '--deep': '#202d52', '--blue': '#607aa9',
@@ -86,21 +95,30 @@ window.GALLERY_THEME_DATA = {
         '--tape-mist': 'rgba(223, 232, 245, 0.92)',
       },
       hero: {
-        kicker: '鲸鱼娘 DEEPSEEK',
-        titleLines: ['白圣女', '&黑牧师', '伊甸园'],   // ⚠️ 目前与 manga 相同：想给 whale 单独文案就改这三行
+        kicker: '儚キミ_Charge',
+        titleLines: ['童话般的你', '发起恋爱猛攻', 'in伊甸园'],   // 左侧大标题的三行（按顺序）
+        titleOffsets: ['-10px', '-5px', '-10px'],               // 每行各自的左右偏移：负数往左、正数往右；不写就沿用 index.html 那三条
         lede: '记录童话的美',
-        cta: '迈入园区',
+        cta: '入园',
         art: {
           png: 'assets/theme-whale.png',
           webp: 'assets/theme-whale.webp',
           alt: '童话立绘',
         },
         artTag: '档案 · NO.001',
-        note: '花璃',
+        note: '花璃&七君',
+        // 大标题的可调属性（键名 = CSS 变量名，不写就用 styles.css 的默认值）
+        style: {
+          '--hero-title-size': 'clamp(3.1rem, 5vw, 4.5rem)',  // 字号（桌面）；想让手机单独小一点再加 --hero-title-size-mobile
+          '--hero-title-weight': '900',                       // 字重
+          '--hero-title-spacing': '2px',                      // 字距（每行内部）
+          '--hero-title-line-height': '1.08',                 // 行高
+          '--hero-title-gap': '30px',                         // 三行之间的间距
+        },
       },
       partitions: [
         { id: 'default', label: '默认区', manifest: 'stickers/manifest_whale-default.json' },
-        { id: 'cos', label: 'Cos区', manifest: 'stickers/manifest_whale-cos.json' },
+        { id: 'cos', label: '表情墙', manifest: 'stickers/manifest_whale-cos.json' },
       ],
     },
   ],

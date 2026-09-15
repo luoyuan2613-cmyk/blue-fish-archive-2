@@ -1176,17 +1176,29 @@ h1 {
   margin-bottom: 19px;
   color: var(--deep);
   font-family: var(--round);
-  font-size: clamp(3.1rem, 5vw, 5.7rem);
-  font-weight: 900;
-  letter-spacing: -0.1em;
-  line-height: 1.08;
+  /* 大标题的可调属性：都在 theme-data.js → themes[].hero.style 里改。
+     每个 var() 都带默认值 = 现在这个样子；不配就等于没改。
+     必须是 CSS 变量而不是内联样式：内联样式优先级最高，会压死下面媒体查询里的手机字号。 */
+  font-size: var(--hero-title-size, clamp(3.1rem, 5vw, 5.7rem));
+  font-weight: var(--hero-title-weight, 900);
+  letter-spacing: var(--hero-title-spacing, -0.1em);
+  line-height: var(--hero-title-line-height, 1.08);
   text-wrap: balance;
+}
+
+/* 三行大标题的排版（原来是写在 index.html 的行内样式，挪出来才能被配置覆盖） */
+#hero-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--hero-title-gap, 15px);
 }
 
 h1 span {
   position: relative;
   display: inline-block;
   color: var(--blue);
+  letter-spacing: var(--hero-title-spacing, 2px);   /* 实际生效的是这条（行内那条已挪走） */
   white-space: nowrap;
   /* 白描边 + 硬投影,让"档案馆"三个字像一张贴纸贴在标题上 */
   text-shadow:
@@ -2727,7 +2739,8 @@ h1 span::after {
   }
 
   h1 {
-    font-size: clamp(3.1rem, 15vw, 5rem);
+    /* 手机上：设了 --hero-title-size-mobile 就用它；否则用桌面那个值；都没设才用原来的流式值 */
+    font-size: var(--hero-title-size-mobile, var(--hero-title-size, clamp(3.1rem, 15vw, 5rem)));
   }
 
   .hero-lede {
@@ -3222,7 +3235,9 @@ h1 span::after {
 .theme-switcher {
   position: fixed;
   top: 50%;
-  left: max(10px, calc(50vw - 706px));
+  /* 基准 50vw - 706px = 内容列（.page-shell）的左边缘；再往左让 86px，落到左边那圈留白里。
+     想再往左/往右挪，只改这个增量（把 792 加大 = 更往左）；max() 兜底防止窄窗口跑到屏幕外。 */
+  left: max(6px, calc(50vw - 792px));
   z-index: 12;
   display: flex;
   flex-direction: column;

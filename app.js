@@ -1232,13 +1232,15 @@ function getActiveTheme() {
   return themeConfig.find((theme) => theme.id === activeThemeId) || getDefaultTheme();
 }
 
-// 读取页面初始状态作为"基底快照"：切主题时先还原再覆盖，避免变量互相污染
+// 读取页面初始状态作为"基底快照"：切主题时先还原再覆盖，避免变量互相污染。
+// 主题可下的"变量"有两处：色板 theme.vars 与排版参数 theme.hero.style，都要纳入快照。
+const themeVarNames = (theme) => [
+  ...Object.keys(theme.vars || {}),
+  ...Object.keys((theme.hero && theme.hero.style) || {}),
+];
+
 const baseThemeVars = (() => {
-  const declared = themeConfig[0]?.vars || {};
-  const names = new Set([
-    ...Object.keys(declared),
-    ...themeConfig.flatMap((theme) => Object.keys(theme.vars || {})),
-  ]);
+  const names = new Set(themeConfig.flatMap((theme) => themeVarNames(theme)));
   const rootStyle = document.documentElement.style;
   const snapshot = {};
   names.forEach((name) => {
@@ -1257,7 +1259,11 @@ function restoreBaseVars() {
 function applyThemeVars(theme) {
   restoreBaseVars();
   const rootStyle = document.documentElement.style;
-  Object.entries(theme.vars || {}).forEach(([name, value]) => rootStyle.setProperty(name, value));
+  // 色板 + 该主题的排版参数（hero.style，例如大标题的字号/字重/行高）
+  const vars = { ...(theme.vars || {}), ...((theme.hero && theme.hero.style) || {}) };
+  Object.entries(vars).forEach(([name, value]) => {
+    if (value) rootStyle.setProperty(name, value);
+  });
 }
 
 function setThemeImage(selector, src) {
@@ -1320,9 +1326,18 @@ const TEXT_BINDINGS = [
 const textDefaults = new Map();
 const artDefaults = { png: '', webp: '', alt: '' };
 
+// 大标题每行的横向错落（index.html 里那三条行内 translateX）也要记下来当回落基准：
+// 否则某个主题配了错落、切回没配的主题时，会残留上一个主题的偏移。
+const HERO_LINE_SELECTOR = '#hero-title span';
+const titleOffsetDefaults = [];
+
 function captureDomDefaults() {
   TEXT_BINDINGS.forEach(([, selector]) => {
     textDefaults.set(selector, Array.from(document.querySelectorAll(selector), (el) => el.textContent));
+  });
+  titleOffsetDefaults.length = 0;
+  document.querySelectorAll(HERO_LINE_SELECTOR).forEach((el) => {
+    titleOffsetDefaults.push(el.style.transform || '');
   });
   if (heroArtImage) {
     artDefaults.png = heroArtImage.getAttribute('src') || '';
@@ -1347,6 +1362,18 @@ function applyThemeText(theme) {
       const next = (list[index] ?? (list.length === 1 ? list[0] : undefined)) || defaults[index];
       if (next) el.textContent = next;
     });
+  });
+
+  // 大标题每行的横向错落：与文字分开配（titleLines 管字，titleOffsets 管偏移）。
+  // 值可以写 '-40px' 这种简写，也可以写完整的 transform；不写就回落到 index.html 里那三条。
+  const offsets = Array.isArray(hero.titleOffsets) ? hero.titleOffsets : [];
+  document.querySelectorAll(HERO_LINE_SELECTOR).forEach((el, index) => {
+    const raw = offsets[index] || titleOffsetDefaults[index] || '';
+    if (!raw) {
+      el.style.removeProperty('transform');
+      return;
+    }
+    el.style.transform = raw.includes('(') ? raw : `translateX(${raw})`;
   });
 }
 
