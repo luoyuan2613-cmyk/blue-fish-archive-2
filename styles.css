@@ -3472,16 +3472,6 @@ h1 span::after {
     max-width: 94vw;
     max-height: 78vh;
   }
-
-  .lightbox.is-maximized .lightbox-actions {
-    bottom: 10px;
-    grid-template-columns: repeat(2, minmax(0, 136px));
-    gap: 8px;
-  }
-
-  .lightbox.is-maximized .action-status {
-    bottom: 58px;
-  }
 }
 
 /* ===========================================================================
@@ -3564,8 +3554,18 @@ h1 span::after {
   transform: translateX(-50%);
 }
 
+/* 状态行自身也要浮起来（位置/颜色/居中都在这里给全，
+   否则它退回文档流，"距底 132px"就失效了） */
 .lightbox.is-immersive .action-status {
-  bottom: 132px;                   /* 再让位给缩放条与操作条 */
+  position: fixed;
+  bottom: 132px;
+  left: 50%;
+  z-index: 4;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 11px;
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 
 @media (max-width: 700px) {
@@ -3648,9 +3648,10 @@ h1 span::after {
 .lightbox.is-immersive .lightbox-actions,
 .lightbox.is-immersive .action-status {
   opacity: 0;
-  transform: translateY(14px);
   pointer-events: none;              /* 隐藏时不拦截鼠标，可直接在图上拖动平移 */
-  transition: opacity 240ms var(--ease), transform 240ms var(--ease);
+  /* 这里刻意只用透明度做显隐：位移类 transform 会改变 getBoundingClientRect，
+     让"距底 X px"的几何断言随显隐状态漂移（调试时被坑过）。 */
+  transition: opacity 240ms var(--ease);
 }
 
 /* 指针靠近屏幕底部（由 app.js 加 is-chrome-shown）或键盘聚焦时才显现 */
@@ -3662,7 +3663,6 @@ h1 span::after {
 .lightbox.is-immersive .lightbox-zoom:focus-within,
 .lightbox.is-immersive .lightbox-actions:focus-within {
   opacity: 0.9;
-  transform: none;
   pointer-events: auto;
 }
 
@@ -3681,7 +3681,6 @@ h1 span::after {
   .lightbox.is-immersive .lightbox-actions,
   .lightbox.is-immersive .action-status {
     opacity: 0.92;
-    transform: none;
     pointer-events: auto;
   }
 
@@ -3722,6 +3721,11 @@ h1 span::after {
   border-radius: 0;
   box-shadow: none;
   transform: none;
+  /* 关键：连过渡一起取消。
+     transform（哪怕只是过渡中的单位矩阵）会让面板成为 position: fixed 后代的**包含块**，
+     于是底部控件的 bottom 变成"相对图片框"而不是"相对视口" → 进入沉浸态时错位/跳动。
+     这也是坑 15 只被当作"测量假象"时的真实后果。 */
+  transition: none;
 }
 
 .lightbox.is-immersive .lightbox-media-shell {

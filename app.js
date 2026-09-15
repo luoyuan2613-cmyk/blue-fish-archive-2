@@ -557,6 +557,8 @@ const CHROME_REVEAL_BAND = 170;    // 距屏幕底部多少像素算“靠近”
 const CHROME_HOLD_MS = 1600;       // 键盘操作后临时显示的时长
 
 let chromeHoldTimer = null;
+let chromeSuppressUntil = 0;       // 这段时间内不因"指针在底部带内"而显现
+const CHROME_SUPPRESS_MS = 700;    // 点完按钮先让控件消失一下，指针再动才回来
 
 function setChromeShown(shown) {
   if (!lightbox) return;
@@ -573,8 +575,19 @@ function revealChromeTemporarily() {
 function initChromeAutoHide() {
   if (!lightbox) return;
 
+  // 点了底部控件后先隐藏：否则"鼠标停在按钮上"会让它一直挂着，
+  // 看起来像"点了最大化却没隐藏"（指针不动就不再显现，动一下才回来）
+  lightbox.addEventListener('click', (event) => {
+    if (!lightbox.classList.contains('is-immersive')) return;
+    if (!(event.target instanceof Element)) return;
+    if (!event.target.closest('.lightbox-zoom, .lightbox-actions')) return;
+    chromeSuppressUntil = performance.now() + CHROME_SUPPRESS_MS;
+    setChromeShown(false);
+  });
+
   lightbox.addEventListener('pointermove', (event) => {
     if (!lightbox.classList.contains('is-immersive')) return;
+    if (performance.now() < chromeSuppressUntil) return;   // 刚点完，先别急着显现
     const nearBottom = event.clientY >= window.innerHeight - CHROME_REVEAL_BAND;
     const overChrome = event.target instanceof Element
       && event.target.closest('.lightbox-actions, .lightbox-zoom, .lightbox-caption, #action-status');
@@ -714,6 +727,7 @@ function closeLightbox() {
   resetZoom();
   syncImmersive();
   window.clearTimeout(chromeHoldTimer);
+  chromeSuppressUntil = 0;
   setChromeShown(false);
   panning = null;
   viewerMode = 'list';
