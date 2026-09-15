@@ -1,6 +1,6 @@
 {
   "storage": {
-    "mode": "",
+    "mode": "local",
     "baseUrl": "",
     "previewBaseUrl": "",
     "largeBaseUrl": ""
