@@ -57,11 +57,27 @@ SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".apng"}
 DATA_DIR = ROOT / "data"
 
 # ---- 存储模式与地址（全部可用环境变量覆盖，代码里不出现任何密钥）----
-STORAGE_MODE = os.environ.get("GALLERY_STORAGE_MODE", "local").strip().lower()
-STORAGE_BASE_URL = os.environ.get("GALLERY_BASE_URL", "").strip()
-STORAGE_PREVIEW_BASE_URL = os.environ.get("GALLERY_PREVIEW_BASE_URL", "").strip()
-STORAGE_LARGE_BASE_URL = os.environ.get("GALLERY_LARGE_BASE_URL", "").strip()
-REMOTE_API = os.environ.get("GALLERY_REMOTE_API", "").strip()
+
+def _env(name: str, default: str = "") -> str:
+    """读取环境变量；**空字符串按未设置处理**。
+
+    为什么必须这样：GitHub Actions 里 `${{ vars.XXX }}` 在变量未定义时会传成空字符串，
+    而 os.environ.get(name, default) 只在"键不存在"时才用默认值——
+    于是 CI 里 mode 会变成 ''，与本地生成的 'local' 不一致，
+    CI 每次都会多提交一次"清单不同步"（实测踩过）。
+    """
+    return os.environ.get(name, "").strip() or default
+
+
+STORAGE_MODE = _env("GALLERY_STORAGE_MODE", "local").lower()
+if STORAGE_MODE not in {"local", "remote"}:
+    raise SystemExit(
+        f"GALLERY_STORAGE_MODE 只能是 local 或 remote，当前为 {STORAGE_MODE!r}"
+    )
+STORAGE_BASE_URL = _env("GALLERY_BASE_URL")
+STORAGE_PREVIEW_BASE_URL = _env("GALLERY_PREVIEW_BASE_URL")
+STORAGE_LARGE_BASE_URL = _env("GALLERY_LARGE_BASE_URL")
+REMOTE_API = _env("GALLERY_REMOTE_API")
 
 # ↓↓↓ 想要改图片说明，只改这一行（会被写进 manifest 的 alt，灯箱与无障碍朗读用）↓↓↓
 DEFAULT_ALT = "动画贺图收藏"
