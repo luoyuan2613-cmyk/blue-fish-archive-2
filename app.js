@@ -344,6 +344,17 @@ function setViewerMeta(text) {
   if (lightboxMeta) lightboxMeta.textContent = text || '';
 }
 
+// 沉浸态 = 最大化 或 已缩放。此时底部控件变半透明（CSS 负责外观），
+// 目的是不遮挡图片；鼠标移上去会自动恢复实心（纯 CSS :hover/:focus-within）。
+function isImmersive() {
+  return isMaximized || !isAtFit();
+}
+
+function syncImmersive() {
+  if (!lightbox) return;
+  lightbox.classList.toggle('is-immersive', isImmersive());
+}
+
 function setZoomLabel() {
   if (!zoomLevelLabel) return;
   const atFit = Math.abs(zoomPercent - fitPercent) < 0.5;
@@ -397,6 +408,7 @@ function applyZoom() {
     panX = 0;
     panY = 0;
     setZoomLabel();
+    syncImmersive();
     return;
   }
   lightboxMediaShell.classList.add('is-zoomed');
@@ -406,6 +418,7 @@ function applyZoom() {
   lightboxImage.style.transform = `translate(${panX}px, ${panY}px)`;
   lightboxImage.classList.toggle('is-pannable', isPannable());
   setZoomLabel();
+  syncImmersive();
 }
 
 function setZoom(percent) {
@@ -442,6 +455,7 @@ function resetZoom() {
   panY = 0;
   clearZoomStyles();
   setZoomLabel();
+  syncImmersive();
 }
 
 // 图片就绪后：测出「适应」百分比、更新单图模式的尺寸说明
@@ -628,6 +642,7 @@ function stepLightbox(step) {
 function closeLightbox() {
   setMaximized(false);                 // 关闭时一并退出最大化，下次打开是正常大小
   resetZoom();
+  syncImmersive();
   panning = null;
   viewerMode = 'list';
   singleView = null;
@@ -656,6 +671,7 @@ function setMaximized(next) {
   if (maximizeButton) maximizeButton.setAttribute('aria-pressed', String(isMaximized));
   if (maximizeLabel) maximizeLabel.textContent = isMaximized ? '还原大小' : '最大化';
   if (actionStatus) actionStatus.textContent = isMaximized ? MAXIMIZE_HINT : '';
+  syncImmersive();
 }
 
 if (maximizeButton) maximizeButton.addEventListener('click', () => setMaximized(!isMaximized));

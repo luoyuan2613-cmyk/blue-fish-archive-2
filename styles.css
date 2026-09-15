@@ -3464,7 +3464,6 @@ h1 span::after {
   bottom: 16px;
   left: 50%;
   z-index: 4;
-  grid-template-columns: repeat(2, minmax(0, 168px));
   padding-top: 0;
   transform: translateX(-50%);
 }
@@ -3613,5 +3612,115 @@ h1 span::after {
   .lightbox.is-maximized .action-status {
     bottom: 104px;
   }
+}
+
+/* ===========================================================================
+ * 修复：最大化模式下缩放"看不出变化"
+ *
+ * 原因（实测）：`.lightbox.is-maximized .lightbox-media-shell img` 是 3 个类 + 元素，
+ * 优先级高于原来的 `.lightbox-media-shell.is-zoomed img`（2 个类 + 元素），
+ * 于是 max-height: 92vh 始终生效，图片被压回原框，+／滚轮只在几十像素里来回蹭。
+ * 修法：用至少同等优先级的选择器把尺寸上限真正解除。
+ * =========================================================================== */
+.lightbox.is-maximized .lightbox-media-shell.is-zoomed img,
+.lightbox .lightbox-media-shell.is-zoomed img {
+  max-width: none;
+  max-height: none;
+}
+
+/* 一进入缩放就把可视框撑到最大化尺寸，图片才"真的变大"（而不是只被裁切） */
+.lightbox-media-shell.is-zoomed {
+  max-width: 96vw;
+  max-height: 92vh;
+}
+
+/* ===========================================================================
+ * 修复：缩放时按钮/档案条被拉伸变形
+ *
+ * 原因（实测）：面板是 width: fit-content，图片一放大面板就从 465px 涨到 1325px，
+ * 而按钮行是 1fr 1fr，于是被一起拉长。
+ * 修法：给底部三行**固定宽度**，与图片宽度彻底解耦。
+ * =========================================================================== */
+.lightbox-caption,
+.lightbox-zoom,
+.lightbox-actions {
+  width: min(460px, 86vw);
+  margin-inline: auto;
+}
+
+/* ===========================================================================
+ * 沉浸态（最大化 或 已缩放）：底部控件半透明，不遮挡图片
+ * 鼠标移到控件上或键盘聚焦时恢复实心；空白处不拦截鼠标，方便直接在图上拖动
+ * =========================================================================== */
+.lightbox.is-immersive .lightbox-caption,
+.lightbox.is-immersive .lightbox-zoom,
+.lightbox.is-immersive .lightbox-actions,
+.lightbox.is-immersive .action-status {
+  opacity: 0.3;
+  transition: opacity 260ms var(--ease);
+}
+
+.lightbox.is-immersive .lightbox-caption:hover,
+.lightbox.is-immersive .lightbox-caption:focus-within,
+.lightbox.is-immersive .lightbox-zoom:hover,
+.lightbox.is-immersive .lightbox-zoom:focus-within,
+.lightbox.is-immersive .lightbox-actions:hover,
+.lightbox.is-immersive .lightbox-actions:focus-within {
+  opacity: 1;
+}
+
+/* 让空白区域"透传"给图片，只有真正的按钮/链接接收点击 */
+.lightbox.is-immersive .lightbox-zoom,
+.lightbox.is-immersive .lightbox-actions {
+  pointer-events: none;
+}
+
+.lightbox.is-immersive .lightbox-zoom > *,
+.lightbox.is-immersive .lightbox-actions > * {
+  pointer-events: auto;
+}
+
+/* 关闭键与翻页键也一并淡一点，别在图上太抢眼（悬停恢复） */
+.lightbox.is-immersive .lightbox-close,
+.lightbox.is-immersive .lightbox-nav {
+  opacity: 0.5;
+  transition: opacity 260ms var(--ease);
+}
+
+.lightbox.is-immersive .lightbox-close:hover,
+.lightbox.is-immersive .lightbox-nav:hover,
+.lightbox.is-immersive .lightbox-close:focus-visible,
+.lightbox.is-immersive .lightbox-nav:focus-visible {
+  opacity: 1;
+}
+
+@media (max-width: 700px) {
+  .lightbox-caption,
+  .lightbox-zoom,
+  .lightbox-actions {
+    width: min(320px, 88vw);
+  }
+}
+
+/* 沉浸态下把白卡与透明棋盘格一并收掉：缩放时看到的是"图片浮在暗底上"，
+   而不是一张裁切过的图贴在白卡里（侧边出现白条会显得像坏掉） */
+.lightbox.is-immersive .lightbox-panel {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+}
+
+.lightbox.is-immersive .lightbox-media-shell {
+  background-color: transparent;
+  background-image: none;
+  border-radius: 12px;
+}
+
+/* 沉浸态不需要和纸胶带（它在卡片顶上，卡都没了） */
+.lightbox.is-immersive .tape-panel {
+  display: none;
 }
 
