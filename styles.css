@@ -3422,15 +3422,6 @@ h1 span::after {
  * 做法：把白色卡片装饰收掉，图片放大到视口，操作条浮到底部居中。
  * 浏览器 UI 仍在，所以退出靠「再点按钮」或 Esc。
  * =========================================================================== */
-.lightbox.is-maximized .lightbox-panel {
-  padding: 0;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  transform: none;
-}
-
 /* 最大化时不需要和纸胶带与档案条（Esc 提示由状态行承担） */
 .lightbox.is-maximized .tape-panel,
 .lightbox.is-maximized .lightbox-caption {
@@ -3472,19 +3463,6 @@ h1 span::after {
 
 .lightbox.is-maximized .action-button {
   min-height: 44px;
-}
-
-/* 状态行也跟着浮起来，用浅色字压在深色背景上 */
-.lightbox.is-maximized .action-status {
-  position: fixed;
-  bottom: 68px;
-  left: 50%;
-  z-index: 4;
-  margin: 0;
-  color: rgba(255, 255, 255, 0.76);
-  font-size: 11px;
-  transform: translateX(-50%);
-  white-space: nowrap;
 }
 
 /* 窄屏：给操作条留出更靠边的位置，图片略收一点 */
@@ -3664,32 +3642,53 @@ h1 span::after {
  * 沉浸态（最大化 或 已缩放）：底部控件半透明，不遮挡图片
  * 鼠标移到控件上或键盘聚焦时恢复实心；空白处不拦截鼠标，方便直接在图上拖动
  * =========================================================================== */
+/* 沉浸态（最大化 或 已缩放）：底部控件**默认隐藏**，不遮挡图片 */
 .lightbox.is-immersive .lightbox-caption,
 .lightbox.is-immersive .lightbox-zoom,
 .lightbox.is-immersive .lightbox-actions,
 .lightbox.is-immersive .action-status {
-  opacity: 0.22;
-  transition: opacity 260ms var(--ease);
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;              /* 隐藏时不拦截鼠标，可直接在图上拖动平移 */
+  transition: opacity 240ms var(--ease), transform 240ms var(--ease);
 }
 
-.lightbox.is-immersive .lightbox-caption:hover,
+/* 指针靠近屏幕底部（由 app.js 加 is-chrome-shown）或键盘聚焦时才显现 */
+.lightbox.is-immersive.is-chrome-shown .lightbox-caption,
+.lightbox.is-immersive.is-chrome-shown .lightbox-zoom,
+.lightbox.is-immersive.is-chrome-shown .lightbox-actions,
+.lightbox.is-immersive.is-chrome-shown .action-status,
 .lightbox.is-immersive .lightbox-caption:focus-within,
-.lightbox.is-immersive .lightbox-zoom:hover,
 .lightbox.is-immersive .lightbox-zoom:focus-within,
-.lightbox.is-immersive .lightbox-actions:hover,
 .lightbox.is-immersive .lightbox-actions:focus-within {
-  opacity: 1;
-}
-
-/* 让空白区域"透传"给图片，只有真正的按钮/链接接收点击 */
-.lightbox.is-immersive .lightbox-zoom,
-.lightbox.is-immersive .lightbox-actions {
-  pointer-events: none;
-}
-
-.lightbox.is-immersive .lightbox-zoom > *,
-.lightbox.is-immersive .lightbox-actions > * {
+  opacity: 0.9;
+  transform: none;
   pointer-events: auto;
+}
+
+/* 只有"已显现"时子元素才接收点击——否则隐藏的按钮会被误点 */
+.lightbox.is-immersive.is-chrome-shown .lightbox-zoom > *,
+.lightbox.is-immersive.is-chrome-shown .lightbox-actions > *,
+.lightbox.is-immersive .lightbox-zoom:focus-within > *,
+.lightbox.is-immersive .lightbox-actions:focus-within > * {
+  pointer-events: auto;
+}
+
+/* 触屏没有 hover，"靠近才显现"会让按钮永远出不来 → 触屏上常显（略淡） */
+@media (hover: none) {
+  .lightbox.is-immersive .lightbox-caption,
+  .lightbox.is-immersive .lightbox-zoom,
+  .lightbox.is-immersive .lightbox-actions,
+  .lightbox.is-immersive .action-status {
+    opacity: 0.92;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .lightbox.is-immersive .lightbox-zoom > *,
+  .lightbox.is-immersive .lightbox-actions > * {
+    pointer-events: auto;
+  }
 }
 
 /* 关闭键与翻页键也一并淡一点，别在图上太抢眼（悬停恢复） */

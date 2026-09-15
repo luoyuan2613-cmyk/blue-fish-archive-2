@@ -543,6 +543,54 @@ function initHeroArtZoom() {
   });
 }
 
+/* ---------------------------------------------------------------------------
+ * 沉浸态底部控件自动隐藏
+ *
+ * 需求：放大/最大化后，底部那组控件**直接隐藏**，只有指针靠近屏幕底部（或键盘聚焦）时才
+ * 半透明显现。
+ *
+ * 为什么必须用 JS：隐藏后的元素（opacity:0 + pointer-events:none）**收不到 hover**，
+ * 纯 CSS 做不到"靠近才出现"。（之前那版"常在半透明 + :hover 变实心"还有个副作用：
+ * 鼠标点完按钮仍停在按钮上 → :hover 一直生效 → 表现成"点了最大化按钮却没变透明"。）
+ * ------------------------------------------------------------------------- */
+const CHROME_REVEAL_BAND = 170;    // 距屏幕底部多少像素算“靠近”
+const CHROME_HOLD_MS = 1600;       // 键盘操作后临时显示的时长
+
+let chromeHoldTimer = null;
+
+function setChromeShown(shown) {
+  if (!lightbox) return;
+  lightbox.classList.toggle('is-chrome-shown', Boolean(shown));
+}
+
+// 键盘用户看不到指针位置，操作后临时显示一会儿
+function revealChromeTemporarily() {
+  setChromeShown(true);
+  window.clearTimeout(chromeHoldTimer);
+  chromeHoldTimer = window.setTimeout(() => setChromeShown(false), CHROME_HOLD_MS);
+}
+
+function initChromeAutoHide() {
+  if (!lightbox) return;
+
+  lightbox.addEventListener('pointermove', (event) => {
+    if (!lightbox.classList.contains('is-immersive')) return;
+    const nearBottom = event.clientY >= window.innerHeight - CHROME_REVEAL_BAND;
+    const overChrome = event.target instanceof Element
+      && event.target.closest('.lightbox-actions, .lightbox-zoom, .lightbox-caption, #action-status');
+    setChromeShown(nearBottom || Boolean(overChrome));
+  });
+
+  lightbox.addEventListener('pointerleave', () => {
+    if (lightbox.classList.contains('is-immersive')) setChromeShown(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (!lightbox.classList.contains('is-open')) return;
+    if (['+', '=', '-', '_', '0'].includes(event.key)) revealChromeTemporarily();
+  });
+}
+
 // 缩放交互：滚轮 / 双击 / 按钮 / 拖动平移
 function initViewerZoom() {
   if (!lightbox) return;
@@ -665,6 +713,8 @@ function closeLightbox() {
   setMaximized(false);                 // 关闭时一并退出最大化，下次打开是正常大小
   resetZoom();
   syncImmersive();
+  window.clearTimeout(chromeHoldTimer);
+  setChromeShown(false);
   panning = null;
   viewerMode = 'list';
   singleView = null;
@@ -1310,6 +1360,7 @@ initMascot();
 initNavScroll();
 initHeroArtZoom();
 initViewerZoom();
+initChromeAutoHide();
 initBackToTop();
 initTheme();
 renderPartitionNav();
