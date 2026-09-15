@@ -91,6 +91,52 @@ def _image_dimensions(path: Path) -> tuple[int, int] | None:
         return None
 
 
+# ---- 文件名防呆：URL 不安全字符 -------------------------------------------------
+#
+# 素材多是从推特存下来的，文件名里会带 `#`（话题标签）之类的内容。真踩过（坑 26）：
+#   27 张 `... #白聖女と黒牧師 ...` 的图**一直没在墙上显示过**，而且更隐蔽的是——
+#   `#` 在 URL 里是**锚点**，浏览器请求时会把它之后整段丢掉 → 请求到不存在的短路径 → 404
+#   → 卡片被判为加载失败 → 当时从 DOM 里删掉卡片 → CSS 多列整墙重排
+#   → 表现为"滚动时已经显示的图片概率性闪一下换成另一张图"（所以前端也做了转义兜底）。
+#
+# 这里在**入库时**就把文件名洗干净（重命名磁盘上的文件，清单与缩略图产物名随之更新），
+# 从源头避免二次编码问题：CDN / 对象存储 / 本地预览都不必再特判。
+#
+# 只替换"真的会破坏 URL"的字符；**空格、中文、`!` 一律保留**——
+# 它们是合法字符（浏览器会自动编码），改名会把 390 个文件名全冲一遍，得不偿失。
+UNSAFE_NAME_CHARS = "#?%"
+
+# 关掉这个行为（例如想先人工确认）：--no-sanitize 或 GALLERY_SANITIZE_NAMES=0
+SANITIZE_NAMES = _env("GALLERY_SANITIZE_NAMES", "1").strip().lower() not in {"0", "false", "no", "off"}
+
+
+def sanitize_filename(name: str) -> str:
+    """把文件名里会破坏 URL 的字符换成 `_`（只处理文件名，不动目录）。"""
+    cleaned = name
+    for char in UNSAFE_NAME_CHARS:
+        cleaned = cleaned.replace(char, "_")
+    return cleaned
+
+
+def sanitize_source_names(source_dir: Path) -> list[tuple[str, str]]:
+    """重命名分区内 URL 不安全的源文件名，返回 [(旧名, 新名), ...]。撞名自动编号，绝不覆盖。"""
+    renames: list[tuple[str, str]] = []
+    for path in sorted(source_dir.iterdir(), key=lambda item: item.name.casefold()):
+        if not path.is_file() or path.suffix.lower() not in SUPPORTED_EXTENSIONS:
+            continue
+        safe = sanitize_filename(path.name)
+        if safe == path.name:
+            continue
+        target = source_dir / safe
+        index = 2
+        while target.exists():
+            target = source_dir / f"{Path(safe).stem}-{index}{Path(safe).suffix}"
+            index += 1
+        path.rename(target)
+        renames.append((path.name, target.name))
+    return renames
+
+
 def build_manifest(source_dir: Path, theme: str, partition: str) -> list[dict[str, str]]:
     if not source_dir.is_dir():
         raise FileNotFoundError(f"Sticker source directory not found: {source_dir}")
@@ -229,6 +275,11 @@ def main() -> int:
         action="store_true",
         help="Fail when any partition manifest is not synchronized with its source folder.",
     )
+    parser.add_argument(
+        "--no-sanitize",
+        action="store_true",
+        help="Do not rename source files that contain URL-unsafe characters (# ? %).",
+    )
     args = parser.parse_args()
 
     try:
@@ -236,6 +287,13 @@ def main() -> int:
     except FileNotFoundError as error:
         print(error, file=sys.stderr)
         return 1
+
+    # 文件名防呆：先洗名字，再建清单（顺序不能反，否则清单里还是旧文件名）。
+    # --check 是只读校验（PR 里跑），绝不能改名，所以跳过。
+    if not args.check and not args.no_sanitize and SANITIZE_NAMES and STORAGE_MODE == "local":
+        for partition in partitions:
+            for old_name, new_name in sanitize_source_names(Path(partition["source"])):
+                print(f"[{partition['id']}] 文件名防呆: {old_name}  →  {new_name}")
 
     print(f"storage mode: {STORAGE_MODE}" + (f"  baseUrl: {STORAGE_BASE_URL}" if STORAGE_BASE_URL else "  (相对路径)"))
     for partition in partitions:

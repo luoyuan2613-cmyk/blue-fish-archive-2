@@ -332,6 +332,9 @@
       <div class="lightbox-panel" role="dialog" aria-modal="true" aria-label="记录预览">
         <span class="tape tape-panel" aria-hidden="true"></span>
         <button class="lightbox-close" type="button" aria-label="关闭预览" data-close-lightbox>×</button>
+        <!-- 翻页键挂在卡片上：卡片态贴着卡片两侧（图三那样），
+             点「最大化」后卡片铺满视口，它们就自然落到屏幕两侧的垂直正中。
+             卡片有 max-height: calc(100vh - 40px)，永远比视口矮 → top: 50% 不可能跑出屏幕。 -->
         <button class="lightbox-nav lightbox-prev" id="lightbox-prev" type="button" aria-label="上一张记录">
           <span aria-hidden="true">‹</span>
         </button>
@@ -339,7 +342,8 @@
           <span aria-hidden="true">›</span>
         </button>
         <div class="lightbox-media-shell">
-          <img id="lightbox-image" src="" alt="记录大图预览" />
+          <!-- draggable=false：否则按住拖动会触发浏览器原生的"拖图片"，抢走 pointermove -->
+          <img id="lightbox-image" src="" alt="记录大图预览" draggable="false" />
         </div>
         <p class="lightbox-caption">
           <span class="lightbox-meta" id="lightbox-meta"></span>

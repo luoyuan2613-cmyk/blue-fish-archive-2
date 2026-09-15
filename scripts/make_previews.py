@@ -109,12 +109,31 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description="Generate WebP previews for all partitions.")
     parser.add_argument("--no-prune", action="store_true", help="Do not delete orphaned previews/large files.")
+    parser.add_argument(
+        "--no-sanitize",
+        action="store_true",
+        help="Do not rename source files that contain URL-unsafe characters (# ? %).",
+    )
     args = parser.parse_args()
 
     partitions = discover_partitions()
     if not partitions:
         print(f"No partition with raster images found under {DATA_DIR}", file=sys.stderr)
         return 1
+
+    # 文件名防呆（与 sync_stickers.py 共用同一份实现，避免两处规则走偏）。
+    # 必须在**生成缩略图之前**洗名字：产物名取自文件名，
+    # 否则会先按旧名生成一批 webp，清单却指向新名 → 前端拿不到缩略图。
+    # 本脚本在 CI/日常流程里先于 sync_stickers.py 执行，所以两边都挂一遍。
+    sanitized = 0
+    if not args.no_sanitize:
+        from sync_stickers import SANITIZE_NAMES, sanitize_source_names
+
+        if SANITIZE_NAMES:
+            for entry in partitions:
+                for old_name, new_name in sanitize_source_names(Path(entry["source"])):
+                    print(f"[{entry['theme']}/{entry['partition']}] 文件名防呆: {old_name}  →  {new_name}")
+                    sanitized += 1
 
     PREVIEW_DIR.mkdir(parents=True, exist_ok=True)
     LARGE_DIR.mkdir(parents=True, exist_ok=True)
@@ -151,6 +170,8 @@ def main() -> int:
 
     pruned = prune_orphans(partitions)
     print(f"Done. {generated} generated, {skipped} up to date, {pruned} orphans pruned.")
+    if sanitized:
+        print(f"Renamed {sanitized} file(s) with URL-unsafe characters; re-run sync_stickers.py to refresh manifests.")
     return 0
 
 

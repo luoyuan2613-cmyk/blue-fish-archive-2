@@ -2359,6 +2359,9 @@ h1 span::after {
   transform: translateX(-50%) rotate(-2deg);
 }
 
+/* 翻页键：卡片的两侧、垂直居中（卡片态贴着卡片，最大化后就是屏幕两侧的正中）。
+   安全前提：卡片有 max-height: calc(100vh - 40px)，永远比视口矮，
+   所以 top: 50% 不可能像之前那样跑到屏幕下方（那是坑 24：面板被大图撑到视口之外）。 */
 .lightbox-nav {
   position: absolute;
   z-index: 3;
@@ -2441,16 +2444,20 @@ h1 span::after {
   opacity: 0.62;
 }
 
-/* 舞台：铺满整个视口，图片在正中（flex 居中，不用 JS 算尺寸）
-   非最大化时四周留 22px 呼吸位；点「最大化」后归零，图片真正贴满。 */
+/* 舞台 = **白卡**（默认形态，图三那种）。
+   尺寸由内容撑开（图片 + 档案条 + 按钮行），由 .lightbox 的 grid 居中，
+   所以卡片四周自然留白、白底 + 圆角 + 阴影 + 和纸胶带都在。
+   上限用视口单位兜住：卡片再大也不会超出屏幕（这是坑 24 的教训——
+   原来它是 grid item 又写 height: 100%，百分比高度失去参照，于是被图片撑到视口之外）。 */
 .lightbox-panel {
   position: relative;
   z-index: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
   padding: 22px;
   background: var(--white);
   border: 4px solid var(--white);
@@ -2489,17 +2496,18 @@ h1 span::after {
   transform: rotate(90deg);
 }
 
-/* 可视框：撑满舞台，图片在正中；图片按比例缩放到刚好放得下（不拉伸、不裁剪） */
+/* 可视框：吃掉面板剩余空间（面板已是视口大小 → 这里是确定尺寸的裁切盒）。
+   min-height: 0 是必须的：flex 项默认 min-height: auto 会被内容（图片）顶高。 */
+/* 可视框（卡片态）：**贴着图片**（尺寸由图片撑开），透明棋盘格衬底；
+   到了沉浸态才被拉去铺满视口（见文件末尾的沉浸态区块）。
+   offsetLeft/Top 以它为参照，平移边界要用（clampPan）。 */
 .lightbox-media-shell {
+  position: relative;
   display: flex;
-  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  width: 100%;
   min-width: 0;
   min-height: 0;
-  max-width: none;
-  max-height: none;
   overflow: hidden;
   background-color: var(--white);
   background-image: linear-gradient(45deg, #edf1f7 25%, transparent 25%), linear-gradient(-45deg, #edf1f7 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #edf1f7 75%), linear-gradient(-45deg, transparent 75%, #edf1f7 75%);
@@ -2528,13 +2536,16 @@ h1 span::after {
   display: none;
 }
 
-/* 图片：等比缩放到可视框内（contain），永远居中、不拉伸、不裁剪 */
+/* 图片（卡片态）：按**原始尺寸**显示 —— 小的不放大（清晰、不糊），大的才等比缩小。
+   上限用视口单位写在这里，而不是 max-height: 100%：
+   卡片高度是"内容撑开"的（auto），百分比高度在这种父级里**不生效**（坑 24），
+   视口单位与父级无关，永远生效。沉浸态再改成铺满可视框（见文件末尾）。 */
 .lightbox-media-shell img {
   display: block;
   width: auto;
   height: auto;
-  max-width: 100%;
-  max-height: 100%;
+  max-width: min(86vw, 1180px);
+  max-height: calc(100vh - 260px);   /* 给卡片内的档案条 + 按钮行 + 四周留白留出位置 */
   object-fit: contain;
   opacity: 0;
   transition: opacity 300ms var(--ease);
@@ -2906,14 +2917,11 @@ h1 span::after {
     height: 33px;
   }
 
-  .lightbox-media-shell {
-    max-width: min(100%, 94vw);
-    max-height: 70vh;
-  }
-
-  .lightbox-media-shell img {
-    max-width: min(100%, 94vw);
-    max-height: 70vh;
+  /* 窄屏：按钮会竖排、占得更高 → 给图片多留一些高度余量（卡片态）。
+     注意只调 img 的视口上限：可视框在卡片态是"贴图"的，在沉浸态是"铺满"的，
+     给它写 max-height 会把沉浸态的舞台压小、图片也就撑不满了。 */
+  .lightbox:not(.is-immersive) .lightbox-media-shell img {
+    max-height: calc(100vh - 300px);
   }
 
   .lightbox-actions {
@@ -3490,10 +3498,27 @@ h1 span::after {
  * 百分比以原始像素为基准：适应窗口 ↔ 100%（1:1）↔ 最高 400%
  * =========================================================================== */
 
-/* 放大后图片允许超出可视框：shell 裁切，图片靠 transform 平移 */
+/* 放大后图片允许超出可视框：shell 裁切，图片靠 transform 平移。
+   这里必须把沉浸态「铺满可视框」的那套收回来：
+   图片回到 flex 布局成为一个被居中的 flex 项，尺寸由 app.js 按缩放百分比写成像素宽，
+   超出可视框的部分由 shell 裁掉，offsetLeft/Top 就是平移边界的锚点（见 clampPan）。
+
+   ⚠️ 选择器要写到 **4 个类**（`.lightbox.is-immersive .lightbox-media-shell.is-zoomed img`）：
+   沉浸态的图片规则是 3 个类，同等规则下它写在文件更后面，会把这条压住
+   —— 和坑 14「CSS 优先级把功能压住」是同一类事故。
+
+   ⚠️ flex: none 也是必须的（实测踩过）：flex 项默认 flex-shrink: 1，
+   可视框装不下时浏览器会把图片**缩回可视框宽度**——于是"放大到一定程度就不动了"，
+   而且高度跟着比例一起缩，永远不溢出 → isPannable() 恒为 false → 按住拖不动。 */
+.lightbox.is-immersive .lightbox-media-shell.is-zoomed img,
 .lightbox-media-shell.is-zoomed img {
+  position: static;
+  flex: none;
+  width: auto;
+  height: auto;
   max-width: none;
   max-height: none;
+  object-fit: fill;
 }
 
 .lightbox-media-shell img {
@@ -3569,11 +3594,9 @@ h1 span::after {
   max-height: none;
 }
 
-/* 让图片的 offsetLeft/offsetTop 相对可视框计算（平移边界要用），
-   同时作为绝对定位的参考框 */
-.lightbox-media-shell {
-  position: relative;
-}
+/* 注：`.lightbox-media-shell { position: relative }` 已并回上面的基础规则
+   （图片的 offsetLeft/offsetTop 要相对可视框计算，平移边界 clampPan 依赖它，
+   同时它也是「适应窗口」时图片绝对定位的参考框）。 */
 
 /* ===========================================================================
  * 修复：缩放时按钮/档案条被拉伸变形
@@ -3604,12 +3627,23 @@ h1 span::after {
 }
 
 /* 鼠标在画面上移动时显现（app.js 加 is-chrome-shown），停住 1.5 秒后由 app.js 移除该类 → 自动隐藏。
-   显隐只由鼠标决定，不使用任何 :focus 条件（鼠标点过的按钮会保持聚焦，会让这一行永远亮着）。 */
+   显隐只由鼠标决定，不使用任何 :focus 条件（鼠标点过的按钮会保持聚焦，会让这一行永远亮着）。
+   ⚠️ 唤醒后也只到 0.6：这些控件是浮在图片上的，绝不能挡住底下的画面内容。 */
 .lightbox.is-immersive.is-chrome-shown .lightbox-caption,
 .lightbox.is-immersive.is-chrome-shown .lightbox-actions,
 .lightbox.is-immersive.is-chrome-shown .action-status {
-  opacity: 0.9;
+  opacity: 0.6;
   pointer-events: auto;
+}
+
+/* 悬停只"稍微加深一点"，**不能变实心**（变实心就又遮挡图片了，见坑 18 的教训：
+   凡靠 hover 反转可见性的设计，都要想清楚指针停在原地的情形）。 */
+.lightbox.is-immersive.is-chrome-shown .lightbox-actions:hover {
+  opacity: 0.8;
+}
+
+.lightbox.is-immersive.is-chrome-shown .lightbox-caption:hover {
+  opacity: 0.78;
 }
 
 /* 只有"已显现"时子元素才接收点击——否则隐藏的按钮会被误点 */
@@ -3617,30 +3651,34 @@ h1 span::after {
   pointer-events: auto;
 }
 
-/* 触屏没有 hover，"靠近才显现"会让按钮永远出不来 → 触屏上常显（略淡） */
+/* 触屏没有 hover，"靠近才显现"会让按钮永远出不来 → 触屏上常显（同样保持半透明） */
 @media (hover: none) {
   .lightbox.is-immersive .lightbox-caption,
   .lightbox.is-immersive .lightbox-actions,
   .lightbox.is-immersive .action-status {
-    opacity: 0.92;
+    opacity: 0.72;
     pointer-events: auto;
   }
 
   .lightbox.is-immersive .lightbox-actions > * {
     pointer-events: auto;
   }
+
+  .lightbox.is-immersive .lightbox-actions:hover {
+    opacity: 0.72;                   /* 触屏没有 hover，别让上面的加深规则生效 */
+  }
 }
 
-/* 关闭键与翻页键也一并淡一点，别在图上太抢眼（悬停恢复） */
+/* 关闭键与翻页键也一并淡一点，别在图上太抢眼；悬停只加深到 0.85，**不恢复实心** */
 .lightbox.is-immersive .lightbox-close,
 .lightbox.is-immersive .lightbox-nav {
-  opacity: 0.5;
+  opacity: 0.55;
   transition: opacity 260ms var(--ease);
 }
 
 .lightbox.is-immersive .lightbox-close:hover,
 .lightbox.is-immersive .lightbox-nav:hover {
-  opacity: 1;
+  opacity: 0.85;
 }
 
 @media (max-width: 700px) {
@@ -3650,9 +3688,15 @@ h1 span::after {
   }
 }
 
-/* 沉浸态下把白卡与透明棋盘格一并收掉：看到的是"图片浮在暗底上"，
-   而不是一张裁切过的图贴在白卡里（侧边出现白条会显得像坏掉） */
+/* 沉浸态（点「最大化」之后）：白卡与透明棋盘格一并收掉，舞台改成铺满视口，
+   图片撑满屏幕 —— "图片浮在暗底上"，而不是一张裁切过的图贴在白卡里。 */
 .lightbox.is-immersive .lightbox-panel {
+  position: absolute;                /* 舞台尺寸从此 = 视口（确定值，不受图片影响） */
+  inset: 0;
+  max-width: none;
+  max-height: none;
+  padding: 0;                        /* 最大化就是要贴边 */
+  align-items: stretch;              /* 可视框铺满舞台 */
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -3666,12 +3710,52 @@ h1 span::after {
 }
 
 .lightbox.is-immersive .lightbox-media-shell {
+  flex: 1 1 auto;                    /* 吃掉整个舞台 */
+  width: 100%;
+  max-width: none;
+  max-height: none;
   background-color: transparent;
   background-image: none;
   border-radius: 12px;
 }
 
+/* 沉浸态的图片：铺满可视框，按比例 contain（这里允许放大到满屏，和卡片态"不放大"不同） */
+.lightbox.is-immersive .lightbox-media-shell img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 /* 沉浸态不需要和纸胶带（它在卡片顶上，卡都没了） */
 .lightbox.is-immersive .tape-panel {
   display: none;
+}
+
+/* ===========================================================================
+ * 加载失败的卡片：**保留节点与占位高度**，只标记状态（配合 app.js 的 onerror）
+ *
+ * 为什么不删卡片（坑 26）：墙是 CSS 多列（columns: 4 210px）均衡分列的，
+ * 删掉中间任意一张，整面墙会重新分列 —— 屏幕上已经显示好的图会"闪一下换成另一张"。
+ * 懒加载滚到哪张坏图就在哪一刻重排，所以现象是"滚动时概率性闪图，全部加载完就消失"。
+ * 这里只让图片不显形、给一个安静的小提示，布局完全不动。
+ * =========================================================================== */
+.sticker-card.is-broken {
+  min-height: 130px;
+}
+
+.sticker-card.is-broken::before {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  content: '图片未加载';
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
 }

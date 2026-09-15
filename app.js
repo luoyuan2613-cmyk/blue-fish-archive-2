@@ -97,13 +97,25 @@ function applyStorageConfig(raw) {
   });
 }
 
+// 把资源路径转成"浏览器真会照着请求"的 URL。
+//
+// ⚠️ 必须做这一步（坑 26，线上实测过）：素材是从推特存下来的，文件名里带着
+// `#白聖女と黒牧師` 这类内容 —— 而 `#` 在 URL 里是**锚点**，浏览器会把 `#` 之后整段丢掉，
+// 于是请求的是一个不存在的短路径 → 404 → 卡片被判为加载失败。
+// 同理 `?` 会被当成查询串的开头。这两个字符必须显式转义：
+// encodeURI 认为它们"合法"（在 URI 里确实合法），所以要在它之后手工替换。
+function encodeImagePath(path) {
+  return encodeURI(path).replace(/#/g, '%23').replace(/\?/g, '%3F');
+}
+
 function joinStorageUrl(base, path) {
   if (!path) return '';
-  if (/^[a-z][a-z0-9+.-]*:/i.test(path) || path.startsWith('//') || path.startsWith('/')) {
-    return path;                                  // 已是绝对地址或站点根路径
+  if (/^[a-z][a-z0-9+.-]*:/i.test(path) || path.startsWith('//')) {
+    return path;                                  // 已是完整地址（http(s):、//cdn...）→ 原样返回，别二次编码
   }
-  if (!base) return path;                         // 未配置 baseUrl → 保持相对路径
-  return base.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+  const encoded = encodeImagePath(path);          // 相对路径 / 站点根路径 → 都要转义
+  if (!base) return encoded;                      // 未配置 baseUrl → 保持相对路径
+  return base.replace(/\/+$/, '') + '/' + encoded.replace(/^\/+/, '');
 }
 
 // kind: 'original'（默认）| 'preview' | 'large'
@@ -198,7 +210,12 @@ function createStickerCard(sticker, index) {
       image.src = getImageUrl(sticker.original);
       return;
     }
-    card.remove();
+    // ⚠️ 兜底**绝不把卡片从 DOM 里删掉**（坑 26）。
+    // 墙是 CSS 多列（`columns: 4 210px`）均衡分列的：从中间抽掉一张卡片，
+    // 整面墙会重新分列 —— 屏幕上同一位置的图就"闪一下换成了另一张"。
+    // 懒加载滚到哪张坏图、就在哪一刻重排，所以表现为"滚动时概率性闪图，加载完就好了"。
+    // 现在只标记状态：节点与占位高度都留着，任何一张图加载失败都不会再动布局。
+    card.classList.add('is-broken');
   };
   // 命中缓存时 load 事件可能早于监听注册,补一次判断
   if (image.complete && image.naturalWidth > 0) {
@@ -340,10 +357,18 @@ function setViewerMeta(text) {
   if (lightboxMeta) lightboxMeta.textContent = text || '';
 }
 
-// 查看器打开即是"沉浸态"：图片铺满可视区、白卡装饰收掉、底部控件默认隐藏
-// （鼠标一动才显现，停 1.5 秒再隐藏 —— 见 initChromeAutoHide）。
+// 查看器两种形态（**打开时是卡片态，不是沉浸态**）：
+//   卡片态（默认）：白卡 + 纸胶带 + 透明棋盘格，图片按原始尺寸适应窗口居中，
+//                   档案条与操作按钮都在卡片里（图三那种样子）。
+//   沉浸态：白卡装饰全部收掉、图片撑满视口，底部控件默认隐藏、鼠标唤醒后半透明浮现。
+//
+// ⚠️ 这里曾经写成 `lightbox.classList.contains('is-open')` —— 于是**点开即沉浸态**，
+//    白卡、留白、卡片里的按钮全都没了，看起来"点开就是大图"，
+//    再点「最大化」也只是从"铺满"变成"更铺满"，两态几乎没有区别。
+//    正确判据：只有点了「最大化」才沉浸；放大（缩放）只在沉浸态里发生。
 function isImmersive() {
-  return Boolean(lightbox && lightbox.classList.contains('is-open'));
+  if (!lightbox || !lightbox.classList.contains('is-open')) return false;
+  return isMaximized || !isAtFit();
 }
 
 function syncImmersive() {
@@ -353,7 +378,19 @@ function syncImmersive() {
 
 function updateViewerHint() {
   if (!lightboxHint) return;
-  lightboxHint.textContent = viewerMode === 'single' ? '双击放大 · Esc 关闭' : '← → 切换 · 双击放大';
+  const immersive = isImmersive();
+  if (!immersive) {
+    // 卡片态：图片已完整可见，能做的只有进全屏 / 翻页
+    lightboxHint.textContent = viewerMode === 'single' ? '双击全屏 · Esc 关闭' : '← → 切换 · 双击全屏';
+    return;
+  }
+  if (viewerMode === 'single') {
+    lightboxHint.textContent = isPannable() ? '拖动平移 · 双击还原' : '双击 1:1 · Esc 关闭';
+    return;
+  }
+  lightboxHint.textContent = isPannable()
+    ? '拖动平移 · 滚轮缩放'
+    : isAtFit() ? '滚轮缩放 · 双击 1:1' : '双击 适应窗口';
 }
 
 function clearZoomStyles() {
@@ -364,16 +401,27 @@ function clearZoomStyles() {
     lightboxImage.classList.remove('is-pannable', 'is-panning');
   }
   if (lightboxMediaShell) lightboxMediaShell.classList.remove('is-zoomed');
+  updateViewerHint();
 }
 
 const isAtFit = () => Math.abs(zoomPercent - fitPercent) < 0.5;
 
-// 「适应窗口」的百分比 = 当前 CSS 渲染宽度 / 原始宽度
+// 「适应窗口」的百分比 = 图片**实际渲染尺寸** ÷ 原始像素。
+// 用图片自己的内容盒来量，两种形态都成立：
+//   卡片态：图片在流内（width/height: auto），盒子尺寸就是显示尺寸 → 直接除；
+//   沉浸态：图片绝对定位铺满可视框 + object-fit: contain
+//           → 取宽高两个方向里较小的那个比例，就是 contain 的缩放比。
 function measureFitPercent() {
   clearZoomStyles();
-  const rendered = lightboxImage.clientWidth;
-  const natural = lightboxImage.naturalWidth;
-  fitPercent = natural > 0 && rendered > 0 ? Math.max(1, (rendered / natural) * 100) : 100;
+  const nw = lightboxImage.naturalWidth;
+  const nh = lightboxImage.naturalHeight;
+  const bw = lightboxImage.clientWidth;
+  const bh = lightboxImage.clientHeight;
+  if (!nw || !nh || !bw || !bh) {
+    fitPercent = 100;
+    return;
+  }
+  fitPercent = Math.max(1, Math.min(bw / nw, bh / nh) * 100);
 }
 
 function isPannable() {
@@ -428,16 +476,27 @@ function applyZoom() {
   clampPan();
   lightboxImage.style.transform = `translate(${panX}px, ${panY}px)`;
   lightboxImage.classList.toggle('is-pannable', isPannable());
+  updateViewerHint();
   syncImmersive();
 }
 
 function setZoom(percent) {
   const max = Math.max(ZOOM_MAX_PERCENT, fitPercent);   // 图很小、适应已超 400% 时不至于卡死
-  zoomPercent = Math.min(max, Math.max(fitPercent, percent));
+  // 下限：适应窗口。但"适应"本身是**放大**的时候（本图库图片都小于视口，适应 ≈ 1.9 倍），
+  // 要允许缩回 100%（原始像素、最清晰），否则「双击 1:1」会被夹住、看起来毫无反应。
+  const min = Math.min(fitPercent, 100);
+  zoomPercent = Math.min(max, Math.max(min, percent));
   applyZoom();
 }
 
 function zoomBy(factor) {
+  // 卡片态下的"放大" = 点「最大化」进入沉浸态（图片撑满视口）：
+  // 卡片态里图片本来就是完整可见的（按原始尺寸适应窗口），没有"再放大一点"的余地。
+  // 逐格缩放、拖动平移都发生在沉浸态里。
+  if (factor > 1 && !isImmersive()) {
+    setMaximized(true);
+    return;
+  }
   setZoom(zoomPercent * factor);
 }
 
@@ -455,6 +514,11 @@ function zoomToOneToOne() {
 }
 
 function toggleFitAndOneToOne() {
+  // 卡片态双击 = 进沉浸态（"双击放大"在卡片态的语义就是放大到全屏）
+  if (!isImmersive()) {
+    setMaximized(true);
+    return;
+  }
   if (isAtFit()) zoomToOneToOne();
   else zoomToFit();
 }
@@ -483,6 +547,13 @@ function revealLightbox() {
   lightbox.classList.add('is-open');
   lightbox.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+  // 打开时一律回到「适应窗口 + 卡片态」（is-maximized 已在 closeLightbox 里复位），
+  // 免得上一轮残留的百分比/平移让这次点开直接变成沉浸态。
+  measureFitPercent();
+  zoomPercent = fitPercent;
+  panX = 0;
+  panY = 0;
+  clearZoomStyles();
   syncImmersive();
 }
 
@@ -625,6 +696,21 @@ function initViewerZoom() {
   };
   lightboxImage.addEventListener('pointerup', endPan);
   lightboxImage.addEventListener('pointercancel', endPan);
+
+  // 视口尺寸变了，「适应窗口」的百分比也跟着变（contain 是按可视框算的）：
+  // 重新量一次；正处在放大状态就保持当前倍数，只把平移边界重新夹一遍。
+  window.addEventListener('resize', () => {
+    if (!lightbox.classList.contains('is-open')) return;
+    if (!(lightboxImage.complete && lightboxImage.naturalWidth > 0)) return;
+    measureFitPercent();
+    if (isAtFit()) {
+      zoomPercent = fitPercent;
+      resetZoom();
+    } else {
+      zoomPercent = Math.max(fitPercent, zoomPercent);
+      applyZoom();
+    }
+  });
 }
 
 function openLightbox(index) {
@@ -734,6 +820,15 @@ function setMaximized(next) {
   if (maximizeButton) maximizeButton.setAttribute('aria-pressed', String(isMaximized));
   if (maximizeLabel) maximizeLabel.textContent = isMaximized ? '还原大小' : '最大化';
   if (actionStatus) actionStatus.textContent = isMaximized ? MAXIMIZE_HINT : '';
+  // 卡片 ↔ 沉浸 换的是整套布局，可视框尺寸跟着变 → 「适应窗口」的百分比必须重算，
+  // 否则滚轮第一格会突然跳变（先变小再变大，实测过）。顺序不能乱：
+  // 先切布局类 → 再量尺寸 → 再归位缩放 → 最后按新状态复核一次。
+  syncImmersive();
+  measureFitPercent();
+  zoomPercent = fitPercent;
+  panX = 0;
+  panY = 0;
+  clearZoomStyles();
   syncImmersive();
 }
 
