@@ -394,11 +394,33 @@ function isPannable() {
   );
 }
 
+// 平移边界：按图片"相对可视框的实际对齐方式"推算，不能假设居中。
+//
+// 原因（实测）：图片比容器大时，浏览器会把 place-items:center 退化成左上对齐
+// （CSS 规范为避免内容永久裁掉），此时图片左边=容器左边，
+// 若仍按 ±(溢出量/2) 限制，就会有一半画面永远拖不到
+// （实测 3307 宽的图只允许 ±977，而真实需要 0 ~ -1953）。
 function clampPan() {
-  const overflowX = Math.max(0, (lightboxImage.clientWidth - lightboxMediaShell.clientWidth) / 2);
-  const overflowY = Math.max(0, (lightboxImage.clientHeight - lightboxMediaShell.clientHeight) / 2);
-  panX = Math.min(overflowX, Math.max(-overflowX, panX));
-  panY = Math.min(overflowY, Math.max(-overflowY, panY));
+  const img = lightboxImage;
+  const shell = lightboxMediaShell;
+  // offsetLeft/Top 是布局值，不受 transform 影响，正好表示"未平移时图片相对可视框的偏移"
+  const anchorX = img.offsetLeft;
+  const anchorY = img.offsetTop;
+
+  // 某个方向的可平移区间：
+  // - 图片比框大 → 两端边缘都要能顶到框边，区间覆盖完整溢出量
+  // - 图片比框小 → 保持在中间（把 anchor 造成的偏差抵消掉）
+  const axisRange = (imgSize, shellSize, anchor) => {
+    const overflow = imgSize - shellSize;
+    if (overflow > 0) return { min: -overflow - anchor, max: -anchor };
+    const center = (shellSize - imgSize) / 2 - anchor;
+    return { min: center, max: center };
+  };
+
+  const rx = axisRange(img.clientWidth, shell.clientWidth, anchorX);
+  const ry = axisRange(img.clientHeight, shell.clientHeight, anchorY);
+  panX = Math.min(rx.max, Math.max(rx.min, panX));
+  panY = Math.min(ry.max, Math.max(ry.min, panY));
 }
 
 function applyZoom() {

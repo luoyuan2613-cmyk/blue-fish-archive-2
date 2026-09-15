@@ -3458,10 +3458,12 @@ h1 span::after {
   right: -14px;
 }
 
-/* 操作条脱离卡片流，浮在底部居中（面板因此只剩图片本身） */
-.lightbox.is-maximized .lightbox-actions {
+/* 操作条脱离卡片流，浮在底部居中（面板因此只剩图片本身）
+   注意：用 is-immersive（最大化 或 已缩放）—— 只看不放大的情况也要浮起来，
+   否则 92vh 的图片会把按钮挤出视口，看起来"几乎不可见" */
+.lightbox.is-immersive .lightbox-actions {
   position: fixed;
-  bottom: 16px;
+  bottom: 30px;
   left: 50%;
   z-index: 4;
   padding-top: 0;
@@ -3575,17 +3577,17 @@ h1 span::after {
 }
 
 /* 最大化模式：三行一起浮在底部（状态行最高、缩放条居中、操作条最下） */
-.lightbox.is-maximized .lightbox-zoom {
+.lightbox.is-immersive .lightbox-zoom {
   position: fixed;
-  bottom: 68px;
+  bottom: 84px;
   left: 50%;
   z-index: 4;
   padding-top: 0;
   transform: translateX(-50%);
 }
 
-.lightbox.is-maximized .action-status {
-  bottom: 116px;                   /* 让位给上面新增的缩放条 */
+.lightbox.is-immersive .action-status {
+  bottom: 132px;                   /* 再让位给缩放条与操作条 */
 }
 
 @media (max-width: 700px) {
@@ -3605,12 +3607,16 @@ h1 span::after {
     min-width: 62px;
   }
 
-  .lightbox.is-maximized .lightbox-zoom {
-    bottom: 60px;
+  .lightbox.is-immersive .lightbox-zoom {
+    bottom: 72px;
   }
 
-  .lightbox.is-maximized .action-status {
-    bottom: 104px;
+  .lightbox.is-immersive .lightbox-actions {
+    bottom: 24px;
+  }
+
+  .lightbox.is-immersive .action-status {
+    bottom: 116px;
   }
 }
 
@@ -3632,6 +3638,12 @@ h1 span::after {
 .lightbox-media-shell.is-zoomed {
   max-width: 96vw;
   max-height: 92vh;
+}
+
+/* 让图片的 offsetLeft/offsetTop 相对可视框计算（平移边界要用），
+   同时作为绝对定位的参考框 */
+.lightbox-media-shell {
+  position: relative;
 }
 
 /* ===========================================================================
@@ -3656,7 +3668,7 @@ h1 span::after {
 .lightbox.is-immersive .lightbox-zoom,
 .lightbox.is-immersive .lightbox-actions,
 .lightbox.is-immersive .action-status {
-  opacity: 0.3;
+  opacity: 0.22;
   transition: opacity 260ms var(--ease);
 }
 
@@ -3723,4 +3735,3 @@ h1 span::after {
 .lightbox.is-immersive .tape-panel {
   display: none;
 }
-
