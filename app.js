@@ -11,10 +11,6 @@ const lightboxPrev = document.querySelector('#lightbox-prev');
 const lightboxNext = document.querySelector('#lightbox-next');
 const maximizeButton = document.querySelector('#maximize-button');
 const maximizeLabel = document.querySelector('#maximize-label');
-const zoomInButton = document.querySelector('#zoom-in');
-const zoomOutButton = document.querySelector('#zoom-out');
-const zoomToggleButton = document.querySelector('#zoom-toggle');
-const zoomLevelLabel = document.querySelector('#zoom-level');
 const lightboxHint = document.querySelector('.lightbox-hint');
 const downloadButton = document.querySelector('#download-button');
 const actionStatus = document.querySelector('#action-status');
@@ -344,21 +340,15 @@ function setViewerMeta(text) {
   if (lightboxMeta) lightboxMeta.textContent = text || '';
 }
 
-// 沉浸态 = 最大化 或 已缩放。此时底部控件变半透明（CSS 负责外观），
-// 目的是不遮挡图片；鼠标移上去会自动恢复实心（纯 CSS :hover/:focus-within）。
+// 查看器打开即是"沉浸态"：图片铺满可视区、白卡装饰收掉、底部控件默认隐藏
+// （鼠标一动才显现，停 1.5 秒再隐藏 —— 见 initChromeAutoHide）。
 function isImmersive() {
-  return isMaximized || !isAtFit();
+  return Boolean(lightbox && lightbox.classList.contains('is-open'));
 }
 
 function syncImmersive() {
   if (!lightbox) return;
   lightbox.classList.toggle('is-immersive', isImmersive());
-}
-
-function setZoomLabel() {
-  if (!zoomLevelLabel) return;
-  const atFit = Math.abs(zoomPercent - fitPercent) < 0.5;
-  zoomLevelLabel.textContent = atFit ? '适应' : `${Math.round(zoomPercent)}%`;
 }
 
 function updateViewerHint() {
@@ -429,7 +419,6 @@ function applyZoom() {
     clearZoomStyles();
     panX = 0;
     panY = 0;
-    setZoomLabel();
     syncImmersive();
     return;
   }
@@ -439,7 +428,6 @@ function applyZoom() {
   clampPan();
   lightboxImage.style.transform = `translate(${panX}px, ${panY}px)`;
   lightboxImage.classList.toggle('is-pannable', isPannable());
-  setZoomLabel();
   syncImmersive();
 }
 
@@ -476,7 +464,6 @@ function resetZoom() {
   panX = 0;
   panY = 0;
   clearZoomStyles();
-  setZoomLabel();
   syncImmersive();
 }
 
@@ -496,6 +483,7 @@ function revealLightbox() {
   lightbox.classList.add('is-open');
   lightbox.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+  syncImmersive();
 }
 
 // 页面上的单张图片（首页立绘）用同一个查看器打开
@@ -586,16 +574,16 @@ function initChromeAutoHide() {
     showChromeBriefly();
   });
 
-  // 点底部控件（最大化 / 缩放 / 下载）→ 先立刻收起来；鼠标再动一下就回来
+  // 点底部控件（最大化 / 下载）→ 先立刻收起来；鼠标再动一下就回来
   lightbox.addEventListener('click', (event) => {
     if (!lightbox.classList.contains('is-immersive')) return;
     if (!(event.target instanceof Element)) return;
-    if (!event.target.closest('.lightbox-zoom, .lightbox-actions')) return;
+    if (!event.target.closest('.lightbox-actions')) return;
     hideChrome();
   });
 }
 
-// 缩放交互：滚轮 / 双击 / 按钮 / 拖动平移
+// 缩放交互：滚轮 / 双击 / 拖动平移（原「− 适应 ＋」按钮行已按需求移除）
 function initViewerZoom() {
   if (!lightbox) return;
   lightbox.addEventListener(
@@ -611,9 +599,6 @@ function initViewerZoom() {
     event.preventDefault();
     toggleFitAndOneToOne();
   });
-  if (zoomInButton) zoomInButton.addEventListener('click', () => zoomBy(ZOOM_STEP));
-  if (zoomOutButton) zoomOutButton.addEventListener('click', () => zoomBy(1 / ZOOM_STEP));
-  if (zoomToggleButton) zoomToggleButton.addEventListener('click', toggleFitAndOneToOne);
 
   lightboxImage.addEventListener('pointerdown', (event) => {
     if (event.button !== 0 || !isPannable()) return;
@@ -724,6 +709,7 @@ function closeLightbox() {
   viewerMode = 'list';
   singleView = null;
   lightbox.classList.remove('is-open');
+  lightbox.classList.remove('is-immersive');
   lightbox.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
   window.setTimeout(() => {

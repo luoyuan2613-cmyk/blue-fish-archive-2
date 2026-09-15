@@ -2329,7 +2329,7 @@ h1 span::after {
   z-index: 30;
   display: grid;
   visibility: hidden;
-  padding: 21px;
+  padding: 0;
   place-items: center;
   opacity: 0;
   transition: opacity 400ms var(--ease), visibility 400ms var(--ease);
@@ -2387,12 +2387,12 @@ h1 span::after {
 }
 
 .lightbox-prev {
-  left: -25px;
+  left: 14px;
   transform: translateY(-50%);
 }
 
 .lightbox-next {
-  right: -25px;
+  right: 14px;
   transform: translateY(-50%);
 }
 
@@ -2441,12 +2441,17 @@ h1 span::after {
   opacity: 0.62;
 }
 
+/* 舞台：铺满整个视口，图片在正中（flex 居中，不用 JS 算尺寸）
+   非最大化时四周留 22px 呼吸位；点「最大化」后归零，图片真正贴满。 */
 .lightbox-panel {
   position: relative;
   z-index: 1;
-  width: fit-content;
-  max-width: 100%;
-  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 22px;
   background: var(--white);
   border: 4px solid var(--white);
   border-radius: 20px 29px 24px 31px;
@@ -2462,8 +2467,8 @@ h1 span::after {
 .lightbox-close {
   position: absolute;
   z-index: 2;
-  top: -17px;
-  right: -17px;
+  top: 14px;
+  right: 14px;
   display: grid;
   width: 38px;
   height: 38px;
@@ -2484,12 +2489,17 @@ h1 span::after {
   transform: rotate(90deg);
 }
 
+/* 可视框：撑满舞台，图片在正中；图片按比例缩放到刚好放得下（不拉伸、不裁剪） */
 .lightbox-media-shell {
-  display: grid;
-  width: fit-content;
-  max-width: min(100%, 92vw);
-  max-height: min(76vh, 760px);
-  place-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
   overflow: hidden;
   background-color: var(--white);
   background-image: linear-gradient(45deg, #edf1f7 25%, transparent 25%), linear-gradient(-45deg, #edf1f7 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #edf1f7 75%), linear-gradient(-45deg, transparent 75%, #edf1f7 75%);
@@ -2518,12 +2528,13 @@ h1 span::after {
   display: none;
 }
 
+/* 图片：等比缩放到可视框内（contain），永远居中、不拉伸、不裁剪 */
 .lightbox-media-shell img {
   display: block;
   width: auto;
-  max-width: min(100%, 92vw);
   height: auto;
-  max-height: min(76vh, 760px);
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   opacity: 0;
   transition: opacity 300ms var(--ease);
@@ -3429,24 +3440,26 @@ h1 span::after {
 }
 
 .lightbox.is-maximized .lightbox-media-shell {
-  max-width: 96vw;
-  max-height: 92vh;
   background-color: transparent;
   background-image: none;
   border-radius: 12px;
 }
 
-.lightbox.is-maximized .lightbox-media-shell img {
-  max-width: 96vw;
-  max-height: 92vh;
-  border-radius: 12px;
-  box-shadow: 0 24px 64px rgba(4, 10, 24, 0.62);
+/* 最大化：面板四周边距归零，图片真正贴满视口 */
+.lightbox.is-maximized .lightbox-panel {
+  padding: 0;
 }
 
-/* 关闭按钮挪到画面外一点，避免压住插图 */
+.lightbox.is-maximized .lightbox-media-shell img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 0;
+}
+
+/* 关闭按钮固定在右上角安全区（舞台已铺满视口，不能再往外挪） */
 .lightbox.is-maximized .lightbox-close {
-  top: -14px;
-  right: -14px;
+  top: 14px;
+  right: 14px;
 }
 
 /* 操作条脱离卡片流，浮在底部居中（面板因此只剩图片本身）
@@ -3465,65 +3478,17 @@ h1 span::after {
   min-height: 44px;
 }
 
-/* 窄屏：给操作条留出更靠边的位置，图片略收一点 */
+/* 窄屏：图片略收一点，给底部操作条留出位置（图片本身仍是 contain 居中） */
 @media (max-width: 700px) {
-  .lightbox.is-maximized .lightbox-media-shell,
-  .lightbox.is-maximized .lightbox-media-shell img {
-    max-width: 94vw;
-    max-height: 78vh;
+  .lightbox-panel {
+    padding: 12px;
   }
 }
 
 /* ===========================================================================
- * 查看器缩放控件（配合 app.js 的 applyZoom 等）
+ * 缩放交互：滚轮 / 双击 / 键盘 + - 0（原有按钮行已按需求移除）
  * 百分比以原始像素为基准：适应窗口 ↔ 100%（1:1）↔ 最高 400%
  * =========================================================================== */
-.lightbox-zoom {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding-top: 12px;
-}
-
-.zoom-button {
-  display: grid;
-  min-width: 42px;
-  height: 36px;
-  padding: 0 12px;
-  place-items: center;
-  color: var(--deep);
-  background: var(--mist);
-  border: 3px solid var(--white);
-  border-radius: 10px 13px 11px 14px;
-  box-shadow: 3px 4px 0 var(--sticker-shadow);
-  font-family: var(--body);
-  font-size: 14px;
-  font-weight: 900;
-  line-height: 1;
-  transition: transform 300ms var(--ease), background 300ms var(--ease), box-shadow 300ms var(--ease);
-}
-
-.zoom-button:hover {
-  background: var(--coral);
-  box-shadow: 2px 3px 0 var(--sticker-shadow);
-  transform: translate(1px, 1px);
-}
-
-.zoom-button:active {
-  transform: translate(2px, 2px) scale(0.98);
-}
-
-.zoom-button:focus-visible {
-  outline: 4px solid var(--coral);
-  outline-offset: 3px;
-}
-
-/* 百分比读数用等宽数字，缩放时数字不会左右抖 */
-.zoom-level {
-  min-width: 72px;
-  font-variant-numeric: tabular-nums;
-}
 
 /* 放大后图片允许超出可视框：shell 裁切，图片靠 transform 平移 */
 .lightbox-media-shell.is-zoomed img {
@@ -3544,14 +3509,20 @@ h1 span::after {
   transition: none;                /* 拖动时不要过渡，跟手 */
 }
 
-/* 最大化模式：三行一起浮在底部（状态行最高、缩放条居中、操作条最下） */
-.lightbox.is-immersive .lightbox-zoom {
+/* 档案条（图片名/尺寸 + 提示）浮在顶部居中：图片铺满时它不再占文档流 */
+.lightbox.is-immersive .lightbox-caption {
   position: fixed;
-  bottom: 84px;
+  top: 16px;
   left: 50%;
   z-index: 4;
-  padding-top: 0;
+  width: min(460px, 86vw);
+  padding: 0 6px;
   transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.lightbox.is-immersive .lightbox-caption .lightbox-meta {
+  color: rgba(255, 255, 255, 0.92);
 }
 
 /* 状态行自身也要浮起来（位置/颜色/居中都在这里给全，
@@ -3569,26 +3540,6 @@ h1 span::after {
 }
 
 @media (max-width: 700px) {
-  .lightbox-zoom {
-    gap: 6px;
-    padding-top: 10px;
-  }
-
-  .zoom-button {
-    min-width: 38px;
-    height: 34px;
-    padding: 0 10px;
-    font-size: 13px;
-  }
-
-  .zoom-level {
-    min-width: 62px;
-  }
-
-  .lightbox.is-immersive .lightbox-zoom {
-    bottom: 72px;
-  }
-
   .lightbox.is-immersive .lightbox-actions {
     bottom: 24px;
   }
@@ -3612,10 +3563,10 @@ h1 span::after {
   max-height: none;
 }
 
-/* 一进入缩放就把可视框撑到最大化尺寸，图片才"真的变大"（而不是只被裁切） */
+/* 一进入缩放就用满整个舞台，图片才"真的变大"（而不是只被裁切） */
 .lightbox-media-shell.is-zoomed {
-  max-width: 96vw;
-  max-height: 92vh;
+  max-width: none;
+  max-height: none;
 }
 
 /* 让图片的 offsetLeft/offsetTop 相对可视框计算（平移边界要用），
@@ -3632,7 +3583,6 @@ h1 span::after {
  * 修法：给底部三行**固定宽度**，与图片宽度彻底解耦。
  * =========================================================================== */
 .lightbox-caption,
-.lightbox-zoom,
 .lightbox-actions {
   width: min(460px, 86vw);
   margin-inline: auto;
@@ -3644,7 +3594,6 @@ h1 span::after {
  * =========================================================================== */
 /* 沉浸态（最大化 或 已缩放）：底部控件**默认隐藏**，不遮挡图片 */
 .lightbox.is-immersive .lightbox-caption,
-.lightbox.is-immersive .lightbox-zoom,
 .lightbox.is-immersive .lightbox-actions,
 .lightbox.is-immersive .action-status {
   opacity: 0;
@@ -3657,7 +3606,6 @@ h1 span::after {
 /* 鼠标在画面上移动时显现（app.js 加 is-chrome-shown），停住 1.5 秒后由 app.js 移除该类 → 自动隐藏。
    显隐只由鼠标决定，不使用任何 :focus 条件（鼠标点过的按钮会保持聚焦，会让这一行永远亮着）。 */
 .lightbox.is-immersive.is-chrome-shown .lightbox-caption,
-.lightbox.is-immersive.is-chrome-shown .lightbox-zoom,
 .lightbox.is-immersive.is-chrome-shown .lightbox-actions,
 .lightbox.is-immersive.is-chrome-shown .action-status {
   opacity: 0.9;
@@ -3665,7 +3613,6 @@ h1 span::after {
 }
 
 /* 只有"已显现"时子元素才接收点击——否则隐藏的按钮会被误点 */
-.lightbox.is-immersive.is-chrome-shown .lightbox-zoom > *,
 .lightbox.is-immersive.is-chrome-shown .lightbox-actions > * {
   pointer-events: auto;
 }
@@ -3673,14 +3620,12 @@ h1 span::after {
 /* 触屏没有 hover，"靠近才显现"会让按钮永远出不来 → 触屏上常显（略淡） */
 @media (hover: none) {
   .lightbox.is-immersive .lightbox-caption,
-  .lightbox.is-immersive .lightbox-zoom,
   .lightbox.is-immersive .lightbox-actions,
   .lightbox.is-immersive .action-status {
     opacity: 0.92;
     pointer-events: auto;
   }
 
-  .lightbox.is-immersive .lightbox-zoom > *,
   .lightbox.is-immersive .lightbox-actions > * {
     pointer-events: auto;
   }
@@ -3700,16 +3645,14 @@ h1 span::after {
 
 @media (max-width: 700px) {
   .lightbox-caption,
-  .lightbox-zoom,
   .lightbox-actions {
     width: min(320px, 88vw);
   }
 }
 
-/* 沉浸态下把白卡与透明棋盘格一并收掉：缩放时看到的是"图片浮在暗底上"，
+/* 沉浸态下把白卡与透明棋盘格一并收掉：看到的是"图片浮在暗底上"，
    而不是一张裁切过的图贴在白卡里（侧边出现白条会显得像坏掉） */
 .lightbox.is-immersive .lightbox-panel {
-  padding: 0;
   background: transparent;
   border: 0;
   border-radius: 0;
