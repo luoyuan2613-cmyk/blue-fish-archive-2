@@ -49,15 +49,19 @@ jobs:
 
       - name: Commit updated manifest and previews
         run: |
+          # ⚠️ data 必须一起提交：脚本的"文件名防呆"会把 data/ 里带 # ? % 的源文件改名
+          # （`#` 在 URL 里是锚点，浏览器请求会被截断 → 404）。
+          # 只提交 previews/large 而漏掉 data，清单里的 original 就会指向不存在的路径
+          # —— 表现是「下载原图」和动图原文件全部 404。这个坑真踩过一次。
           MANIFESTS="$(git ls-files --modified --others --exclude-standard stickers || true)"
-          NEW_FILES="$(git ls-files --others --exclude-standard previews large)"
-          if git diff --quiet -- stickers previews large && [ -z "$NEW_FILES" ]; then
+          NEW_FILES="$(git ls-files --others --exclude-standard previews large data)"
+          if git diff --quiet -- stickers previews large data && [ -z "$NEW_FILES" ]; then
             echo "Manifest and previews are already synchronized."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add stickers previews large
+          git add stickers previews large data
           git commit -m "chore: sync sticker manifest and previews"
           git push
