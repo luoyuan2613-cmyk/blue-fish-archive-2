@@ -3417,3 +3417,91 @@ h1 span::after {
   }
 }
 
+/* ===========================================================================
+ * 灯箱「最大化」查看（配合 app.js 的 setMaximized，不调用 Fullscreen API）
+ * 做法：把白色卡片装饰收掉，图片放大到视口，操作条浮到底部居中。
+ * 浏览器 UI 仍在，所以退出靠「再点按钮」或 Esc。
+ * =========================================================================== */
+.lightbox.is-maximized .lightbox-panel {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+}
+
+/* 最大化时不需要和纸胶带与档案条（Esc 提示由状态行承担） */
+.lightbox.is-maximized .tape-panel,
+.lightbox.is-maximized .lightbox-caption {
+  display: none;
+}
+
+.lightbox.is-maximized .lightbox-media-shell {
+  max-width: 96vw;
+  max-height: 92vh;
+  background-color: transparent;
+  background-image: none;
+  border-radius: 12px;
+}
+
+.lightbox.is-maximized .lightbox-media-shell img {
+  max-width: 96vw;
+  max-height: 92vh;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(4, 10, 24, 0.62);
+}
+
+/* 关闭按钮挪到画面外一点，避免压住插图 */
+.lightbox.is-maximized .lightbox-close {
+  top: -14px;
+  right: -14px;
+}
+
+/* 操作条脱离卡片流，浮在底部居中（面板因此只剩图片本身） */
+.lightbox.is-maximized .lightbox-actions {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  z-index: 4;
+  grid-template-columns: repeat(2, minmax(0, 168px));
+  padding-top: 0;
+  transform: translateX(-50%);
+}
+
+.lightbox.is-maximized .action-button {
+  min-height: 44px;
+}
+
+/* 状态行也跟着浮起来，用浅色字压在深色背景上 */
+.lightbox.is-maximized .action-status {
+  position: fixed;
+  bottom: 68px;
+  left: 50%;
+  z-index: 4;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 11px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* 窄屏：给操作条留出更靠边的位置，图片略收一点 */
+@media (max-width: 700px) {
+  .lightbox.is-maximized .lightbox-media-shell,
+  .lightbox.is-maximized .lightbox-media-shell img {
+    max-width: 94vw;
+    max-height: 78vh;
+  }
+
+  .lightbox.is-maximized .lightbox-actions {
+    bottom: 10px;
+    grid-template-columns: repeat(2, minmax(0, 136px));
+    gap: 8px;
+  }
+
+  .lightbox.is-maximized .action-status {
+    bottom: 58px;
+  }
+}
+

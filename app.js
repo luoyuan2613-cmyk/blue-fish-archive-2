@@ -9,7 +9,8 @@ const lightboxMediaShell = document.querySelector('.lightbox-media-shell');
 const lightboxMeta = document.querySelector('#lightbox-meta');
 const lightboxPrev = document.querySelector('#lightbox-prev');
 const lightboxNext = document.querySelector('#lightbox-next');
-const copyButton = document.querySelector('#copy-button');
+const maximizeButton = document.querySelector('#maximize-button');
+const maximizeLabel = document.querySelector('#maximize-label');
 const downloadButton = document.querySelector('#download-button');
 const actionStatus = document.querySelector('#action-status');
 const mascot = document.querySelector('#mascot');
@@ -88,7 +89,7 @@ let currentPartition = THEMES[0].partitions[0].id;   // 初始分区 = 该主题
 let stickerList = [];
 let activeIndex = -1;
 let activeSticker = null;
-let activeBlobPromise = null;
+let isMaximized = false;            // 灯箱「最大化」状态（不调用全屏 API，只放大到视口）
 
 const revealItems = document.querySelectorAll('[data-reveal]');
 revealItems.forEach((item) => {
@@ -205,16 +206,27 @@ function animateStickerCount(total) {
   }, duration + 240);
 }
 
+// Fisher-Yates 洗牌（原地打乱传入的数组）。
+// 每次刷新页面、切换分区、点"重新加载"都会重新洗一次，
+// 灯箱翻页用的就是同一个 stickerList，因此顺序自动跟随，无需额外改动。
+function shuffleInPlace(list) {
+  for (let i = list.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [list[i], list[j]] = [list[j], list[i]];
+  }
+  return list;
+}
+
 function renderStickers(stickers) {
   // 渲染逻辑只认"传进来的这一批"，不掺任何分区/分类状态：
   // 这样瀑布流核心逻辑（去重 / 卡片 / 计数）在切换数据源时完全复用。
-  stickerList = [
+  stickerList = shuffleInPlace([
     ...new Map(
       stickers
         .filter((sticker) => sticker && sticker.original)
         .map((sticker) => [sticker.original, sticker]),
     ).values(),
-  ];
+  ]);
   renderStickerGrid();
 }
 
@@ -251,21 +263,21 @@ function updatePartitionStatus() {
 // 分类条：只渲染有内容的分类（空分类自动隐藏），全部为空则整条不显示
 
 function openLightbox(index) {
-  showSticker(index, { prefetchOriginal: true });
+  showSticker(index);
   lightbox.classList.add('is-open');
   lightbox.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
-  copyButton.focus();
+  if (maximizeButton) maximizeButton.focus();
 }
 
-function showSticker(index, { prefetchOriginal = false } = {}) {
+function showSticker(index) {
   const sticker = stickerList[index];
   if (!sticker) return;
   activeIndex = index;
   activeSticker = sticker;
   const animated = isAnimatedSticker(sticker);
   // 静态图显示 WebP 大图层(几十~一两百 KB),动画图才加载原文件;
-  // 下载/复制仍指向原图,这里只优化「看」,不改变「取」。
+  // 下载仍指向原图,这里只优化「看」,不改变「取」。
   lightboxImage.classList.remove('is-ready');
   lightboxImage.src = animated
     ? sticker.original
@@ -276,14 +288,8 @@ function showSticker(index, { prefetchOriginal = false } = {}) {
   lightboxImage.alt = sticker.alt || '表情包大图预览';
   downloadButton.href = sticker.original;
   downloadButton.download = sticker.filename || 'sticker';
-  // 打开时预取原图,点「复制」就不用等下载;翻页浏览只按需取,
-  // 否则连翻十几张会把整包原图都拉一遍。写入授权窗口问题由 copyImage 的 promise-based 写入解决。
-  activeBlobPromise = prefetchOriginal
-    ? fetch(sticker.original)
-        .then((response) => response.blob())
-        .catch(() => null)
-    : null;
-  actionStatus.textContent = '';
+  // 翻页浏览只按需取大图（prefetchNeighbours），不在这里额外预取原图
+  if (actionStatus) actionStatus.textContent = isMaximized ? MAXIMIZE_HINT : '';
   lightboxMediaShell.classList.toggle('is-animated', animated);
   updateLightboxMeta(sticker, index);
   const hasNeighbours = stickerList.length > 1;
@@ -324,6 +330,7 @@ function stepLightbox(step) {
 }
 
 function closeLightbox() {
+  setMaximized(false);                 // 关闭时一并退出最大化，下次打开是正常大小
   lightbox.classList.remove('is-open');
   lightbox.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
@@ -335,103 +342,23 @@ function closeLightbox() {
   }, 650);
 }
 
-// Chrome/Edge 的剪贴板写入只接受 image/png:webp/jpg/gif 直接写会抛
-// NotAllowedError(实测 "Type image/webp not supported on write"),必须先转成 PNG。
-const MIME_BY_EXT = {
-  png: 'image/png',
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  webp: 'image/webp',
-  gif: 'image/gif',
-  apng: 'image/apng',
-};
+/* ---------------------------------------------------------------------------
+ * 灯箱「最大化」查看
+ * 不调用 Fullscreen API（用户选择：浏览器 UI 保留），只给灯箱加一个状态类，
+ * 由 styles.css 把白卡装饰收掉、图片放大到视口，操作条浮到底部居中。
+ * 退出方式：再点一次按钮 / 按 Esc（Esc 先还原大小，再按一次才关闭灯箱）。
+ * ------------------------------------------------------------------------- */
+const MAXIMIZE_HINT = '已最大化 · 按 Esc 或再点按钮还原';
 
-function mimeFromFilename(filename) {
-  const ext = filename.split('.').pop().toLowerCase();
-  return MIME_BY_EXT[ext] || 'image/png';
+function setMaximized(next) {
+  isMaximized = Boolean(next);
+  if (lightbox) lightbox.classList.toggle('is-maximized', isMaximized);
+  if (maximizeButton) maximizeButton.setAttribute('aria-pressed', String(isMaximized));
+  if (maximizeLabel) maximizeLabel.textContent = isMaximized ? '还原大小' : '最大化';
+  if (actionStatus) actionStatus.textContent = isMaximized ? MAXIMIZE_HINT : '';
 }
 
-function loadImageFromBlob(blob) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(blob);
-    const image = new Image();
-    image.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve(image);
-    };
-    image.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('image decode failed'));
-    };
-    image.src = url;
-  });
-}
-
-function imageToPngBlob(image) {
-  return new Promise((resolve, reject) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
-    const context = canvas.getContext('2d');
-    if (!context) {
-      reject(new Error('canvas unavailable'));
-      return;
-    }
-    context.drawImage(image, 0, 0);
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error('png encode failed'));
-    }, 'image/png');
-  });
-}
-
-async function copyImage() {
-  if (!activeSticker) return;
-
-  if (!navigator.clipboard || !window.ClipboardItem) {
-    actionStatus.textContent = '当前浏览器不支持复制图片，请下载原图';
-    return;
-  }
-
-  copyButton.disabled = true;
-  actionStatus.textContent = '正在准备图片…';
-
-  try {
-    const original = activeSticker.original;
-    const animated = isAnimatedSticker(activeSticker);
-    // 把「取原图 + 转 PNG」整个异步流程作为 Promise 传给 ClipboardItem:
-    // write() 在点击的用户激活任务里同步被授权,浏览器内部等待数据就绪。
-    // 实测:先 await 下载完再 write() 会因用户激活失效抛 NotAllowedError(大图必现),
-    // 而 promise-based 同步调用 write() 即使 5.6MB 原图也能成功。
-    const pngBlobPromise = (async () => {
-      let blob = activeBlobPromise ? await activeBlobPromise : null;
-      if (!blob) {
-        blob = await fetch(original).then((response) => response.blob());
-      }
-      // PNG 且非动画可直接复用;其余格式(webp/jpg/gif…)经 canvas 转 PNG。
-      // 动画图(GIF/APNG)只能取首帧,要保留动画请用「下载原图」。
-      const mime = blob.type || mimeFromFilename(original);
-      if (mime === 'image/png' && !animated) {
-        return blob;
-      }
-      const image = await loadImageFromBlob(blob);
-      return imageToPngBlob(image);
-    })();
-
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'image/png': pngBlobPromise }),
-    ]);
-    actionStatus.textContent = animated
-      ? '已复制（动图已转为静态图）'
-      : '图片已复制';
-  } catch (error) {
-    actionStatus.textContent = '复制失败，请下载原图';
-  } finally {
-    copyButton.disabled = false;
-  }
-}
-
-copyButton.addEventListener('click', copyImage);
+if (maximizeButton) maximizeButton.addEventListener('click', () => setMaximized(!isMaximized));
 lightboxImage.addEventListener('load', () => lightboxImage.classList.add('is-ready'));
 if (lightboxPrev) lightboxPrev.addEventListener('click', () => stepLightbox(-1));
 if (lightboxNext) lightboxNext.addEventListener('click', () => stepLightbox(1));
@@ -441,7 +368,8 @@ document.querySelectorAll('[data-close-lightbox]').forEach((element) => {
 document.addEventListener('keydown', (event) => {
   if (!lightbox.classList.contains('is-open')) return;
   if (event.key === 'Escape') {
-    closeLightbox();
+    if (isMaximized) setMaximized(false);   // 最大化时 Esc 先还原大小
+    else closeLightbox();
   } else if (event.key === 'ArrowLeft') {
     stepLightbox(-1);
   } else if (event.key === 'ArrowRight') {
