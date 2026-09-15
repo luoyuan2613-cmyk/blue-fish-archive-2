@@ -23,7 +23,7 @@
 fish-gallery/
 ├── index.html            页面结构 + 全部文案
 ├── styles.css            样式（深海贴纸风；追加式改动，未动上游规则）
-├── app.js               交互：瀑布流 / 灯箱 / 主题书签头 / 分区切换
+├── app.js               交互：瀑布流 / 查看器（缩放·平移）/ 主题书签头 / 分区切换
 ├── _headers              Cloudflare 缓存策略（本地服务会忽略它）
 ├── .assetsignore         部署忽略清单（决定哪些文件不上传到 Cloudflare，见 §四）
 │

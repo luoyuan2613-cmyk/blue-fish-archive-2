@@ -3505,3 +3505,113 @@ h1 span::after {
   }
 }
 
+/* ===========================================================================
+ * 查看器缩放控件（配合 app.js 的 applyZoom 等）
+ * 百分比以原始像素为基准：适应窗口 ↔ 100%（1:1）↔ 最高 400%
+ * =========================================================================== */
+.lightbox-zoom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.zoom-button {
+  display: grid;
+  min-width: 42px;
+  height: 36px;
+  padding: 0 12px;
+  place-items: center;
+  color: var(--deep);
+  background: var(--mist);
+  border: 3px solid var(--white);
+  border-radius: 10px 13px 11px 14px;
+  box-shadow: 3px 4px 0 var(--sticker-shadow);
+  font-family: var(--body);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1;
+  transition: transform 300ms var(--ease), background 300ms var(--ease), box-shadow 300ms var(--ease);
+}
+
+.zoom-button:hover {
+  background: var(--coral);
+  box-shadow: 2px 3px 0 var(--sticker-shadow);
+  transform: translate(1px, 1px);
+}
+
+.zoom-button:active {
+  transform: translate(2px, 2px) scale(0.98);
+}
+
+.zoom-button:focus-visible {
+  outline: 4px solid var(--coral);
+  outline-offset: 3px;
+}
+
+/* 百分比读数用等宽数字，缩放时数字不会左右抖 */
+.zoom-level {
+  min-width: 72px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 放大后图片允许超出可视框：shell 裁切，图片靠 transform 平移 */
+.lightbox-media-shell.is-zoomed img {
+  max-width: none;
+  max-height: none;
+}
+
+.lightbox-media-shell img {
+  cursor: zoom-in;                 /* 提示"可以点/双击放大" */
+}
+
+.lightbox-media-shell img.is-pannable {
+  cursor: grab;
+}
+
+.lightbox-media-shell img.is-panning {
+  cursor: grabbing;
+  transition: none;                /* 拖动时不要过渡，跟手 */
+}
+
+/* 最大化模式：三行一起浮在底部（状态行最高、缩放条居中、操作条最下） */
+.lightbox.is-maximized .lightbox-zoom {
+  position: fixed;
+  bottom: 68px;
+  left: 50%;
+  z-index: 4;
+  padding-top: 0;
+  transform: translateX(-50%);
+}
+
+.lightbox.is-maximized .action-status {
+  bottom: 116px;                   /* 让位给上面新增的缩放条 */
+}
+
+@media (max-width: 700px) {
+  .lightbox-zoom {
+    gap: 6px;
+    padding-top: 10px;
+  }
+
+  .zoom-button {
+    min-width: 38px;
+    height: 34px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
+  .zoom-level {
+    min-width: 62px;
+  }
+
+  .lightbox.is-maximized .lightbox-zoom {
+    bottom: 60px;
+  }
+
+  .lightbox.is-maximized .action-status {
+    bottom: 104px;
+  }
+}
+

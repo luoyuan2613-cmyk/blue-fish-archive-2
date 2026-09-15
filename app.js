@@ -11,6 +11,11 @@ const lightboxPrev = document.querySelector('#lightbox-prev');
 const lightboxNext = document.querySelector('#lightbox-next');
 const maximizeButton = document.querySelector('#maximize-button');
 const maximizeLabel = document.querySelector('#maximize-label');
+const zoomInButton = document.querySelector('#zoom-in');
+const zoomOutButton = document.querySelector('#zoom-out');
+const zoomToggleButton = document.querySelector('#zoom-toggle');
+const zoomLevelLabel = document.querySelector('#zoom-level');
+const lightboxHint = document.querySelector('.lightbox-hint');
 const downloadButton = document.querySelector('#download-button');
 const actionStatus = document.querySelector('#action-status');
 const mascot = document.querySelector('#mascot');
@@ -311,12 +316,250 @@ function updatePartitionStatus() {
 
 // 分类条：只渲染有内容的分类（空分类自动隐藏），全部为空则整条不显示
 
-function openLightbox(index) {
-  showSticker(index);
+/* ---------------------------------------------------------------------------
+ * 查看器：两种来源 + 真缩放
+ *
+ * 来源：
+ *  - list  ：从瀑布流点进来，有「上一张 / 下一张」
+ *  - single：页面上的独立图片（首页立绘），没有翻页
+ *
+ * 缩放（原生实现，不引库）：
+ *  - 百分比以**原始像素**为基准（100% = 1:1），下限是「适应窗口」，上限 400%
+ *  - 滚轮 / 双击 / ＋− 按钮 / 键盘（+ - 0）都能缩放；双击在「适应 ↔ 100%」之间切换
+ *  - 放大超出可视框后可**按住拖动平移**，并限制在边界内（不会拖出画布）
+ *  - Esc 逐级退出：先归位缩放 → 再退出最大化 → 最后关闭
+ * ------------------------------------------------------------------------- */
+const ZOOM_MAX_PERCENT = 400;
+const ZOOM_STEP = 1.25;
+
+let viewerMode = 'list';          // 'list' | 'single'
+let singleView = null;            // single 模式下的 { src, alt, label, downloadName }
+let zoomPercent = 100;            // 相对原始像素的百分比（100 = 1:1）
+let fitPercent = 100;             // 「适应窗口」对应的百分比，图片加载后测得
+let panX = 0;
+let panY = 0;
+let panning = null;
+
+function setViewerMeta(text) {
+  if (lightboxMeta) lightboxMeta.textContent = text || '';
+}
+
+function setZoomLabel() {
+  if (!zoomLevelLabel) return;
+  const atFit = Math.abs(zoomPercent - fitPercent) < 0.5;
+  zoomLevelLabel.textContent = atFit ? '适应' : `${Math.round(zoomPercent)}%`;
+}
+
+function updateViewerHint() {
+  if (!lightboxHint) return;
+  lightboxHint.textContent = viewerMode === 'single' ? '双击放大 · Esc 关闭' : '← → 切换 · 双击放大';
+}
+
+function clearZoomStyles() {
+  if (lightboxImage) {
+    lightboxImage.style.width = '';
+    lightboxImage.style.height = '';
+    lightboxImage.style.transform = '';
+    lightboxImage.classList.remove('is-pannable', 'is-panning');
+  }
+  if (lightboxMediaShell) lightboxMediaShell.classList.remove('is-zoomed');
+}
+
+const isAtFit = () => Math.abs(zoomPercent - fitPercent) < 0.5;
+
+// 「适应窗口」的百分比 = 当前 CSS 渲染宽度 / 原始宽度
+function measureFitPercent() {
+  clearZoomStyles();
+  const rendered = lightboxImage.clientWidth;
+  const natural = lightboxImage.naturalWidth;
+  fitPercent = natural > 0 && rendered > 0 ? Math.max(1, (rendered / natural) * 100) : 100;
+}
+
+function isPannable() {
+  if (!lightboxImage || !lightboxMediaShell) return false;
+  return (
+    lightboxImage.clientWidth > lightboxMediaShell.clientWidth + 1 ||
+    lightboxImage.clientHeight > lightboxMediaShell.clientHeight + 1
+  );
+}
+
+function clampPan() {
+  const overflowX = Math.max(0, (lightboxImage.clientWidth - lightboxMediaShell.clientWidth) / 2);
+  const overflowY = Math.max(0, (lightboxImage.clientHeight - lightboxMediaShell.clientHeight) / 2);
+  panX = Math.min(overflowX, Math.max(-overflowX, panX));
+  panY = Math.min(overflowY, Math.max(-overflowY, panY));
+}
+
+function applyZoom() {
+  if (!lightboxImage || !lightboxImage.naturalWidth) return;
+  if (isAtFit()) {                       // 适应窗口 → 交回 CSS，外观与改造前一致
+    clearZoomStyles();
+    panX = 0;
+    panY = 0;
+    setZoomLabel();
+    return;
+  }
+  lightboxMediaShell.classList.add('is-zoomed');
+  lightboxImage.style.width = `${(lightboxImage.naturalWidth * zoomPercent) / 100}px`;
+  lightboxImage.style.height = 'auto';
+  clampPan();
+  lightboxImage.style.transform = `translate(${panX}px, ${panY}px)`;
+  lightboxImage.classList.toggle('is-pannable', isPannable());
+  setZoomLabel();
+}
+
+function setZoom(percent) {
+  const max = Math.max(ZOOM_MAX_PERCENT, fitPercent);   // 图很小、适应已超 400% 时不至于卡死
+  zoomPercent = Math.min(max, Math.max(fitPercent, percent));
+  applyZoom();
+}
+
+function zoomBy(factor) {
+  setZoom(zoomPercent * factor);
+}
+
+function zoomToFit() {
+  panX = 0;
+  panY = 0;
+  zoomPercent = fitPercent;
+  applyZoom();
+}
+
+function zoomToOneToOne() {
+  panX = 0;
+  panY = 0;
+  setZoom(100);
+}
+
+function toggleFitAndOneToOne() {
+  if (isAtFit()) zoomToOneToOne();
+  else zoomToFit();
+}
+
+function resetZoom() {
+  zoomPercent = fitPercent;
+  panX = 0;
+  panY = 0;
+  clearZoomStyles();
+  setZoomLabel();
+}
+
+// 图片就绪后：测出「适应」百分比、更新单图模式的尺寸说明
+function syncViewerImage() {
+  if (!lightboxImage) return;
+  if (!(lightboxImage.complete && lightboxImage.naturalWidth > 0)) return;
+  lightboxImage.classList.add('is-ready');
+  measureFitPercent();
+  resetZoom();
+  if (viewerMode === 'single' && singleView) {
+    setViewerMeta(`${singleView.label} · ${lightboxImage.naturalWidth}×${lightboxImage.naturalHeight}`);
+  }
+}
+
+function revealLightbox() {
   lightbox.classList.add('is-open');
   lightbox.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
   if (maximizeButton) maximizeButton.focus();
+}
+
+// 页面上的单张图片（首页立绘）用同一个查看器打开
+function openSingleImage(src, { alt = '', label = '单图', downloadName = '' } = {}) {
+  if (!src) return;
+  viewerMode = 'single';
+  singleView = { src, alt, label, downloadName };
+  lightboxImage.classList.remove('is-ready');
+  resetZoom();
+  lightboxImage.src = src;
+  lightboxImage.alt = alt;
+  if (downloadButton) {
+    downloadButton.href = src;
+    downloadButton.download = downloadName || label;
+  }
+  if (lightboxMediaShell) lightboxMediaShell.classList.remove('is-animated');
+  if (lightboxPrev) lightboxPrev.hidden = true;
+  if (lightboxNext) lightboxNext.hidden = true;
+  setViewerMeta(label);
+  updateViewerHint();
+  syncViewerImage();
+  revealLightbox();
+}
+
+// 首页立绘：点击或键盘 Enter/Space 放大（图源取当前实际显示的那张，主题切换后自动跟随）
+function initHeroArtZoom() {
+  const heroWindow = document.querySelector('#hero-art-window');
+  if (!heroWindow || !heroArtImage) return;
+  const open = () => {
+    const src = heroArtImage.currentSrc || heroArtImage.src;
+    if (!src) return;
+    openSingleImage(src, {
+      alt: heroArtImage.alt || '立绘',
+      label: '立绘',
+      downloadName: src.split('/').pop() || 'art',
+    });
+  };
+  heroWindow.addEventListener('click', open);
+  heroWindow.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      open();
+    }
+  });
+}
+
+// 缩放交互：滚轮 / 双击 / 按钮 / 拖动平移
+function initViewerZoom() {
+  if (!lightbox) return;
+  lightbox.addEventListener(
+    'wheel',
+    (event) => {
+      if (!lightbox.classList.contains('is-open') || !lightboxImage.naturalWidth) return;
+      event.preventDefault();
+      zoomBy(event.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP);
+    },
+    { passive: false },
+  );
+  lightboxImage.addEventListener('dblclick', (event) => {
+    event.preventDefault();
+    toggleFitAndOneToOne();
+  });
+  if (zoomInButton) zoomInButton.addEventListener('click', () => zoomBy(ZOOM_STEP));
+  if (zoomOutButton) zoomOutButton.addEventListener('click', () => zoomBy(1 / ZOOM_STEP));
+  if (zoomToggleButton) zoomToggleButton.addEventListener('click', toggleFitAndOneToOne);
+
+  lightboxImage.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0 || !isPannable()) return;
+    panning = { id: event.pointerId, x: event.clientX, y: event.clientY, startX: panX, startY: panY };
+    try {
+      lightboxImage.setPointerCapture(event.pointerId);   // 合成事件可能没有真实指针，失败也不影响拖动
+    } catch (error) {
+      /* 忽略：没有捕获也能靠 pointermove 收到事件 */
+    }
+    lightboxImage.classList.add('is-panning');
+    event.preventDefault();
+  });
+  lightboxImage.addEventListener('pointermove', (event) => {
+    if (!panning || event.pointerId !== panning.id) return;
+    panX = panning.startX + (event.clientX - panning.x);
+    panY = panning.startY + (event.clientY - panning.y);
+    clampPan();
+    lightboxImage.style.transform = `translate(${panX}px, ${panY}px)`;
+  });
+  const endPan = (event) => {
+    if (!panning || event.pointerId !== panning.id) return;
+    panning = null;
+    lightboxImage.classList.remove('is-panning');
+  };
+  lightboxImage.addEventListener('pointerup', endPan);
+  lightboxImage.addEventListener('pointercancel', endPan);
+}
+
+function openLightbox(index) {
+  viewerMode = 'list';
+  singleView = null;
+  updateViewerHint();
+  showSticker(index);
+  revealLightbox();
 }
 
 function showSticker(index) {
@@ -343,7 +586,9 @@ function showSticker(index) {
   if (actionStatus) actionStatus.textContent = isMaximized ? MAXIMIZE_HINT : '';
   lightboxMediaShell.classList.toggle('is-animated', animated);
   updateLightboxMeta(sticker, index);
-  const hasNeighbours = stickerList.length > 1;
+  resetZoom();
+  syncViewerImage();
+  const hasNeighbours = viewerMode === 'list' && stickerList.length > 1;
   if (lightboxPrev) lightboxPrev.hidden = !hasNeighbours;
   if (lightboxNext) lightboxNext.hidden = !hasNeighbours;
   prefetchNeighbours(index);
@@ -382,6 +627,10 @@ function stepLightbox(step) {
 
 function closeLightbox() {
   setMaximized(false);                 // 关闭时一并退出最大化，下次打开是正常大小
+  resetZoom();
+  panning = null;
+  viewerMode = 'list';
+  singleView = null;
   lightbox.classList.remove('is-open');
   lightbox.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
@@ -410,7 +659,10 @@ function setMaximized(next) {
 }
 
 if (maximizeButton) maximizeButton.addEventListener('click', () => setMaximized(!isMaximized));
-lightboxImage.addEventListener('load', () => lightboxImage.classList.add('is-ready'));
+lightboxImage.addEventListener('load', () => {
+  lightboxImage.classList.add('is-ready');
+  syncViewerImage();          // 测「适应」百分比 + 更新单图模式的尺寸说明
+});
 if (lightboxPrev) lightboxPrev.addEventListener('click', () => stepLightbox(-1));
 if (lightboxNext) lightboxNext.addEventListener('click', () => stepLightbox(1));
 document.querySelectorAll('[data-close-lightbox]').forEach((element) => {
@@ -419,8 +671,16 @@ document.querySelectorAll('[data-close-lightbox]').forEach((element) => {
 document.addEventListener('keydown', (event) => {
   if (!lightbox.classList.contains('is-open')) return;
   if (event.key === 'Escape') {
-    if (isMaximized) setMaximized(false);   // 最大化时 Esc 先还原大小
+    // 逐级退出：先归位缩放 → 再退出最大化 → 最后关闭
+    if (!isAtFit()) zoomToFit();
+    else if (isMaximized) setMaximized(false);
     else closeLightbox();
+  } else if (event.key === '+' || event.key === '=') {
+    zoomBy(ZOOM_STEP);
+  } else if (event.key === '-' || event.key === '_') {
+    zoomBy(1 / ZOOM_STEP);
+  } else if (event.key === '0') {
+    zoomToFit();
   } else if (event.key === 'ArrowLeft') {
     stepLightbox(-1);
   } else if (event.key === 'ArrowRight') {
@@ -1010,6 +1270,8 @@ function initTheme() {
 
 initMascot();
 initNavScroll();
+initHeroArtZoom();
+initViewerZoom();
 initBackToTop();
 initTheme();
 renderPartitionNav();
