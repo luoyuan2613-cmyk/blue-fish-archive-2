@@ -39,8 +39,8 @@ const isAnimatedSticker = (sticker) => /\.(gif|apng)$/i.test(sticker.original);
 const THEMES = [
   {
     id: 'manga',
-    name: '漫画主题',
-    label: '漫画',
+    name: '白圣女与黑牧师主题',
+    label: '圣女',
     partitions: [
       { id: 'default', label: '默认区', manifest: 'stickers/manifest_manga-default.json' },
       { id: 'cos', label: 'Cos区', manifest: 'stickers/manifest_manga-cos.json' },
@@ -48,8 +48,8 @@ const THEMES = [
   },
   {
     id: 'whale',
-    name: '蓝色大肥鱼主题',
-    label: '蓝鲸',
+    name: '童话般的你主题',
+    label: '花璃',
     partitions: [
       { id: 'default', label: '默认区', manifest: 'stickers/manifest_whale-default.json' },
       { id: 'cos', label: 'Cos区', manifest: 'stickers/manifest_whale-cos.json' },
@@ -320,6 +320,10 @@ function renderStickerGrid(animateCount = true) {
     fragment.appendChild(createStickerCard(sticker, index));
   });
   stickerGrid.appendChild(fragment);
+
+  // 首页气泡的图取自当前分区 → 分区/主题一换就把在飞的旧图清掉重来
+  // （controller 在文件末尾初始化，首次渲染时它已经存在）
+  if (heroBubbleController) heroBubbleController.refresh();
 }
 
 function updatePartitionStatus() {
@@ -1228,7 +1232,7 @@ const themeConfig = [
   {
     id: 'manga',
     name: '漫画主题',
-    label: '漫画',
+    label: '圣女',
     matches: ['白圣女', '伊甸园', '黑牧师', '圣女'],
     vars: {
       '--ink': '#2e241d', '--deep': '#3d3226', '--blue': '#a8743f',
@@ -1247,8 +1251,8 @@ const themeConfig = [
   {
     id: 'whale',
     name: '蓝色大肥鱼主题',
-    label: '蓝鲸',
-    matches: ['大肥鱼', '鲸鱼娘', 'DeepSeek'],
+    label: '童话',
+    matches: ['大肥鱼', '儚キミ', '发起猛攻'],
     vars: {
       '--ink': '#16213d', '--deep': '#202d52', '--blue': '#607aa9',
       '--mist': '#dfe8f5', '--paper': '#f7f8fb', '--gold': '#b99a67',
@@ -1258,10 +1262,10 @@ const themeConfig = [
       '--tape-mist': 'rgba(223, 232, 245, 0.92)',
     },
     art: { png: 'assets/theme-whale.png', webp: 'assets/theme-whale.webp' },
-    alt: '蓝色大肥鱼立绘',
-    note: '蓝色大肥鱼',
+    alt: '童话立绘',
+    note: '花璃',
     artTag: '档案 · NO.001',
-    copy: { kicker: '鲸鱼娘 DEEPSEEK', lede: '同人表情收藏' },
+    copy: { kicker: '鲸鱼娘 DEEPSEEK', lede: '记录童话的美' },
   },
 ];
 
@@ -1442,6 +1446,155 @@ function initTheme() {
   if (forced && themeConfig.some((theme) => theme.id === forced)) applyTheme(forced, { animate: false });
 }
 
+/* ---------------------------------------------------------------------------
+ * 首页气泡：在「来源」卡片上方那条空白带里，飘过几个装着随机作品图的肥皂泡。
+ *
+ * 设计取舍（纯静态站，不引 GSAP/Lottie 那类库）：
+ *  - 动效全交给 CSS：外层 heroBubbleDrift 管「左下→右上 + 由小变大」，
+ *    内层 heroBubbleWobble 管「上下浮动 + 微旋转」，两层叠加就得到带弧度的轨迹；
+ *    JS 只做三件事：派发、回收、暂停。
+ *  - 只动 transform / opacity（走合成层），不碰 left/top → 不触发重排。
+ *    同屏最多 4 个，开销可以忽略（对比：墙上 331 张卡片才是这站的性能大头）。
+ *  - 图片走 getImageUrl 收口、用现成的 previews/ 缩略图（480px、二三十 KB，
+ *    大多已随作品墙进过缓存），**不额外下载原图**。
+ *  - 每次派发**现取 stickerList**（当前分区的清单），所以切分区/切主题自动跟随；
+ *    切换瞬间还会 refresh() 一次，把在飞的旧分区气泡清掉。
+ *  - 图片始终 object-fit: contain + 居中 → 任何比例都不变形、不裁切。
+ * ------------------------------------------------------------------------- */
+const BUBBLE_SIZE_MIN = 90;
+const BUBBLE_SIZE_MAX = 150;
+const BUBBLE_ALIVE_MAX = 5;            // 同屏上限：派发 2~3s、寿命 8~12s → 平均并发约 4 个（实测落在 3~5）
+const BUBBLE_SPAWN_MIN_MS = 2000;
+const BUBBLE_SPAWN_MAX_MS = 3000;
+const BUBBLE_LIFE_MIN_MS = 8000;
+const BUBBLE_LIFE_MAX_MS = 12000;
+const BUBBLE_FIRST_DELAY_MS = 1200;    // 等首屏入场动画先铺开，再开始冒泡
+// 飘动距离 = （基准宽度 − 泡直径）× 1.5 —— 即"在原来基础上往右多飘二分之一"。
+// 气泡带在 CSS 里铺成了基准宽度的 1.5 倍（.hero-bubbles { right: -50% }，给这段距离留地方），
+// 所以这里先除以同一个系数把"基准宽度"还原出来。两处的 1.5 必须同步改。
+const BUBBLE_DRIFT_SCALE = 1.5;
+
+let heroBubbleController = null;
+
+const randomBetween = (min, max) => min + Math.random() * (max - min);
+
+function initHeroBubbles() {
+  const layer = document.querySelector('#hero-bubbles');
+  if (!layer) return;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const retireTimers = new Map();
+  let paused = false;
+  let offscreen = false;
+  let spawnTimer = null;
+
+  // CSS 在窄屏 / 减少动效下会把这一层 display: none —— 那种情况下不要再派发
+  const layerUsable = () => layer.offsetParent !== null;
+
+  function pickImageSource() {
+    const pool = stickerList.filter((item) => item && (item.preview || item.original));
+    if (!pool.length) return '';       // 清单还没到（异步）→ 这一轮先不派发
+    const item = pool[Math.floor(Math.random() * pool.length)];
+    return getImageUrl(item.preview, 'preview') || getImageUrl(item.original);
+  }
+
+  function retire(bubble) {
+    const timer = retireTimers.get(bubble);
+    if (timer) window.clearTimeout(timer);
+    retireTimers.delete(bubble);
+    bubble.remove();
+  }
+
+  function spawn() {
+    if (paused || !layerUsable()) return;
+    if (retireTimers.size >= BUBBLE_ALIVE_MAX) return;
+    const src = pickImageSource();
+    if (!src) return;
+
+    const size = Math.round(randomBetween(BUBBLE_SIZE_MIN, BUBBLE_SIZE_MAX));
+    const life = Math.round(randomBetween(BUBBLE_LIFE_MIN_MS, BUBBLE_LIFE_MAX_MS));
+    // 三个位移量都按气泡带**实测尺寸**算，保证整颗泡从头到尾都落在带内（不被 overflow 切边）：
+    const bandH = Math.max(120, layer.clientHeight);
+    const baseW = Math.max(160, layer.clientWidth / BUBBLE_DRIFT_SCALE);  // 还原"基准宽度"
+    const topPx = randomBetween(0.3, 1) * Math.max(0, bandH - size);      // 偏下半部起步
+    const risePx = Math.min(topPx, randomBetween(0.3, 0.75) * topPx + bandH * 0.12); // 上升不超过起点高度
+    const travelPx = Math.max(120, (baseW - size) * BUBBLE_DRIFT_SCALE);  // 往右多飘二分之一
+
+    const bubble = document.createElement('span');
+    bubble.className = 'hero-bubble';
+    // 轨迹参数都从 CSS 变量走，视觉全在 styles.css，JS 不掺样式
+    bubble.style.setProperty('--size', `${size}px`);
+    bubble.style.setProperty('--life', `${life}ms`);                    // 动画时长 == 这个泡的寿命
+    bubble.style.setProperty('--t', (topPx / Math.max(1, bandH - size)).toFixed(3));
+    bubble.style.setProperty('--travel', `${Math.round(travelPx)}px`);
+    bubble.style.setProperty('--rise', `${Math.round(risePx)}px`);
+    bubble.style.setProperty('--wobble', `${Math.round(randomBetween(2800, 4200))}ms`);
+
+    const inner = document.createElement('span');
+    inner.className = 'hero-bubble-inner';
+    const image = document.createElement('img');
+    image.src = src;
+    image.alt = '';
+    image.decoding = 'async';
+    inner.appendChild(image);
+    bubble.appendChild(inner);
+    layer.appendChild(bubble);
+
+    // 到点回收（和动画时长同一个数）。刻意不用 animationend：
+    // 标签页切后台时 CSS 动画被暂停、事件可能永远不来，定时器更可靠。
+    retireTimers.set(bubble, window.setTimeout(() => retire(bubble), life + 200));
+  }
+
+  function scheduleNext(delay) {
+    window.clearTimeout(spawnTimer);
+    if (paused) return;
+    const wait = typeof delay === 'number' ? delay : randomBetween(BUBBLE_SPAWN_MIN_MS, BUBBLE_SPAWN_MAX_MS);
+    spawnTimer = window.setTimeout(() => {
+      spawn();
+      scheduleNext();
+    }, wait);
+  }
+
+  // 暂停条件：标签页不可见 / 首屏滚出去了 / 用户要求减少动效
+  function sync() {
+    const nextPaused = document.hidden || offscreen || reduceMotion.matches;
+    layer.classList.toggle('is-paused', nextPaused);
+    if (nextPaused === paused) return;
+    paused = nextPaused;
+    if (paused) window.clearTimeout(spawnTimer);
+    else scheduleNext();
+  }
+
+  // 分区/主题换了：在飞的气泡装的还是旧分区的图 → 清掉重来
+  function refresh() {
+    retireTimers.forEach((timer, bubble) => {
+      window.clearTimeout(timer);
+      bubble.remove();
+    });
+    retireTimers.clear();
+    window.clearTimeout(spawnTimer);
+    if (!paused) scheduleNext(240);
+  }
+
+  const hero = layer.closest('.hero') || layer;
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      offscreen = !entries.some((entry) => entry.isIntersecting);
+      sync();
+    });
+    observer.observe(hero);
+  }
+  document.addEventListener('visibilitychange', sync);
+  if (typeof reduceMotion.addEventListener === 'function') {
+    reduceMotion.addEventListener('change', sync);
+  }
+
+  paused = document.hidden || reduceMotion.matches;
+  if (!paused) scheduleNext(BUBBLE_FIRST_DELAY_MS);
+
+  heroBubbleController = { refresh };
+}
+
 initMascot();
 initNavScroll();
 initHeroArtZoom();
@@ -1450,5 +1603,6 @@ initChromeAutoHide();
 initBackToTop();
 initTheme();
 renderPartitionNav();
+initHeroBubbles();
 setActivePartition(currentPartition);
 loadStickers();
