@@ -827,9 +827,9 @@ const themeConfig = [
     },
     art: { png: 'assets/001.png', webp: 'assets/001.webp' },
     alt: '白圣女与黑牧师立绘',
-    note: '白圣女 & 黑牧师',
-    artTag: '白圣女 · 黑牧师',
-    copy: { kicker: '白圣女的日常记录', lede: '记录可爱的圣女大人' },
+    note: '黑牧师 · 劳伦斯',              // 与 index.html 的 .art-note 保持一致
+    artTag: '白圣女 · 塞西莉娅',           // 与 index.html 的 .art-tag 保持一致
+    copy: { kicker: '白聖女と黒牧師', lede: '记录可爱的圣女大人' }   // 与 index.html 的 hero 文案一致,
   },
   {
     id: 'whale',
