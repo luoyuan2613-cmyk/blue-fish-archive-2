@@ -94,8 +94,8 @@
 
     <header class="site-nav" data-reveal>
       <a class="wordmark" href="#top" aria-label="回到首页">
-        <img class="brand-logo brand-logo-color" src="logo/deepseek_蓝鲸_彩色.png" alt="白圣女与黑牧师伊甸园 Logo" />
-        <span>白圣女与黑牧师伊甸园</span>
+        <img class="brand-logo brand-logo-color" data-brand-logo="color" src="logo/deepseek_蓝鲸_彩色.png" alt="白圣女与黑牧师伊甸园 Logo" />
+        <span data-copy="brand">白圣女与黑牧师伊甸园</span>
       </a>
       <nav class="nav-links" aria-label="主导航">
         <a href="#wall">收录区</a>
@@ -225,9 +225,6 @@
         </div>
 
         <aside class="source-panel" data-reveal data-delay="220" id="archive">
-          <!-- 气泡带：挂在「来源」卡片正上方那块空白里（app.js 的 initHeroBubbles 负责派发肥皂泡）。
-               纯装饰，整层 pointer-events: none，不拦任何点击。 -->
-          <div class="hero-bubbles" id="hero-bubbles" aria-hidden="true"></div>
           <h2>来源</h2>
           <div class="source-list">
             <a
@@ -324,8 +321,8 @@
     <footer class="site-footer" id="rights" data-reveal>
       <span class="divider-bubbles footer-bubbles" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="footer-brand">
-        <img class="brand-logo brand-logo-black" src="logo/deepseek_蓝鲸_黑色.png" alt="白圣女与黑牧师伊甸园 Logo" />
-        <span>白圣女与黑牧师伊甸园</span>
+        <img class="brand-logo brand-logo-black" data-brand-logo="black" src="logo/deepseek_蓝鲸_黑色.png" alt="白圣女与黑牧师伊甸园 Logo" />
+        <span data-copy="brand">白圣女与黑牧师伊甸园</span>
       </span>
       <p>非官方整理 · 版权归原作者所有 ｜ 和武叶佐乃</p>
     </footer>
@@ -382,6 +379,8 @@
     </div>
     <audio id="mascot-audio" src="memes/xixi.aac" preload="none"></audio>
 
+    <!-- 文案/图片/配色数据：必须在 app.js 之前同步加载（首屏不闪默认主题） -->
+    <script src="theme-data.js"></script>
     <script src="app.js" defer></script>
   </body>
 </html>
