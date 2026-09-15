@@ -49,8 +49,13 @@ jobs:
           outputs = {}
           errors = []
           for path in manifests:
-              entries = json.loads(path.read_text(encoding="utf-8"))
-              print(f"{path.as_posix()}: {len(entries)} entries")
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              # 兼容两种清单格式：新的 { storage, items } 与旧的裸数组
+              entries = payload if isinstance(payload, list) else payload.get("items", [])
+              storage = {} if isinstance(payload, list) else payload.get("storage", {})
+              print(f"{path.as_posix()}: {len(entries)} entries"
+                    + (f"  storage={storage.get('mode', '?')} baseUrl={storage.get('baseUrl', '') or '(相对路径)'}"
+                       if storage else "  (旧格式)"))
               for entry in entries:
                   for key in ("original", "preview", "large"):
                       rel = entry.get(key)

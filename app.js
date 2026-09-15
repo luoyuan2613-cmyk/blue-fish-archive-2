@@ -71,6 +71,51 @@ function getActivePartition() {
   return partitions.find((part) => part.id === currentPartition) || partitions[0];
 }
 
+/* ---------------------------------------------------------------------------
+ * 图片地址收口（为"图片迁到对象存储 / 国内 CDN"做准备）
+ *
+ * 清单里可以带 storage 段（见 scripts/sync_stickers.py）：
+ *   { "storage": { "baseUrl": "https://img.example.com/",
+ *                  "previewBaseUrl": "", "largeBaseUrl": "" },
+ *     "items": [ … ] }
+ *
+ * 前端所有取图都经过 getImageUrl()，所以将来换 CDN 只需改清单里的 baseUrl，
+ * 不必再动任何渲染代码。baseUrl 为空时行为与改造前完全一致（相对路径）；
+ * 已经是绝对地址（http(s):// / data: / blob: / 以 / 开头）的路径原样返回，
+ * 便于迁移期间逐张过渡。
+ * ------------------------------------------------------------------------- */
+const storageConfig = { baseUrl: '', previewBaseUrl: '', largeBaseUrl: '' };
+
+// 每次都按新清单重置（缺字段即视为空）：
+// 否则从"带 baseUrl 的分区"切到"旧格式/本地分区"时，旧 baseUrl 会残留，
+// 把相对路径拼成上一个 CDN 的地址。
+function applyStorageConfig(raw) {
+  const source = raw && typeof raw === 'object' ? raw : {};
+  ['baseUrl', 'previewBaseUrl', 'largeBaseUrl'].forEach((key) => {
+    storageConfig[key] = typeof source[key] === 'string' ? source[key].trim() : '';
+  });
+}
+
+function joinStorageUrl(base, path) {
+  if (!path) return '';
+  if (/^[a-z][a-z0-9+.-]*:/i.test(path) || path.startsWith('//') || path.startsWith('/')) {
+    return path;                                  // 已是绝对地址或站点根路径
+  }
+  if (!base) return path;                         // 未配置 baseUrl → 保持相对路径
+  return base.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+}
+
+// kind: 'original'（默认）| 'preview' | 'large'
+function getImageUrl(path, kind = 'original') {
+  if (!path) return '';
+  const fallback = storageConfig.baseUrl;
+  const base =
+    kind === 'preview' ? storageConfig.previewBaseUrl || fallback
+      : kind === 'large' ? storageConfig.largeBaseUrl || fallback
+        : fallback;
+  return joinStorageUrl(base, path);
+}
+
 async function fetchPartition(themeId, partitionId) {
   const theme = getThemeById(themeId);
   const partition = theme.partitions.find((part) => part.id === partitionId);
@@ -79,7 +124,11 @@ async function fetchPartition(themeId, partitionId) {
   if (partitionCache.has(key)) return partitionCache.get(key);
   const response = await fetch(partition.manifest, { cache: 'no-cache' });
   if (!response.ok) throw new Error(`${partition.manifest} unavailable`);
-  const stickers = await response.json();
+  const payload = await response.json();
+  // 兼容两种清单格式：新的 { storage, items } 与旧的裸数组（旧数据永不失效）
+  const legacyArray = Array.isArray(payload);
+  const stickers = legacyArray ? payload : (payload && payload.items) || [];
+  applyStorageConfig(legacyArray ? null : payload && payload.storage);   // 旧格式 → 清空为相对路径
   partitionCache.set(key, stickers);
   return stickers;
 }
@@ -128,7 +177,7 @@ function createStickerCard(sticker, index) {
   const inner = document.createElement('span');
   inner.className = 'sticker-card-inner';
 
-  const source = sticker.preview || sticker.original;
+  const source = getImageUrl(sticker.preview, 'preview') || getImageUrl(sticker.original);
   const image = document.createElement('img');
   image.src = source;
   image.alt = '';
@@ -145,7 +194,7 @@ function createStickerCard(sticker, index) {
   image.onerror = () => {
     if (sticker.preview && !triedOriginal) {
       triedOriginal = true;
-      image.src = sticker.original;
+      image.src = getImageUrl(sticker.original);
       return;
     }
     card.remove();
@@ -280,13 +329,15 @@ function showSticker(index) {
   // 下载仍指向原图,这里只优化「看」,不改变「取」。
   lightboxImage.classList.remove('is-ready');
   lightboxImage.src = animated
-    ? sticker.original
-    : sticker.large || sticker.preview || sticker.original;
+    ? getImageUrl(sticker.original)
+    : getImageUrl(sticker.large, 'large')
+      || getImageUrl(sticker.preview, 'preview')
+      || getImageUrl(sticker.original);
   if (lightboxImage.complete && lightboxImage.naturalWidth > 0) {
     lightboxImage.classList.add('is-ready');
   }
   lightboxImage.alt = sticker.alt || '表情包大图预览';
-  downloadButton.href = sticker.original;
+  downloadButton.href = getImageUrl(sticker.original);
   downloadButton.download = sticker.filename || 'sticker';
   // 翻页浏览只按需取大图（prefetchNeighbours），不在这里额外预取原图
   if (actionStatus) actionStatus.textContent = isMaximized ? MAXIMIZE_HINT : '';
@@ -317,7 +368,7 @@ function prefetchNeighbours(index) {
   [-1, 1].forEach((step) => {
     const neighbour = stickerList[(index + step + stickerList.length) % stickerList.length];
     if (!neighbour || isAnimatedSticker(neighbour)) return;
-    const source = neighbour.large || neighbour.preview;
+    const source = getImageUrl(neighbour.large, 'large') || getImageUrl(neighbour.preview, 'preview');
     if (!source) return;
     const preload = new Image();
     preload.src = source;

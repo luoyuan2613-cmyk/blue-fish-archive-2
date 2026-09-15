@@ -1,290 +1,298 @@
-[
-  {
-    "original": "data/whale/default/09009413b31bb05176806c2b707adab44bede083.jpg",
-    "filename": "09009413b31bb05176806c2b707adab44bede083.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-09009413b31bb05176806c2b707adab44bede083.webp",
-    "large": "large/whale-default-09009413b31bb05176806c2b707adab44bede083.webp",
-    "width": 480,
-    "height": 480
+{
+  "storage": {
+    "mode": "local",
+    "baseUrl": "",
+    "previewBaseUrl": "",
+    "largeBaseUrl": ""
   },
-  {
-    "original": "data/whale/default/0b13ae4e78f0f736d45a93024c55b319eac41382.jpg",
-    "filename": "0b13ae4e78f0f736d45a93024c55b319eac41382.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-0b13ae4e78f0f736d45a93024c55b319eac41382.webp",
-    "large": "large/whale-default-0b13ae4e78f0f736d45a93024c55b319eac41382.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/0fb4d4300a55b319945d5d7605a98226cefc1782.jpg",
-    "filename": "0fb4d4300a55b319945d5d7605a98226cefc1782.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-0fb4d4300a55b319945d5d7605a98226cefc1782.webp",
-    "large": "large/whale-default-0fb4d4300a55b319945d5d7605a98226cefc1782.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/1.png",
-    "filename": "1.png",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-1.webp",
-    "large": "large/whale-default-1.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/136c1d50f8198618a6e330870ced2e738ad4e683.jpg",
-    "filename": "136c1d50f8198618a6e330870ced2e738ad4e683.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-136c1d50f8198618a6e330870ced2e738ad4e683.webp",
-    "large": "large/whale-default-136c1d50f8198618a6e330870ced2e738ad4e683.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/136e46c5b74543a988b1adcf58178a82b8011487.jpg",
-    "filename": "136e46c5b74543a988b1adcf58178a82b8011487.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-136e46c5b74543a988b1adcf58178a82b8011487.webp",
-    "large": "large/whale-default-136e46c5b74543a988b1adcf58178a82b8011487.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/194f36514fc2d562150881eea11190ef76c66c2e.jpg",
-    "filename": "194f36514fc2d562150881eea11190ef76c66c2e.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-194f36514fc2d562150881eea11190ef76c66c2e.webp",
-    "large": "large/whale-default-194f36514fc2d562150881eea11190ef76c66c2e.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/2.png",
-    "filename": "2.png",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-2.webp",
-    "large": "large/whale-default-2.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/2d67ace83901213fb99991df12e736d12e2e9580.jpg",
-    "filename": "2d67ace83901213fb99991df12e736d12e2e9580.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-2d67ace83901213fb99991df12e736d12e2e9580.webp",
-    "large": "large/whale-default-2d67ace83901213fb99991df12e736d12e2e9580.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/3.png",
-    "filename": "3.png",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-3.webp",
-    "large": "large/whale-default-3.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/31543adca144ad34a814588496a20cf430ad8580.jpg",
-    "filename": "31543adca144ad34a814588496a20cf430ad8580.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-31543adca144ad34a814588496a20cf430ad8580.webp",
-    "large": "large/whale-default-31543adca144ad34a814588496a20cf430ad8580.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/37aa0c45ad34598240213a914af431adcaef8480.jpg",
-    "filename": "37aa0c45ad34598240213a914af431adcaef8480.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-37aa0c45ad34598240213a914af431adcaef8480.webp",
-    "large": "large/whale-default-37aa0c45ad34598240213a914af431adcaef8480.webp",
-    "width": 480,
-    "height": 439
-  },
-  {
-    "original": "data/whale/default/38b71e74aeaf6158c0ba8897a4a0966382078355.png",
-    "filename": "38b71e74aeaf6158c0ba8897a4a0966382078355.png",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-38b71e74aeaf6158c0ba8897a4a0966382078355.webp",
-    "large": "large/whale-default-38b71e74aeaf6158c0ba8897a4a0966382078355.webp",
-    "width": 480,
-    "height": 320
-  },
-  {
-    "original": "data/whale/default/4.png",
-    "filename": "4.png",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-4.webp",
-    "large": "large/whale-default-4.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/47663dee76c6a7ef5e5ef725bbfaaf51f3de6636.jpg",
-    "filename": "47663dee76c6a7ef5e5ef725bbfaaf51f3de6636.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-47663dee76c6a7ef5e5ef725bbfaaf51f3de6636.webp",
-    "large": "large/whale-default-47663dee76c6a7ef5e5ef725bbfaaf51f3de6636.webp",
-    "width": 212,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/5.png",
-    "filename": "5.png",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-5.webp",
-    "large": "large/whale-default-5.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/574102c279310a55cd8001f7f14543a983261082.jpg",
-    "filename": "574102c279310a55cd8001f7f14543a983261082.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-574102c279310a55cd8001f7f14543a983261082.webp",
-    "large": "large/whale-default-574102c279310a55cd8001f7f14543a983261082.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/5b851f109313b07eba99010b4ad7912397dd8c02.jpg",
-    "filename": "5b851f109313b07eba99010b4ad7912397dd8c02.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-5b851f109313b07eba99010b4ad7912397dd8c02.webp",
-    "large": "large/whale-default-5b851f109313b07eba99010b4ad7912397dd8c02.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/6b98db084b36acafd44b49ff3ad98d1000e99c80.jpg",
-    "filename": "6b98db084b36acafd44b49ff3ad98d1000e99c80.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-6b98db084b36acafd44b49ff3ad98d1000e99c80.webp",
-    "large": "large/whale-default-6b98db084b36acafd44b49ff3ad98d1000e99c80.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/70d5a1f531adcbef819fa105eaaf2edda2cc9f80.jpg",
-    "filename": "70d5a1f531adcbef819fa105eaaf2edda2cc9f80.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-70d5a1f531adcbef819fa105eaaf2edda2cc9f80.webp",
-    "large": "large/whale-default-70d5a1f531adcbef819fa105eaaf2edda2cc9f80.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/8eaa0ecd7cd98d10843b5a32673fb80e7aec90bb.jpg",
-    "filename": "8eaa0ecd7cd98d10843b5a32673fb80e7aec90bb.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-8eaa0ecd7cd98d10843b5a32673fb80e7aec90bb.webp",
-    "large": "large/whale-default-8eaa0ecd7cd98d10843b5a32673fb80e7aec90bb.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/91da66ee76094b365539c4eee5cc7cd98c109d80.jpg",
-    "filename": "91da66ee76094b365539c4eee5cc7cd98c109d80.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-91da66ee76094b365539c4eee5cc7cd98c109d80.webp",
-    "large": "large/whale-default-91da66ee76094b365539c4eee5cc7cd98c109d80.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/96a6822fb9389b5047553f51c335e5dde6116e80.jpg",
-    "filename": "96a6822fb9389b5047553f51c335e5dde6116e80.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-96a6822fb9389b5047553f51c335e5dde6116e80.webp",
-    "large": "large/whale-default-96a6822fb9389b5047553f51c335e5dde6116e80.webp",
-    "width": 480,
-    "height": 471
-  },
-  {
-    "original": "data/whale/default/a19e9400213fb80e797bbed470d12f2eb8389480.jpg",
-    "filename": "a19e9400213fb80e797bbed470d12f2eb8389480.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-a19e9400213fb80e797bbed470d12f2eb8389480.webp",
-    "large": "large/whale-default-a19e9400213fb80e797bbed470d12f2eb8389480.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/aca03c2297dda1445da2b3b1f4b7d0a20df48680.jpg",
-    "filename": "aca03c2297dda1445da2b3b1f4b7d0a20df48680.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-aca03c2297dda1445da2b3b1f4b7d0a20df48680.webp",
-    "large": "large/whale-default-aca03c2297dda1445da2b3b1f4b7d0a20df48680.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/be602783b9014a907e9a99beef773912b21bee83.jpg",
-    "filename": "be602783b9014a907e9a99beef773912b21bee83.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-be602783b9014a907e9a99beef773912b21bee83.webp",
-    "large": "large/whale-default-be602783b9014a907e9a99beef773912b21bee83.webp",
-    "width": 480,
-    "height": 477
-  },
-  {
-    "original": "data/whale/default/ChatGPT Image 2026年8月17日 16_14_48.png",
-    "filename": "ChatGPT Image 2026年8月17日 16_14_48.png",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-ChatGPT Image 2026年8月17日 16_14_48.webp",
-    "large": "large/whale-default-ChatGPT Image 2026年8月17日 16_14_48.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/ChatGPT Image 2026年8月17日 16_18_05.png",
-    "filename": "ChatGPT Image 2026年8月17日 16_18_05.png",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-ChatGPT Image 2026年8月17日 16_18_05.webp",
-    "large": "large/whale-default-ChatGPT Image 2026年8月17日 16_18_05.webp",
-    "width": 480,
-    "height": 384
-  },
-  {
-    "original": "data/whale/default/ChatGPT Image 2026年9月13日 00_14_50.jpg",
-    "filename": "ChatGPT Image 2026年9月13日 00_14_50.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-ChatGPT Image 2026年9月13日 00_14_50.webp",
-    "large": "large/whale-default-ChatGPT Image 2026年9月13日 00_14_50.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/e1433a0b304e251f54f1b5fbe186c9177f3e532c.jpg",
-    "filename": "e1433a0b304e251f54f1b5fbe186c9177f3e532c.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-e1433a0b304e251f54f1b5fbe186c9177f3e532c.webp",
-    "large": "large/whale-default-e1433a0b304e251f54f1b5fbe186c9177f3e532c.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/e3de2f27cffc1e170f1b53320c90f603728de983.jpg",
-    "filename": "e3de2f27cffc1e170f1b53320c90f603728de983.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-e3de2f27cffc1e170f1b53320c90f603728de983.webp",
-    "large": "large/whale-default-e3de2f27cffc1e170f1b53320c90f603728de983.webp",
-    "width": 480,
-    "height": 480
-  },
-  {
-    "original": "data/whale/default/eae75b02738da977b28b5928f651f8198718e383.jpg",
-    "filename": "eae75b02738da977b28b5928f651f8198718e383.jpg",
-    "alt": "动画贺图收藏",
-    "preview": "previews/whale-default-eae75b02738da977b28b5928f651f8198718e383.webp",
-    "large": "large/whale-default-eae75b02738da977b28b5928f651f8198718e383.webp",
-    "width": 480,
-    "height": 480
-  }
-]
+  "items": [
+    {
+      "original": "data/whale/default/09009413b31bb05176806c2b707adab44bede083.jpg",
+      "filename": "09009413b31bb05176806c2b707adab44bede083.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-09009413b31bb05176806c2b707adab44bede083.webp",
+      "large": "large/whale-default-09009413b31bb05176806c2b707adab44bede083.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/0b13ae4e78f0f736d45a93024c55b319eac41382.jpg",
+      "filename": "0b13ae4e78f0f736d45a93024c55b319eac41382.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-0b13ae4e78f0f736d45a93024c55b319eac41382.webp",
+      "large": "large/whale-default-0b13ae4e78f0f736d45a93024c55b319eac41382.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/0fb4d4300a55b319945d5d7605a98226cefc1782.jpg",
+      "filename": "0fb4d4300a55b319945d5d7605a98226cefc1782.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-0fb4d4300a55b319945d5d7605a98226cefc1782.webp",
+      "large": "large/whale-default-0fb4d4300a55b319945d5d7605a98226cefc1782.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/1.png",
+      "filename": "1.png",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-1.webp",
+      "large": "large/whale-default-1.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/136c1d50f8198618a6e330870ced2e738ad4e683.jpg",
+      "filename": "136c1d50f8198618a6e330870ced2e738ad4e683.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-136c1d50f8198618a6e330870ced2e738ad4e683.webp",
+      "large": "large/whale-default-136c1d50f8198618a6e330870ced2e738ad4e683.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/136e46c5b74543a988b1adcf58178a82b8011487.jpg",
+      "filename": "136e46c5b74543a988b1adcf58178a82b8011487.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-136e46c5b74543a988b1adcf58178a82b8011487.webp",
+      "large": "large/whale-default-136e46c5b74543a988b1adcf58178a82b8011487.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/194f36514fc2d562150881eea11190ef76c66c2e.jpg",
+      "filename": "194f36514fc2d562150881eea11190ef76c66c2e.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-194f36514fc2d562150881eea11190ef76c66c2e.webp",
+      "large": "large/whale-default-194f36514fc2d562150881eea11190ef76c66c2e.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/2.png",
+      "filename": "2.png",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-2.webp",
+      "large": "large/whale-default-2.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/2d67ace83901213fb99991df12e736d12e2e9580.jpg",
+      "filename": "2d67ace83901213fb99991df12e736d12e2e9580.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-2d67ace83901213fb99991df12e736d12e2e9580.webp",
+      "large": "large/whale-default-2d67ace83901213fb99991df12e736d12e2e9580.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/3.png",
+      "filename": "3.png",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-3.webp",
+      "large": "large/whale-default-3.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/31543adca144ad34a814588496a20cf430ad8580.jpg",
+      "filename": "31543adca144ad34a814588496a20cf430ad8580.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-31543adca144ad34a814588496a20cf430ad8580.webp",
+      "large": "large/whale-default-31543adca144ad34a814588496a20cf430ad8580.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/37aa0c45ad34598240213a914af431adcaef8480.jpg",
+      "filename": "37aa0c45ad34598240213a914af431adcaef8480.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-37aa0c45ad34598240213a914af431adcaef8480.webp",
+      "large": "large/whale-default-37aa0c45ad34598240213a914af431adcaef8480.webp",
+      "width": 480,
+      "height": 439
+    },
+    {
+      "original": "data/whale/default/38b71e74aeaf6158c0ba8897a4a0966382078355.png",
+      "filename": "38b71e74aeaf6158c0ba8897a4a0966382078355.png",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-38b71e74aeaf6158c0ba8897a4a0966382078355.webp",
+      "large": "large/whale-default-38b71e74aeaf6158c0ba8897a4a0966382078355.webp",
+      "width": 480,
+      "height": 320
+    },
+    {
+      "original": "data/whale/default/4.png",
+      "filename": "4.png",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-4.webp",
+      "large": "large/whale-default-4.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/47663dee76c6a7ef5e5ef725bbfaaf51f3de6636.jpg",
+      "filename": "47663dee76c6a7ef5e5ef725bbfaaf51f3de6636.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-47663dee76c6a7ef5e5ef725bbfaaf51f3de6636.webp",
+      "large": "large/whale-default-47663dee76c6a7ef5e5ef725bbfaaf51f3de6636.webp",
+      "width": 212,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/5.png",
+      "filename": "5.png",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-5.webp",
+      "large": "large/whale-default-5.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/574102c279310a55cd8001f7f14543a983261082.jpg",
+      "filename": "574102c279310a55cd8001f7f14543a983261082.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-574102c279310a55cd8001f7f14543a983261082.webp",
+      "large": "large/whale-default-574102c279310a55cd8001f7f14543a983261082.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/5b851f109313b07eba99010b4ad7912397dd8c02.jpg",
+      "filename": "5b851f109313b07eba99010b4ad7912397dd8c02.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-5b851f109313b07eba99010b4ad7912397dd8c02.webp",
+      "large": "large/whale-default-5b851f109313b07eba99010b4ad7912397dd8c02.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/6b98db084b36acafd44b49ff3ad98d1000e99c80.jpg",
+      "filename": "6b98db084b36acafd44b49ff3ad98d1000e99c80.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-6b98db084b36acafd44b49ff3ad98d1000e99c80.webp",
+      "large": "large/whale-default-6b98db084b36acafd44b49ff3ad98d1000e99c80.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/70d5a1f531adcbef819fa105eaaf2edda2cc9f80.jpg",
+      "filename": "70d5a1f531adcbef819fa105eaaf2edda2cc9f80.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-70d5a1f531adcbef819fa105eaaf2edda2cc9f80.webp",
+      "large": "large/whale-default-70d5a1f531adcbef819fa105eaaf2edda2cc9f80.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/8eaa0ecd7cd98d10843b5a32673fb80e7aec90bb.jpg",
+      "filename": "8eaa0ecd7cd98d10843b5a32673fb80e7aec90bb.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-8eaa0ecd7cd98d10843b5a32673fb80e7aec90bb.webp",
+      "large": "large/whale-default-8eaa0ecd7cd98d10843b5a32673fb80e7aec90bb.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/91da66ee76094b365539c4eee5cc7cd98c109d80.jpg",
+      "filename": "91da66ee76094b365539c4eee5cc7cd98c109d80.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-91da66ee76094b365539c4eee5cc7cd98c109d80.webp",
+      "large": "large/whale-default-91da66ee76094b365539c4eee5cc7cd98c109d80.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/96a6822fb9389b5047553f51c335e5dde6116e80.jpg",
+      "filename": "96a6822fb9389b5047553f51c335e5dde6116e80.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-96a6822fb9389b5047553f51c335e5dde6116e80.webp",
+      "large": "large/whale-default-96a6822fb9389b5047553f51c335e5dde6116e80.webp",
+      "width": 480,
+      "height": 471
+    },
+    {
+      "original": "data/whale/default/a19e9400213fb80e797bbed470d12f2eb8389480.jpg",
+      "filename": "a19e9400213fb80e797bbed470d12f2eb8389480.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-a19e9400213fb80e797bbed470d12f2eb8389480.webp",
+      "large": "large/whale-default-a19e9400213fb80e797bbed470d12f2eb8389480.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/aca03c2297dda1445da2b3b1f4b7d0a20df48680.jpg",
+      "filename": "aca03c2297dda1445da2b3b1f4b7d0a20df48680.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-aca03c2297dda1445da2b3b1f4b7d0a20df48680.webp",
+      "large": "large/whale-default-aca03c2297dda1445da2b3b1f4b7d0a20df48680.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/be602783b9014a907e9a99beef773912b21bee83.jpg",
+      "filename": "be602783b9014a907e9a99beef773912b21bee83.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-be602783b9014a907e9a99beef773912b21bee83.webp",
+      "large": "large/whale-default-be602783b9014a907e9a99beef773912b21bee83.webp",
+      "width": 480,
+      "height": 477
+    },
+    {
+      "original": "data/whale/default/ChatGPT Image 2026年8月17日 16_14_48.png",
+      "filename": "ChatGPT Image 2026年8月17日 16_14_48.png",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-ChatGPT Image 2026年8月17日 16_14_48.webp",
+      "large": "large/whale-default-ChatGPT Image 2026年8月17日 16_14_48.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/ChatGPT Image 2026年8月17日 16_18_05.png",
+      "filename": "ChatGPT Image 2026年8月17日 16_18_05.png",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-ChatGPT Image 2026年8月17日 16_18_05.webp",
+      "large": "large/whale-default-ChatGPT Image 2026年8月17日 16_18_05.webp",
+      "width": 480,
+      "height": 384
+    },
+    {
+      "original": "data/whale/default/ChatGPT Image 2026年9月13日 00_14_50.jpg",
+      "filename": "ChatGPT Image 2026年9月13日 00_14_50.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-ChatGPT Image 2026年9月13日 00_14_50.webp",
+      "large": "large/whale-default-ChatGPT Image 2026年9月13日 00_14_50.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/e1433a0b304e251f54f1b5fbe186c9177f3e532c.jpg",
+      "filename": "e1433a0b304e251f54f1b5fbe186c9177f3e532c.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-e1433a0b304e251f54f1b5fbe186c9177f3e532c.webp",
+      "large": "large/whale-default-e1433a0b304e251f54f1b5fbe186c9177f3e532c.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/e3de2f27cffc1e170f1b53320c90f603728de983.jpg",
+      "filename": "e3de2f27cffc1e170f1b53320c90f603728de983.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-e3de2f27cffc1e170f1b53320c90f603728de983.webp",
+      "large": "large/whale-default-e3de2f27cffc1e170f1b53320c90f603728de983.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "original": "data/whale/default/eae75b02738da977b28b5928f651f8198718e383.jpg",
+      "filename": "eae75b02738da977b28b5928f651f8198718e383.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/whale-default-eae75b02738da977b28b5928f651f8198718e383.webp",
+      "large": "large/whale-default-eae75b02738da977b28b5928f651f8198718e383.webp",
+      "width": 480,
+      "height": 480
+    }
+  ]
+}

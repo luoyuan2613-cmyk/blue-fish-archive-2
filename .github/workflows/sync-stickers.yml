@@ -33,6 +33,18 @@ jobs:
         run: python scripts/make_previews.py
 
       - name: Generate manifest
+        # 预埋：把图片切到对象存储 / CDN 时，只需在仓库
+        # Settings → Secrets and variables → Actions → Variables 里加这几个变量，
+        # 不必改任何代码（这些是明文变量，不放密钥；密钥永远不进仓库）。
+        #   GALLERY_BASE_URL         例如 https://img.example.com/
+        #   GALLERY_PREVIEW_BASE_URL 可选，只给缩略图用
+        #   GALLERY_LARGE_BASE_URL   可选，只给灯箱大图用
+        #   GALLERY_STORAGE_MODE     local（默认）| remote
+        env:
+          GALLERY_STORAGE_MODE: ${{ vars.GALLERY_STORAGE_MODE }}
+          GALLERY_BASE_URL: ${{ vars.GALLERY_BASE_URL }}
+          GALLERY_PREVIEW_BASE_URL: ${{ vars.GALLERY_PREVIEW_BASE_URL }}
+          GALLERY_LARGE_BASE_URL: ${{ vars.GALLERY_LARGE_BASE_URL }}
         run: python scripts/sync_stickers.py
 
       - name: Commit updated manifest and previews

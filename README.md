@@ -31,7 +31,8 @@ fish-gallery/
 │     例：data/manga/default/  data/manga/cos/  data/whale/default/  data/whale/cos/
 ├── previews/             480px WebP 缩略图（脚本生成，产物名带「主题-分区-」前缀）
 ├── large/                原尺寸 WebP（脚本生成，灯箱看图用）
-├── stickers/             每个「主题×分区」一份清单：manifest_<主题>-<分区>.json（脚本生成，勿手改）
+├── stickers/             每个「主题×分区」一份清单：manifest_<主题>-<分区>.json
+│                         （结构为 { storage, items }；storage.baseUrl 留空＝走相对路径）
 ├── assets/               首页立绘（含主题专用立绘 theme-whale.*）
 ├── logo/                 站点图标与品牌标记（含 favicon.ico）
 ├── memes/                看板娘图片与音效
@@ -186,6 +187,10 @@ Cloudflare Workers：自动拉取仓库，作为静态资源发布（约 1–2 �
   | `/data/*`、`/previews/*`、`/large/*` | `max-age=31536000, immutable`（永久，故换图要改名） |
   | `/logo/*`、`/assets/*`、`/memes/*` | `max-age=600`（10 分钟，换素材后能较快生效） |
   | `index.html`、`app.js`、清单等 | `max-age=0, must-revalidate`（每次发布即时生效） |
+- **图片与 CDN 的开关（已预埋）**：清单里的 `storage.baseUrl` 决定前端从哪里取图。
+  在仓库 `Settings → Secrets and variables → Actions → Variables` 里加
+  `GALLERY_BASE_URL`（以及可选的 `GALLERY_PREVIEW_BASE_URL`、`GALLERY_LARGE_BASE_URL`），
+  CI 生成的清单就会带上该地址——**换 CDN 不需要改代码**。详见 `架构演进路线图.md`。
 - **仓库设置**：`Settings → Actions → General → Workflow permissions` 需为 **Read and write**，
   否则 CI 无法把生成的清单/缩略图提交回仓库。
 - **部署切换期**：推送后替换实例的约 60 秒内域名会全部超时，属正常现象，等 1 分钟再试。
@@ -214,6 +219,7 @@ data/<主题>/<分区>/   →   stickers/manifest_<主题>-<分区>.json
 | `README.md` | 本文件：结构、日常操作、推送排错、部署与缓存 |
 | `UPLOAD.md` | 操作手册：加/删图速查、本地使用、**新增/重命名主题与分区全流程** |
 | `开发交接（和武）.md` | 交接文档：完整历史、13 个已踩坑（含部署事故、缓存坑、无头验证三陷阱等） |
+| `架构演进路线图.md` | 图片迁往对象存储 / 国内 CDN 的三阶段计划、选型对比、迁移手册与待办 |
 
 ---
 

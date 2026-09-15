@@ -1,10 +1,46 @@
-"""Generate or validate the static sticker manifests (one per theme/partition)."""
+"""Generate or validate the static sticker manifests (one per theme/partition).
+
+两种存储模式（切换只改环境变量，不动代码）：
+
+- ``local``（默认）：扫描 ``data/<主题>/<分区>/`` 得到文件列表。当前的用法。
+- ``remote``：不再扫描本地目录，改为从外部 API 拉文件列表——为"图片搬到对象存储
+  （R2 / OSS / COS）+ 前端直传"做准备。现在只是预埋接口，等真正迁移时再用。
+
+环境变量（**不要**把任何密钥写进仓库或本文档）：
+
+===============  ==================================================
+GALLERY_STORAGE_MODE   ``local`` | ``remote``，默认 ``local``
+GALLERY_BASE_URL       图片根地址，写进清单的 storage.baseUrl（留空 = 相对路径）
+GALLERY_PREVIEW_BASE_URL  可选，单独给缩略图用（留空则回退到 GALLERY_BASE_URL）
+GALLERY_LARGE_BASE_URL    可选，单独给灯箱大图用（同上）
+GALLERY_REMOTE_API     remote 模式下的文件列表接口地址
+===============  ==================================================
+
+``remote`` 模式下 API 的约定（返回 JSON）：
+
+.. code-block:: json
+
+    {
+      "storage": { "baseUrl": "https://img.example.com/", "previewBaseUrl": "", "largeBaseUrl": "" },
+      "files": [
+        { "path": "data/manga/default/01.jpg", "filename": "01.jpg",
+          "preview": "previews/manga-default-01.webp",
+          "large":   "large/manga-default-01.webp",
+          "width": 1200, "height": 1600, "alt": "..." }
+      ]
+    }
+
+请求时会带上 ``?theme=<主题>&partition=<分区>`` 两个查询参数。
+"""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 from PIL import Image
@@ -19,6 +55,13 @@ SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".apng"}
 # 主题与分区都由目录结构自动发现（有图才生成清单），加分区只要建目录 + 放图，
 # 前端 app.js 的 THEMES 里补一条同名分区即可。
 DATA_DIR = ROOT / "data"
+
+# ---- 存储模式与地址（全部可用环境变量覆盖，代码里不出现任何密钥）----
+STORAGE_MODE = os.environ.get("GALLERY_STORAGE_MODE", "local").strip().lower()
+STORAGE_BASE_URL = os.environ.get("GALLERY_BASE_URL", "").strip()
+STORAGE_PREVIEW_BASE_URL = os.environ.get("GALLERY_PREVIEW_BASE_URL", "").strip()
+STORAGE_LARGE_BASE_URL = os.environ.get("GALLERY_LARGE_BASE_URL", "").strip()
+REMOTE_API = os.environ.get("GALLERY_REMOTE_API", "").strip()
 
 # ↓↓↓ 想要改图片说明，只改这一行（会被写进 manifest 的 alt，灯箱与无障碍朗读用）↓↓↓
 DEFAULT_ALT = "动画贺图收藏"
@@ -106,8 +149,61 @@ def discover_partitions() -> list[dict[str, object]]:
     return partitions
 
 
-def manifest_text(manifest: list[dict[str, str]]) -> str:
-    return json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+def storage_block() -> dict[str, str]:
+    """写进清单的存储配置；baseUrl 留空表示沿用相对路径（当前行为）。"""
+    return {
+        "mode": STORAGE_MODE,
+        "baseUrl": STORAGE_BASE_URL,
+        "previewBaseUrl": STORAGE_PREVIEW_BASE_URL,
+        "largeBaseUrl": STORAGE_LARGE_BASE_URL,
+    }
+
+
+def fetch_remote_manifest(theme: str, partition: str) -> tuple[dict[str, str], list[dict[str, str]]]:
+    """remote 模式：从外部 API 取文件列表（预埋接口，尚未接入真实服务）。
+
+    真实迁移时把 GALLERY_REMOTE_API 指向自己的服务（或 Cloudflare Worker）即可；
+    接口形状见模块 docstring。这里只做最朴素的 HTTP GET，不携带任何密钥。
+    """
+    if not REMOTE_API:
+        raise RuntimeError(
+            "STORAGE_MODE=remote 需要设置 GALLERY_REMOTE_API 环境变量（图片列表接口地址）"
+        )
+    query = urllib.parse.urlencode({"theme": theme, "partition": partition})
+    url = f"{REMOTE_API}{'&' if '?' in REMOTE_API else '?'}{query}"
+    with urllib.request.urlopen(url, timeout=30) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+
+    storage = payload.get("storage") or storage_block()
+    files = payload.get("files") or []
+    entries: list[dict[str, str]] = []
+    for item in files:
+        entry = {
+            "original": item.get("path") or item.get("url") or "",
+            "filename": item.get("filename") or Path(entry_path(item)).name,
+            "alt": item.get("alt") or DEFAULT_ALT,
+        }
+        for key in ("preview", "large"):
+            if item.get(key):
+                entry[key] = item[key]
+        if item.get("width") and item.get("height"):
+            entry["width"], entry["height"] = item["width"], item["height"]
+        entries.append({k: v for k, v in entry.items() if v not in ("", None)})
+    return storage, entries
+
+
+def entry_path(item: dict) -> str:
+    return item.get("path") or item.get("url") or ""
+
+
+def manifest_text(storage: dict[str, str], items: list[dict[str, str]]) -> str:
+    """清单结构：{ storage: {...}, items: [...] }。
+
+    注意：**不要**在这里加时间戳之类的易变字段——CI 用 --check 逐字节比对，
+    有任何每次生成都不同的内容都会让校验永远失败。
+    """
+    payload = {"storage": storage, "items": items}
+    return json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
 
 
 def main() -> int:
@@ -125,13 +221,19 @@ def main() -> int:
         print(error, file=sys.stderr)
         return 1
 
+    print(f"storage mode: {STORAGE_MODE}" + (f"  baseUrl: {STORAGE_BASE_URL}" if STORAGE_BASE_URL else "  (相对路径)"))
     for partition in partitions:
         source_dir = Path(partition["source"])
         manifest_path = Path(partition["manifest"])
+        theme = str(partition["theme"])
+        part = str(partition["partition"])
         try:
-            entries = build_manifest(source_dir, str(partition["theme"]), str(partition["partition"]))
-            expected = manifest_text(entries)
-        except (FileNotFoundError, ValueError) as error:
+            if STORAGE_MODE == "remote":
+                storage, entries = fetch_remote_manifest(theme, part)
+            else:
+                storage, entries = storage_block(), build_manifest(source_dir, theme, part)
+            expected = manifest_text(storage, entries)
+        except (FileNotFoundError, ValueError, RuntimeError) as error:
             print(f"[{partition['id']}] {error}", file=sys.stderr)
             return 1
 

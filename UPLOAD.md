@@ -73,6 +73,21 @@ git add -A && git commit -m "add images" && git push
 
 ---
 
+## 清单长什么样（了解即可，不用手改）
+
+`stickers/manifest_<主题>-<分区>.json`：
+
+```json
+{
+  "storage": { "mode": "local", "baseUrl": "", "previewBaseUrl": "", "largeBaseUrl": "" },
+  "items": [ { "original": "data/…", "filename": "…", "preview": "previews/…", "large": "large/…", "width": 480, "height": 360 } ]
+}
+```
+
+- `storage.baseUrl` 留空 = 图片走本地相对路径（当前状态）。
+- 将来图片搬到对象存储 / CDN 时，只把这个字段填成 CDN 域名即可，前端不用改。
+- 细节与迁移步骤见 `架构演进路线图.md`。
+
 ## 新增 / 重命名 主题与分区（操作手册）
 
 ### 概念
