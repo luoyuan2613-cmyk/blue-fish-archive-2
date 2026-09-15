@@ -278,7 +278,9 @@ def main() -> int:
     parser.add_argument(
         "--no-sanitize",
         action="store_true",
-        help="Do not rename source files that contain URL-unsafe characters (# ? %).",
+        # ⚠️ help 里的 `%` 必须写成 `%%`：argparse 会拿 help 做 printf 格式化，
+        # 单独的 `%` 会直接抛 ValueError: badly formed help string（脚本连启动都进不去，坑 27）。
+        help="Do not rename source files that contain URL-unsafe characters (#, ?, %%).",
     )
     args = parser.parse_args()
 
