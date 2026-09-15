@@ -1,0 +1,4 @@
+# Windows 脚本按 CRLF 检出：避免编辑器/Git 各自翻转换行符导致
+# "文件永远显示为已修改"（曾把整份 .bat 判成 105 行全改，其实只差行尾）。
+*.bat text eol=crlf
+*.ps1 text eol=crlf

@@ -1,13 +1,19 @@
-# 【站名】 图片收藏站
+# 白圣女与黑牧师伊甸园 · 图片收藏站
 
-基于 [EDMOK/blue-fish-archive](https://github.com/EDMOK/blue-fish-archive)（蓝色大肥鱼档案馆）的静态图片站骨架，
-保留其全部设计与交互（深海贴纸风、防抖瀑布流、灯箱翻页、复制转 PNG、国内可达字体 CDN），
-已清空原作者的版权素材，替换为中立占位素材与占位文案。
+纯静态图片站：**无框架、无构建、无后端**，只有 `index.html` + `styles.css` + `app.js`，
+数据是每个「主题 × 分区」一份 JSON 清单（由脚本生成）。
+界面沿用上游 [EDMOK/blue-fish-archive](https://github.com/EDMOK/blue-fish-archive) 的「深海贴纸风」，
+内容为收集整理的他人作品 —— 来源与授权见站内「来源」区与页脚声明（**不可删除**）。
 
-**当前状态：已推送到 GitHub（`luoyuan2613-cmyk/blue-fish-archive-2`），CI 自动链路已验证通过；
-已换入 28 张真实素材；尚待完成：品牌文案替换 + 接入 Cloudflare Pages。**
+| 项 | 值 |
+|---|---|
+| 线上地址 | https://blue-fish-archive-2.luoyuan2613.workers.dev/ |
+| 仓库 | `git@github.com:luoyuan2613-cmyk/blue-fish-archive-2.git`（**SSH**，非 HTTPS） |
+| 托管 | Cloudflare Workers 静态资源；推送到 `main` 自动部署 |
+| 本地预览 | 双击 `启动本地预览.bat`，或桌面快捷方式「图片站（W）」 |
+| 数据目录（日常只动这里） | `data/<主题>/<分区>/` |
 
-上线地址（连上 Cloudflare Pages 后生效）：`https://blue-fish-archive-2.pages.dev/`
+> 最后更新：2026-09-15（结构与流程的一次大改后的版本）
 
 ---
 
@@ -15,151 +21,204 @@
 
 ```
 fish-gallery/
-├── index.html          页面结构 + 全部文案（品牌占位点都在这里）
-├── styles.css          样式（与原作一致，无需改动）
-├── app.js              交互逻辑（与原作一致，无需改动）
-├── stickers/manifest_<主题>-<分区>.json   每个「主题×分区」一份清单（脚本生成，勿手改）
-├── data/<主题>/<分区>/   ← 素材目录（唯一需要你操作的目录）
-├── previews/           480px WebP 缩略图（脚本生成，瀑布流用）
-├── large/              原尺寸 WebP（脚本生成，灯箱看图用）
-├── assets/             首页立绘：deepseek_whale.png / .webp
-├── logo/               favicon.png、apple-touch-icon.png、品牌标记 2 张
-├── memes/              看板娘图片与音效
+├── index.html            页面结构 + 全部文案
+├── styles.css            样式（深海贴纸风；追加式改动，未动上游规则）
+├── app.js               交互：瀑布流 / 灯箱 / 主题书签头 / 分区切换
+├── _headers              Cloudflare 缓存策略（本地服务会忽略它）
+├── .assetsignore         部署忽略清单（决定哪些文件不上传到 Cloudflare，见 §四）
+│
+├── data/<主题>/<分区>/    ← 素材目录（唯一需要你操作的目录）
+│     例：data/manga/default/  data/manga/cos/  data/whale/default/  data/whale/cos/
+├── previews/             480px WebP 缩略图（脚本生成，产物名带「主题-分区-」前缀）
+├── large/                原尺寸 WebP（脚本生成，灯箱看图用）
+├── stickers/             每个「主题×分区」一份清单：manifest_<主题>-<分区>.json（脚本生成，勿手改）
+├── assets/               首页立绘（含主题专用立绘 theme-whale.*）
+├── logo/                 站点图标与品牌标记（含 favicon.ico）
+├── memes/                看板娘图片与音效
+│
 ├── scripts/
-│   ├── make_previews.py    data/<主题>/<分区>/ → previews/ + large/（产物名带主题-分区前缀）
-│   └── sync_stickers.py    data/<主题>/<分区>/ → 各自的分区清单（含宽高）
-└── .github/workflows/
-    ├── sync-stickers.yml       推送后自动生成缩略图与清单并提交回仓库
-    └── validate-stickers.yml   PR 时校验清单是否同步
+│   ├── make_previews.py  data/<主题>/<分区>/ → previews/ + large/，并清理孤儿产物
+│   └── sync_stickers.py  data/<主题>/<分区>/ → stickers/manifest_<主题>-<分区>.json
+├── .github/workflows/
+│   ├── sync-stickers.yml     push 后自动生成缩略图与清单并提交回仓库
+│   └── validate-stickers.yml PR 时校验清单是否与素材同步
+│
+├── 启动本地预览.bat        双击起本地服务并打开浏览器
+├── 创建桌面快捷方式.bat    在桌面生成/刷新「图片站（W）」快捷方式
+├── create_shortcuts.ps1    上面那个 bat 实际调用的 PowerShell
+├── UPLOAD.md               操作手册（加/删图、新增/重命名主题与分区）
+└── 开发交接（和武）.md      完整交接与历史踩坑记录
 ```
 
-## 二、本地跑起来
+**主题 × 分区**：主题（`manga` / `whale`）各自拥有一套分区（`default` / `cos`），互不混合。
+切主题时，顶部导航和作品墙顶部的分区入口会整体换成该主题自己的分区。
+分区数量与图片数量由素材目录决定，页面标签上会显示各区实际数量。
+
+---
+
+## 二、日常操作
+
+### 加图 / 删图（本地，三条命令）
 
 ```bash
-# 需要 Python 3 + Pillow
-pip install Pillow
-
-# 1) 生成缩略图与大图（只处理新增/更新的文件，可反复执行）
+# 1) 图片放进对应分区，例如 data/whale/cos/
+# 2) 生成缩略图与大图（自动清理源文件已不存在的旧产物）
 python scripts/make_previews.py
-
-# 2) 重新生成清单
+# 3) 重新生成清单
 python scripts/sync_stickers.py
-
-# 3) 本地预览
-python -m http.server 8000
-# 打开 http://127.0.0.1:8000/
+# 4) 提交并推送（推上去才会到云端）
+git add -A && git commit -m "加图" && git push
 ```
 
-支持格式：`PNG · JPG · JPEG · GIF · WebP · APNG`。
-注意：**GIF / APNG 不生成缩略图**，前端会直接播放原文件（原作设计如此）。
+⚠️ **在 Windows PowerShell 里 `&&` 不可用**（5.1 不支持），请逐行执行：
 
-## 三、日常加图（本地）
-
-1. 把图片拷进 `media/`（建议用新的文件名，避免老访客命中永久缓存看到旧图）。
-2. 跑上面第 1、2 条命令。
-3. 预览确认后提交推送。
-
-推到 GitHub 后，`.github/workflows/sync-stickers.yml` 会在 `media/**` 有变更时
-自动跑这两条脚本并把结果 commit 回仓库，**这一步之后你连命令都不用敲**。
-
-### ⚠️ 工作流的路径触发规则（实测踩过的坑）
-
-`sync-stickers.yml` **只在这些路径变化时触发**：
-
+```powershell
+git add -A
+git commit -m "加图"
+git push
 ```
-media/**    scripts/*.py    .github/workflows/sync-stickers.yml
+（cmd 或 Git Bash 里 `&&` 可用；`;` 在 PowerShell 里可连接但不短路。）
+
+只想提交图片内容、不带其它杂项时：
+
+```powershell
+git add data previews large stickers
+git commit -m "加图"
+git push
 ```
 
-`previews/**`、`large/**`、`stickers/manifest.json` **不在触发路径里**。因此：
+**删图同理**：删掉 `data/<主题>/<分区>/` 里的原图 → 跑上面两条脚本（自动清孤儿产物与清单条目）→ 提交推送。
 
-| 你的操作 | 会发生什么 |
+**格式**：`PNG · JPG · JPEG · GIF · WebP · APNG`。**GIF / APNG 不生成缩略图**，前端直接播原图。
+**换图请改文件名**：`data/`、`previews/`、`large/` 是永久缓存，同名换内容老访客会一直看到旧图。
+单张 ≤ **25 MiB**（Cloudflare 限制）。中文名、带空格的文件名都可以。
+
+### 网页方式（不装任何东西）
+
+在 GitHub 网页上往 `data/<主题>/<分区>/` 上传或删除文件并 Commit 即可：
+CI 会自动生成清单与缩略图、清理孤儿产物并提交回来（因为 `data/**` 在触发路径里），随后自动部署。
+
+### 本地预览（Windows）
+
+- 双击 `启动本地预览.bat` → 起 `http://127.0.0.1:8000/` 并打开浏览器；**关掉窗口即停止服务**。
+- 换端口：`启动本地预览.bat 8080`；只起服务不开浏览器：`启动本地预览.bat --no-browser`。
+- 端口已在监听时会直接开页面，不会重复起服务。
+- 别用 `file://` 直接双击 `index.html`：浏览器会拦截 `fetch('stickers/…')`，页面会是空墙。
+- 手机/平板同局域网看：用 `http://<本机IP>:8000`，但**局域网 IP 不是安全上下文，灯箱「复制图片」会失效**（看图/下载正常）。
+
+---
+
+## 三、推送与排错
+
+### 标准推送
+
+```powershell
+git add -A
+git commit -m "说明"
+git push          # 或 git push origin main
+```
+推送成功后 CI 与 Cloudflare 约 1–2 分钟生效；部署切换的几十秒内站点会短暂打不开（正常）。
+
+### 遇到 `Permission denied (publickey)` 的排查顺序（2026-09 事故复盘）
+
+**不要急着重生成 SSH Key。** 按顺序查：
+
+```powershell
+ssh -T git@github.com      # 1) 通 → 账号与密钥没问题，问题在「Git 用的 ssh」与「手敲的 ssh」不一致
+git remote -v              # 2) 确认远端是你要推的仓库
+git ls-remote origin       # 3) 若 1 成功而这里失败 → 就是两套 ssh 配置不一致
+ssh -v -T git@github.com   # 4) 看 identity file 列表：全是 type -1 = 找不到密钥文件
+ssh-add -l                 # 5) 看 ssh-agent 里有没有加载 key
+```
+
+**当时的真实根因**：本机 GitHub 用的密钥文件名是 **`id_ed25519_manga`（非默认名）**，且
+`%USERPROFILE%\.ssh\` 下**没有 `config`**。于是：
+- **系统 OpenSSH**（`C:\Windows\System32\OpenSSH\ssh.exe`）能找到 —— 它连得上 Windows ssh-agent（服务已运行、key 已加载）；
+- **Git 自带 ssh**（`C:\Program Files\Git\usr\bin\ssh.exe`）找不到 —— 它用的是另一套 agent socket，又没有 key 文件、没有 config → `publickey` 拒绝。
+
+**已做的两处加固（都已实测）**：
+
+1. `%USERPROFILE%\.ssh\config` 显式指定密钥文件（**根治**，不再依赖 agent）：
+   ```
+   Host github.com
+     HostName github.com
+     User git
+     IdentityFile ~/.ssh/id_ed25519_manga
+     IdentitiesOnly yes
+     AddKeysToAgent yes
+   ```
+   加固前 Git 自带 ssh 报 `Permission denied`，加固后成功 `Hi luoyuan2613-cmyk!`；
+   连 `git ls-remote` 走自带 ssh 也能列出提交。
+2. `git config --global core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe"`（当时的救急修法）。
+   有了第 1 条后它已非必需，留着也无害。
+
+**已知的其它推送坑**：
+
+| 现象 | 原因与对策 |
 |---|---|
-| 只往 `media/` 加图 → push | ✅ 触发，CI 生成缩略图 + 清单并提交回仓库 |
-| 改了 `scripts/*.py` → push | ✅ 触发 |
-| 只推 `stickers/manifest.json`（手改清单） | ❌ 什么都不触发，远端保持你推上去的样子 |
-| 只删 `previews/` 或 `large/` 里的文件 | ❌ 不触发；这些孤儿文件会留在仓库里（不影响页面，因为页面只读 manifest） |
+| `git clone https://github.com/...` 卡死/超时 | 本机到 `github.com:443` 不通，**必须走 SSH**（`git@github.com:...`） |
+| `The token '&' is not a valid statement separator` | Windows PowerShell 5.1 不支持 `&&`，逐行执行或用 cmd/Git Bash |
+| `git push` 长时间无输出后超时 | 图片较多时上传慢（数十 MB），重试即可；或用后台任务推送 |
+| 本地比远端多 N 个提交 | 说明只 commit 没 push；`git log --oneline origin/main..HEAD` 查看，再 `git push` |
 
-**安全做法**：永远只通过「改 `media/`」来增删图，并在本地跑完那两条脚本后**一起**提交
-（这样 manifest 也不会不同步）。另外注意：CI 自己的提交只改了 `previews/`、`large/`、
-`stickers/manifest.json`，所以**不会**再次触发自己，不会形成死循环。
+---
 
-### 已实测的链路（本仓库验证过）
+## 四、部署链路与缓存
 
-- ✅ push `media/` 新图 → Actions 自动生成 `previews/` + `large/` + 更新 manifest → 以
-  `github-actions[bot]` 身份提交回仓库（需仓库 Actions 权限为 **Read and write**，已开启）
-- ✅ 清单不同步时 CI 会失败（`--check` 退出码 1），可作为护栏
-
-## 四、上线（GitHub + Cloudflare Pages）
-
-1. 新建 GitHub 仓库，把本目录推上去。
-2. Cloudflare Pages → 连接该仓库：
-   - **构建命令：留空**
-   - **输出目录：`/`**
-3. ⚠️ **仓库 Settings → Actions → General → Workflow permissions 必须选 "Read and write"**。
-   不改这一步，CI 无法把生成的缩略图/清单推回仓库，线上页面会一直停在骨架屏。
-
-选 Cloudflare Pages 而不是 Vercel / GitHub Pages 的原因：原站就在 `pages.dev` 上，
-国内可直连；GitHub Pages 在大陆常常打不开，Vercel 的默认域名也不稳。
-
-## 五、品牌替换点（7 处，全在 `index.html`，文件里已用 `【替换点 N】` 注释标出）
-
-| # | 位置 | 占位符 |
-|---|---|---|
-| 1 | `<title>` 与 meta description | `【站名】` / `【一句话简介…】` |
-| 2 | 导航站名与品牌标记 | `【站名】`（含 `<img alt>`） |
-| 3 | Hero 三行文案 | `【副标题…】` / `【主标题上】`·`【主标题下】` / `【一句话简介】` |
-| 4 | 首页立绘区 | `【标签…】` / 立绘 `alt` / `【立绘下方小字】` |
-| 5 | 来源区两张卡 + 授权说明 | `【来源 A/B…】` / `【原作者名 · 平台】` / `【授权协议…】` |
-| 6 | 页脚品牌 + 作者署名 | `【站名】` / `【作者名】` |
-| 7 | 空状态文案 | 无需改，看需求 |
-
-`【作者名】` 还出现在导航栏两个社交图标的 `aria-label` / `title` 里，
-它们的 `href` 目前是 `#`，请换成你自己的 Bilibili / GitHub 地址（来源卡的 `href` 同理）。
-
-替换完成后可以自查残留：
-
-```bash
-grep -n "【" index.html   # 应只剩你想保留的
+```
+改 data/<主题>/<分区>/  →  跑两条脚本  →  git push
+        ↓
+GitHub Actions：sync-stickers.yml 生成 previews/ + large/ + 清单并提交回仓库
+        ↓
+Cloudflare Workers：自动拉取仓库，作为静态资源发布（约 1–2 分钟）
 ```
 
-## 六、占位素材清单（上线前全部要换掉）
+- **CI 触发路径只有**：`data/**`、`scripts/*.py`、`.github/workflows/sync-stickers.yml`。
+  只推 `previews/`、`large/`、`stickers/` **不会触发任何工作流**（所以别只删产物）；需要时可去
+  Actions 页面手动 `Run workflow`。
+- **`.assetsignore` 是部署的命门**：Cloudflare 的部署命令是 `npx wrangler deploy` 且资源目录是仓库根，
+  若 `deploy` 把 `.git/` 一起当静态资源，`pack` 文件会超 **25 MiB** 上限导致
+  `Asset too large` 构建失败（本项目曾因此长期部署不生效）。因此该文件排除了
+  `.git`、`.github`、`scripts`、`*.md`、`*.bat`、`*.ps1` —— **不要删**。
+- **缓存策略（`_headers`）**：
+  | 路径 | Cache-Control |
+  |---|---|
+  | `/data/*`、`/previews/*`、`/large/*` | `max-age=31536000, immutable`（永久，故换图要改名） |
+  | `/logo/*`、`/assets/*`、`/memes/*` | `max-age=600`（10 分钟，换素材后能较快生效） |
+  | `index.html`、`app.js`、清单等 | `max-age=0, must-revalidate`（每次发布即时生效） |
+- **仓库设置**：`Settings → Actions → General → Workflow permissions` 需为 **Read and write**，
+  否则 CI 无法把生成的清单/缩略图提交回仓库。
+- **部署切换期**：推送后替换实例的约 60 秒内域名会全部超时，属正常现象，等 1 分钟再试。
 
-| 文件 | 现在是什么 | 你要换成 |
-|---|---|---|
-| `media/ph01–ph06.png` | 6 张渐变占位块（含不同宽高比，用于验证瀑布流） | 你的图片，然后删掉这些 |
-| `assets/deepseek_whale.png/.webp` | 422×750 渐变块 | 你的首页代表图（不需要可删整块 HTML） |
-| `logo/deepseek_蓝鲸_彩色.png` | 占位圆形标记（**文件名沿用原作**，为了零改代码） | 你的 logo；换名后需同步改 `index.html` |
-| `logo/deepseek_蓝鲸_黑色.png` | 同上，页脚用 | 同上 |
-| `logo/favicon.png` / `apple-touch-icon.png` | 占位标记 | 你的站点图标 |
-| `memes/120302wg44ju245iDQ38xu.png/.webp` | 占位看板娘笑脸 | 你的看板娘；不需要就删掉 `#mascot` 整块 |
-| `memes/xixi.aac` | **0.5 秒静音**（本机无 ffmpeg，无法编码 AAC） | 你的音效（任意 AAC/MP3，改 `index.html` 里的 `<audio src>`） |
+---
 
-## 七、上线前 checklist
+## 五、新增 / 重命名 主题与分区
 
-- [ ] 7 处品牌文案全部替换，`grep -n "【" index.html` 无残留占位符
-- [ ] `media/` 里的占位图（`ph0*.png`）已删除，换成真实素材
-- [ ] `previews/`、`large/`、`stickers/manifest.json` 已重新生成（删了图后会同步移除条目）
-- [ ] 来源区逐条填写真实出处与授权协议
-- [ ] 页脚保留「非官方整理 · 版权归原作者所有」声明
-- [ ] 社交图标链接已换成你自己的地址
-- [ ] Cloudflare Pages 的 Workflow permissions 已设为 Read and write
-- [ ] 手机上看一眼瀑布流与灯箱
+摘要（**详细步骤见 [UPLOAD.md](UPLOAD.md)**）：
 
-## 八、版权提示（收录他人作品时必读）
+```
+data/<主题>/<分区>/   →   stickers/manifest_<主题>-<分区>.json
+```
+1. **建目录放图**即完成数据侧（脚本自动发现，有图才生成清单）。
+2. 前端要在 `app.js` 里同步：`THEMES`（哪个主题有哪些分区、各自读哪份清单）与
+   `themeConfig`（配色/立绘/文案）——**两处 id 必须一致**，这是唯一容易漏改的地方。
+3. 本地跑两条脚本 → 刷新验证 → 推送。
+4. 重命名时要 `git mv` 目录、删旧清单、跑脚本（会自动清理旧前缀产物），再改 `app.js` 两处。
 
-本站骨架默认面向「整理/展示他人作品」的场景，因此：
+---
 
-- 来源区与页脚声明**不可删除**；请如实标注原作者、平台与授权协议。
-- 若原作者要求撤下，应能快速定位并删除对应文件（`media/` + `previews/` + `large/` 里的同名文件，删完重跑脚本）。
-- 原作者素材（立绘、表情包、logo、看板娘图）已从本仓库全部清除，未随骨架分发。
+## 六、文档索引
 
-## 九、与原作的差异（3 处，均已记录）
+| 文件 | 用途 |
+|---|---|
+| `README.md` | 本文件：结构、日常操作、推送排错、部署与缓存 |
+| `UPLOAD.md` | 操作手册：加/删图速查、本地使用、**新增/重命名主题与分区全流程** |
+| `开发交接（和武）.md` | 交接文档：完整历史、13 个已踩坑（含部署事故、缓存坑、无头验证三陷阱等） |
 
-1. **`index.html`**：品牌文案占位化，来源区改为通用来源/授权结构，社交与来源链接改为占位 `href`。
-2. **`stickers/manifest.json`**：`alt` 由 `鲸鱼娘同人表情包` 改为 `【图片说明】`。
-   注意 `scripts/sync_stickers.py` 里的 `alt` 是硬编码的，**下一次跑脚本会被覆盖回角色名**；
-   届时手动改 `sync_stickers.py` 里那一行为你想要的值，或每次生成后改清单。
-3. **`app.js` / `styles.css`**：保持与原作者完全一致（按需求不做改动）。因此仍留有非功能性痕迹：
-   - `app.js` 里看板娘位置的 localStorage 键名 `deepseek-mascot-position`；
-   - `styles.css` 一条注释提到原角色名。
-   两者都不影响功能，介意的话自行替换字符串即可。
+---
+
+## 七、版权提示（收录他人作品，必读）
+
+- 站内「来源」区与页脚「非官方整理 · 版权归原作者所有」**不可删除**；请如实标注原作者、平台与授权协议。
+- 需要撤下某张图时：删 `data/` 里的原图 → 跑两条脚本（自动清产物与清单）→ 推送。
+- 上游原作者的素材（立绘、表情包、logo、看板娘图）未随本仓库分发。
