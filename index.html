@@ -225,6 +225,9 @@
         </div>
 
         <aside class="source-panel" data-reveal data-delay="220" id="archive">
+          <!-- 气泡带：挂在「来源」卡片正上方那块空白里（app.js 的 initHeroBubbles 负责派发肥皂泡）。
+               纯装饰，整层 pointer-events: none，不拦任何点击。 -->
+          <div class="hero-bubbles" id="hero-bubbles" aria-hidden="true"></div>
           <h2>来源</h2>
           <div class="source-list">
             <a

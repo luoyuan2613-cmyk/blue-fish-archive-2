@@ -3764,3 +3764,137 @@ h1 span::after {
   letter-spacing: 0.04em;
   opacity: 0.7;
 }
+
+/* ===========================================================================
+ * 首页气泡带（配合 app.js 的 initHeroBubbles）
+ *
+ * 位置 = 「来源」卡片正上方那块空白：.source-panel 是 align-self: end（贴着这一行底部），
+ * 所以它上方天然空着。气泡层就挂在面板里、用 bottom: 100% 往上铺，
+ * 这样它**自动跟随来源列的宽度与位置**，改响应式也不会跑偏。
+ * 右边多伸出 50%（right: -50%）：飘动距离由 JS 按"本层宽度 − 泡直径"算，
+ * 层面宽了，气泡自然就多飘二分之一的路程。
+ * 整层 pointer-events: none，纯装饰，永远不抢点击。
+ * =========================================================================== */
+.hero-bubbles {
+  position: absolute;
+  right: -50%;                       /* 往右多出半列宽 → 飘动距离增加二分之一 */
+  bottom: calc(100% + 10px);         /* 贴着「来源」卡片上沿往上让开 10px */
+  left: 0;
+  height: min(34vh, 300px);
+  overflow: hidden;                  /* 气泡只在这一层里活动，不会飘到页面别处 */
+  pointer-events: none;
+}
+
+/* 外层：管「从左往右斜着飘 + 由小变大」，整条轨迹的时长 = 这个气泡的寿命 */
+.hero-bubble {
+  position: absolute;
+  left: 0;
+  /* 纵向起点 = 「剩余空间 × --t」，保证整颗泡（连最大的 150px）始终落在带内，
+     不会被 overflow: hidden 切掉上下边 */
+  top: calc((100% - var(--size, 120px)) * var(--t, 0.5));
+  width: var(--size, 120px);
+  height: var(--size, 120px);
+  border: 2px solid rgba(96, 122, 169, 0.26);
+  border-radius: 50%;
+  /* 肥皂泡：中间透、边缘亮、外圈泛蓝，配合下方的高光点 */
+  background:
+    radial-gradient(
+      circle at 34% 28%,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.34) 38%,
+      rgba(223, 232, 245, 0.3) 66%,
+      rgba(96, 122, 169, 0.22) 100%
+    );
+  box-shadow:
+    inset 0 0 16px rgba(255, 255, 255, 0.8),
+    inset -4px -6px 12px rgba(96, 122, 169, 0.14),
+    0 8px 20px rgba(32, 45, 82, 0.1);
+  opacity: 0;
+  will-change: transform, opacity;   /* 只有 2~4 个气泡，放心用（不像墙上 331 张卡片） */
+  animation: heroBubbleDrift var(--life, 10s) cubic-bezier(0.42, 0, 0.58, 1) forwards;
+}
+
+/* 泡上的高光点：沿用页面里 .bubble::after 的做法，保持同一套视觉语言 */
+.hero-bubble::after {
+  position: absolute;
+  top: 15%;
+  left: 19%;
+  width: 16%;
+  height: 16%;
+  content: '';
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+}
+
+/* 内层：管「上下浮动 + 轻微摇摆」—— 和外面那条水平位移叠加，轨迹就成了带弧度的小波浪，
+   不用在一条 keyframes 里硬写抛物线。 */
+.hero-bubble-inner {
+  position: absolute;
+  inset: 0;
+  animation: heroBubbleWobble var(--wobble, 3.4s) ease-in-out infinite;
+}
+
+/* 泡里的图：保持比例、居中、不裁切（圆的内接正方形是直径的 70.7%，
+   图片盒取 68% —— 既尽量看清图，又留出泡的边缘与高光不被切）。 */
+.hero-bubble img {
+  position: absolute;
+  top: 16%;
+  left: 16%;
+  width: 68%;
+  height: 68%;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 10px;
+  filter: drop-shadow(0 2px 5px rgba(32, 45, 82, 0.2));
+}
+
+/* 外层：左下 → 右上，越飘越大，两头淡入淡出（出场像"冒出来"，到右边界像"破掉"） */
+@keyframes heroBubbleDrift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.32);
+  }
+  12% {
+    opacity: 1;
+  }
+  76% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--travel, 260px), calc(var(--rise, 90px) * -1), 0) scale(1);
+  }
+}
+
+/* 内层：小幅上下浮动 + 微旋转，幅度刻意压小，免得看起来像锯齿 */
+@keyframes heroBubbleWobble {
+  0% {
+    transform: translate3d(0, 7px, 0) rotate(-5deg);
+  }
+  50% {
+    transform: translate3d(0, -9px, 0) rotate(4deg);
+  }
+  100% {
+    transform: translate3d(0, 7px, 0) rotate(-5deg);
+  }
+}
+
+/* 滚出首屏 / 切到别的标签页 → 由 app.js 加 .is-paused，动画就地暂停（不空转耗电） */
+.hero-bubbles.is-paused .hero-bubble,
+.hero-bubbles.is-paused .hero-bubble-inner {
+  animation-play-state: paused;
+}
+
+/* 「减少动效」偏好：整个气泡带不显示（JS 那边也直接不派发） */
+@media (prefers-reduced-motion: reduce) {
+  .hero-bubbles {
+    display: none;
+  }
+}
+
+/* 窄屏：来源面板会移到最下面，上方那块空间不再是"空白带"，直接不显示气泡 */
+@media (max-width: 1060px) {
+  .hero-bubbles {
+    display: none;
+  }
+}
