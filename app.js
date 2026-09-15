@@ -496,7 +496,6 @@ function revealLightbox() {
   lightbox.classList.add('is-open');
   lightbox.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
-  if (maximizeButton) maximizeButton.focus();
 }
 
 // 页面上的单张图片（首页立绘）用同一个查看器打开
@@ -544,63 +543,55 @@ function initHeroArtZoom() {
 }
 
 /* ---------------------------------------------------------------------------
- * 沉浸态底部控件自动隐藏
+ * 沉浸态底部控件的显隐：**只由鼠标决定**，不涉及焦点、也不涉及键盘。
  *
- * 需求：放大/最大化后，底部那组控件**直接隐藏**，只有指针靠近屏幕底部（或键盘聚焦）时才
- * 半透明显现。
+ * 规则（三条，简单直观）：
+ *   1. 鼠标在画面上移动 → 控件显现；
+ *   2. 鼠标停住不动 1.5 秒 → 控件自动隐藏；
+ *   3. 点底部按钮（尤其「最大化」）→ 立刻隐藏，画面保持干净；之后鼠标一动又会出现。
  *
- * 为什么必须用 JS：隐藏后的元素（opacity:0 + pointer-events:none）**收不到 hover**，
- * 纯 CSS 做不到"靠近才出现"。（之前那版"常在半透明 + :hover 变实心"还有个副作用：
- * 鼠标点完按钮仍停在按钮上 → :hover 一直生效 → 表现成"点了最大化按钮却没变透明"。）
+ * 为什么不用 :focus-within / :focus-visible 这类焦点条件：
+ * 鼠标点过的按钮会**一直保持聚焦**，焦点条件于是一直成立，那一行就永远亮着
+ * —— 这正是"缩放/最大化后按钮不隐藏"的根因（实测复现过）。
+ * 只按鼠标动没动来判断，逻辑单一，任何浏览器里表现都一致。
  * ------------------------------------------------------------------------- */
-const CHROME_REVEAL_BAND = 170;    // 距屏幕底部多少像素算“靠近”
-const CHROME_HOLD_MS = 1600;       // 键盘操作后临时显示的时长
+const CHROME_IDLE_MS = 1500;       // 鼠标停住多久后自动隐藏
 
-let chromeHoldTimer = null;
-let chromeSuppressUntil = 0;       // 这段时间内不因"指针在底部带内"而显现
-const CHROME_SUPPRESS_MS = 700;    // 点完按钮先让控件消失一下，指针再动才回来
+let chromeIdleTimer = null;
 
 function setChromeShown(shown) {
   if (!lightbox) return;
   lightbox.classList.toggle('is-chrome-shown', Boolean(shown));
 }
 
-// 键盘用户看不到指针位置，操作后临时显示一会儿
-function revealChromeTemporarily() {
+// 立刻隐藏，并取消尚未到期的倒计时
+function hideChrome() {
+  window.clearTimeout(chromeIdleTimer);
+  chromeIdleTimer = null;
+  setChromeShown(false);
+}
+
+// 鼠标动一下 → 显现，并重新开始 1.5 秒倒计时
+function showChromeBriefly() {
   setChromeShown(true);
-  window.clearTimeout(chromeHoldTimer);
-  chromeHoldTimer = window.setTimeout(() => setChromeShown(false), CHROME_HOLD_MS);
+  window.clearTimeout(chromeIdleTimer);
+  chromeIdleTimer = window.setTimeout(hideChrome, CHROME_IDLE_MS);
 }
 
 function initChromeAutoHide() {
   if (!lightbox) return;
 
-  // 点了底部控件后先隐藏：否则"鼠标停在按钮上"会让它一直挂着，
-  // 看起来像"点了最大化却没隐藏"（指针不动就不再显现，动一下才回来）
+  lightbox.addEventListener('pointermove', () => {
+    if (!lightbox.classList.contains('is-immersive')) return;
+    showChromeBriefly();
+  });
+
+  // 点底部控件（最大化 / 缩放 / 下载）→ 先立刻收起来；鼠标再动一下就回来
   lightbox.addEventListener('click', (event) => {
     if (!lightbox.classList.contains('is-immersive')) return;
     if (!(event.target instanceof Element)) return;
     if (!event.target.closest('.lightbox-zoom, .lightbox-actions')) return;
-    chromeSuppressUntil = performance.now() + CHROME_SUPPRESS_MS;
-    setChromeShown(false);
-  });
-
-  lightbox.addEventListener('pointermove', (event) => {
-    if (!lightbox.classList.contains('is-immersive')) return;
-    if (performance.now() < chromeSuppressUntil) return;   // 刚点完，先别急着显现
-    const nearBottom = event.clientY >= window.innerHeight - CHROME_REVEAL_BAND;
-    const overChrome = event.target instanceof Element
-      && event.target.closest('.lightbox-actions, .lightbox-zoom, .lightbox-caption, #action-status');
-    setChromeShown(nearBottom || Boolean(overChrome));
-  });
-
-  lightbox.addEventListener('pointerleave', () => {
-    if (lightbox.classList.contains('is-immersive')) setChromeShown(false);
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (!lightbox.classList.contains('is-open')) return;
-    if (['+', '=', '-', '_', '0'].includes(event.key)) revealChromeTemporarily();
+    hideChrome();
   });
 }
 
@@ -726,8 +717,8 @@ function closeLightbox() {
   setMaximized(false);                 // 关闭时一并退出最大化，下次打开是正常大小
   resetZoom();
   syncImmersive();
-  window.clearTimeout(chromeHoldTimer);
-  chromeSuppressUntil = 0;
+  window.clearTimeout(chromeIdleTimer);
+  chromeIdleTimer = null;
   setChromeShown(false);
   panning = null;
   viewerMode = 'list';

@@ -3654,23 +3654,19 @@ h1 span::after {
   transition: opacity 240ms var(--ease);
 }
 
-/* 指针靠近屏幕底部（由 app.js 加 is-chrome-shown）或键盘聚焦时才显现 */
+/* 鼠标在画面上移动时显现（app.js 加 is-chrome-shown），停住 1.5 秒后由 app.js 移除该类 → 自动隐藏。
+   显隐只由鼠标决定，不使用任何 :focus 条件（鼠标点过的按钮会保持聚焦，会让这一行永远亮着）。 */
 .lightbox.is-immersive.is-chrome-shown .lightbox-caption,
 .lightbox.is-immersive.is-chrome-shown .lightbox-zoom,
 .lightbox.is-immersive.is-chrome-shown .lightbox-actions,
-.lightbox.is-immersive.is-chrome-shown .action-status,
-.lightbox.is-immersive .lightbox-caption:focus-within,
-.lightbox.is-immersive .lightbox-zoom:focus-within,
-.lightbox.is-immersive .lightbox-actions:focus-within {
+.lightbox.is-immersive.is-chrome-shown .action-status {
   opacity: 0.9;
   pointer-events: auto;
 }
 
 /* 只有"已显现"时子元素才接收点击——否则隐藏的按钮会被误点 */
 .lightbox.is-immersive.is-chrome-shown .lightbox-zoom > *,
-.lightbox.is-immersive.is-chrome-shown .lightbox-actions > *,
-.lightbox.is-immersive .lightbox-zoom:focus-within > *,
-.lightbox.is-immersive .lightbox-actions:focus-within > * {
+.lightbox.is-immersive.is-chrome-shown .lightbox-actions > * {
   pointer-events: auto;
 }
 
@@ -3698,9 +3694,7 @@ h1 span::after {
 }
 
 .lightbox.is-immersive .lightbox-close:hover,
-.lightbox.is-immersive .lightbox-nav:hover,
-.lightbox.is-immersive .lightbox-close:focus-visible,
-.lightbox.is-immersive .lightbox-nav:focus-visible {
+.lightbox.is-immersive .lightbox-nav:hover {
   opacity: 1;
 }
 
