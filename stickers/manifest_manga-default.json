@@ -2381,15 +2381,6 @@
       "height": 480
     },
     {
-      "original": "data/manga/default/9-15预览图.jpg",
-      "filename": "9-15预览图.jpg",
-      "alt": "动画贺图收藏",
-      "preview": "previews/manga-default-9-15预览图.webp",
-      "large": "large/manga-default-9-15预览图.webp",
-      "width": 480,
-      "height": 335
-    },
-    {
       "original": "data/manga/default/90603692_p0-『白聖女と黒牧師』⑧.jpg",
       "filename": "90603692_p0-『白聖女と黒牧師』⑧.jpg",
       "alt": "动画贺图收藏",
@@ -2856,6 +2847,15 @@
       "large": "large/manga-default-FVW2jOtUcAERDeW.webp",
       "width": 343,
       "height": 480
+    },
+    {
+      "original": "data/manga/default/image.jpg",
+      "filename": "image.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-default-image.webp",
+      "large": "large/manga-default-image.webp",
+      "width": 480,
+      "height": 335
     },
     {
       "original": "data/manga/default/【中川】.jpg",
