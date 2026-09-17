@@ -1657,6 +1657,49 @@ function initHeroBubbles() {
   heroBubbleController = { refresh };
 }
 
+/* ---------------------------------------------------------------------------
+ * 顶栏背景音乐开关（index.html 的 #bgm-toggle + <audio id="bgm-audio">，样式在 styles.css 末尾）
+ *
+ * 三条规则：
+ *   1. 默认**不播放**（图标偏淡）—— 浏览器禁止无用户交互的自动播放，所以不写 autoplay；
+ *   2. 点击 → audio.play()：这次点击本身就是"用户交互"，因此一定被允许（这正是绕开自动播放限制的正规做法）；
+ *   3. 再点 → pause()。**按钮自己不切状态**，播放态统一由 play / pause / ended 事件回写，
+ *      这样用系统媒体键、蓝牙耳机或别处代码暂停时，图标也会跟着回到停止态，不会"假装在播放"。
+ * ------------------------------------------------------------------------- */
+const BGM_VOLUME = 0.55;   // 背景音乐，音量压低：不盖过看板娘音效等站内其它声音
+
+function initBgm() {
+  const toggle = document.getElementById('bgm-toggle');
+  const audio = document.getElementById('bgm-audio');
+  if (!toggle || !audio) return;
+
+  audio.loop = true;       // 循环播放（HTML 上已写 loop，这里再兜一次，防止标签被改）
+  audio.volume = BGM_VOLUME;
+
+  function syncBgmState() {
+    const playing = !audio.paused && !audio.ended;
+    toggle.classList.toggle('is-playing', playing);
+    toggle.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    toggle.title = playing ? '点我暂停背景音乐' : '点我播放背景音乐';
+    toggle.setAttribute('aria-label', toggle.title);
+  }
+
+  toggle.addEventListener('click', () => {
+    if (audio.paused) {
+      const started = audio.play();
+      // 万一被拒（无交互策略 / 系统拦截），回写一次状态，别留下"假装在播放"的图标
+      if (started && typeof started.catch === 'function') started.catch(syncBgmState);
+    } else {
+      audio.pause();
+    }
+  });
+
+  audio.addEventListener('play', syncBgmState);
+  audio.addEventListener('pause', syncBgmState);
+  audio.addEventListener('ended', syncBgmState);
+  syncBgmState();
+}
+
 // 顺序有依赖，别打乱：
 //   1) captureDomDefaults 先把 index.html 的原始文案/立绘记下来，供"主题缺字段"时回落
 //   2) initSiteCopy 渲染全站通用文案（顶栏站名/logo/标签标题/可调属性）
@@ -1669,6 +1712,7 @@ initHeroArtZoom();
 initViewerZoom();
 initChromeAutoHide();
 initBackToTop();
+initBgm();
 initTheme();
 renderPartitionNav();
 initHeroBubbles();

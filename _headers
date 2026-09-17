@@ -25,3 +25,8 @@
 
 /memes/*
   Cache-Control: public, max-age=600
+
+# 背景音乐（music/bgm.m4a，约 4.9 MB）：文件名固定 → 不设 immutable。
+# 同样给 10 分钟：换歌后老访客最多 10 分钟自愈，不需要强刷（理由同上面品牌素材）。
+/music/*
+  Cache-Control: public, max-age=600

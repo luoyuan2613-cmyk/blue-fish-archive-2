@@ -93,10 +93,23 @@
     </div>
 
     <header class="site-nav" data-reveal>
-      <a class="wordmark" href="#top" aria-label="回到首页">
-        <img class="brand-logo brand-logo-color" data-brand-logo="color" src="logo/deepseek_蓝鲸_彩色.png" alt="白圣女与黑牧师伊甸园 Logo" />
-        <span data-copy="brand">白圣女与黑牧师伊甸园</span>
-      </a>
+      <div class="nav-left">
+        <a class="wordmark" href="#top" aria-label="回到首页">
+          <img class="brand-logo brand-logo-color" data-brand-logo="color" src="logo/deepseek_蓝鲸_彩色.png" alt="白圣女与黑牧师伊甸园 Logo" />
+          <span data-copy="brand">白圣女与黑牧师伊甸园</span>
+        </a>
+        <!-- 背景音乐开关：原生 <audio> + JS，无第三方库（状态类 is-playing 由 app.js 的 initBgm 维护） -->
+        <button
+          class="bgm-toggle"
+          id="bgm-toggle"
+          type="button"
+          aria-pressed="false"
+          aria-label="点我播放/暂停背景音乐"
+          title="点我播放/暂停背景音乐"
+        >
+          <span class="bgm-note" aria-hidden="true">♪</span>
+        </button>
+      </div>
       <nav class="nav-links" aria-label="主导航">
         <a href="#wall">收录区</a>
         <!-- 分区入口：由 app.js 按「当前主题」渲染，随主题切换整体重建 -->
@@ -384,6 +397,9 @@
       </span>
     </div>
     <audio id="mascot-audio" src="memes/xixi.aac" preload="none"></audio>
+    <!-- 背景音乐：loop 循环播放，preload="metadata" 只先取时长，不预下载整首；
+         不写 autoplay —— 浏览器禁止无交互自动播放，必须由顶栏按钮的点击触发（见 app.js initBgm） -->
+    <audio id="bgm-audio" src="music/bgm.m4a" loop preload="metadata"></audio>
 
     <!-- 文案/图片/配色数据：必须在 app.js 之前同步加载（首屏不闪默认主题） -->
     <script src="theme-data.js"></script>

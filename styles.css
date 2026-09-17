@@ -3913,3 +3913,129 @@ h1 span::after {
     display: none;
   }
 }
+
+/* ===========================================================================
+ * 顶栏背景音乐开关（index.html 的 #bgm-toggle，逻辑在 app.js 的 initBgm）
+ *
+ * 位置：站名右侧。.nav-left 把「站名 + 按钮」包成一组，site-nav 仍是「左 / 中 / 右」
+ *      三个 flex 项（space-between 的分配方式不变）；桌面端按钮再**绝对定位**贴到站名右侧，
+ *      连"左侧变宽导致中间导航右移"的那几像素都省掉了（实测前后逐像素一致）。
+ * 外观：沿用顶栏贴纸语言 —— 白底 + 3px 白边 + 硬投影 + 不规则圆角（同 .nav-social-link）。
+ * 状态：默认停止 = 音符偏淡（柔和蓝 + opacity .82）、不旋转；
+ *      播放中 = 加 .is-playing（底色转深、音符转白 + 缓慢自转）。
+ * 只动 transform / opacity / color，不碰 left/top，不会触发布局重排。
+ * =========================================================================== */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;      /* 极窄屏时允许站名被压缩，别把顶栏撑破 */
+}
+
+.bgm-toggle {
+  display: grid;
+  flex: 0 0 auto;    /* 绝不参与压缩：任何宽度下都保持同样大小的方块 */
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  color: var(--blue);
+  background: var(--white);
+  border: 3px solid var(--white);
+  border-radius: 11px 13px 10px 12px;
+  box-shadow: 3px 4px 0 var(--sticker-shadow);
+  opacity: 0.82;     /* 停止态：存在感刻意压低 */
+  cursor: pointer;
+  transition: color 300ms var(--ease), background 300ms var(--ease), opacity 300ms var(--ease),
+    transform 300ms var(--ease), box-shadow 300ms var(--ease);
+}
+
+.bgm-note {
+  display: block;
+  font-size: 19px;
+  line-height: 1;
+  transform-origin: 50% 50%;
+}
+
+/* 悬停：轻微放大 + 变色（不动其他顶栏按钮的任何规则） */
+.bgm-toggle:hover {
+  color: var(--white);
+  background: var(--blue);
+  opacity: 1;
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 2px 3px 0 var(--sticker-shadow);
+}
+
+.bgm-toggle:active {
+  transform: translate(1px, 1px) scale(0.98);
+}
+
+/* 桌面/平板：按钮**绝对定位**贴在站名右侧 —— 它完全不参与 flex 空间分配，
+   于是中间导航与右侧按钮的位置与"没加这个按钮"时逐像素一致
+   （实测：默认区分区药丸 682–742、右侧「去看看」1209–1299，前后完全相同）。
+   ⚠️ 必须写在上面的 :hover / :active 之后：同优先级的选择器，后面的生效。 */
+@media (min-width: 701px) {
+  .nav-left {
+    position: relative;
+  }
+
+  .bgm-toggle {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 10px);
+    transform: translateY(-50%);
+  }
+
+  .bgm-toggle:hover {
+    transform: translateY(-50%) scale(1.06);
+  }
+
+  .bgm-toggle:active {
+    transform: translateY(-50%) scale(0.98);
+  }
+}
+
+.bgm-toggle:focus-visible {
+  outline: 4px solid var(--coral);
+  outline-offset: 3px;
+}
+
+/* 播放中：颜色变深（深海蓝底 + 白音符）+ 音符缓慢自转。
+   写在 :hover 之后，优先级同为 2 个类 → 播放态悬停时底色保持深色，只有放大效果叠加。 */
+.bgm-toggle.is-playing {
+  color: var(--white);
+  background: var(--deep);
+  opacity: 1;
+}
+
+.bgm-toggle.is-playing .bgm-note {
+  animation: bgm-note-spin 3.6s linear infinite;
+}
+
+@keyframes bgm-note-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* 手机：缩小一档，给站名和右侧按钮让出空间 */
+@media (max-width: 700px) {
+  .nav-left {
+    gap: 7px;
+  }
+
+  .bgm-toggle {
+    width: 30px;
+    height: 30px;
+  }
+
+  .bgm-note {
+    font-size: 16px;
+  }
+}
+
+/* 「减少动效」偏好：不转，但颜色变化保留（播放状态依然看得出来） */
+@media (prefers-reduced-motion: reduce) {
+  .bgm-toggle.is-playing .bgm-note {
+    animation: none;
+  }
+}
