@@ -7,38 +7,20 @@
   },
   "items": [
     {
-      "original": "data/manga/cos/02.jpg",
-      "filename": "02.jpg",
-      "alt": "动画贺图收藏",
-      "preview": "previews/manga-cos-02.webp",
-      "large": "large/manga-cos-02.webp",
-      "width": 270,
-      "height": 480
-    },
-    {
-      "original": "data/manga/cos/04.jpg",
-      "filename": "04.jpg",
-      "alt": "动画贺图收藏",
-      "preview": "previews/manga-cos-04.webp",
-      "large": "large/manga-cos-04.webp",
-      "width": 270,
-      "height": 480
-    },
-    {
-      "original": "data/manga/cos/Camera_1040g3k831o3rgact4q005pfdov4192827eue8ng.jpg",
-      "filename": "Camera_1040g3k831o3rgact4q005pfdov4192827eue8ng.jpg",
-      "alt": "动画贺图收藏",
-      "preview": "previews/manga-cos-Camera_1040g3k831o3rgact4q005pfdov4192827eue8ng.webp",
-      "large": "large/manga-cos-Camera_1040g3k831o3rgact4q005pfdov4192827eue8ng.webp",
-      "width": 320,
-      "height": 480
-    },
-    {
       "original": "data/manga/cos/image (2).jpg",
       "filename": "image (2).jpg",
       "alt": "动画贺图收藏",
       "preview": "previews/manga-cos-image (2).webp",
       "large": "large/manga-cos-image (2).webp",
+      "width": 320,
+      "height": 480
+    },
+    {
+      "original": "data/manga/cos/IMG_2458.jpg",
+      "filename": "IMG_2458.jpg",
+      "alt": "动画贺图收藏",
+      "preview": "previews/manga-cos-IMG_2458.webp",
+      "large": "large/manga-cos-IMG_2458.webp",
       "width": 320,
       "height": 480
     },
@@ -165,15 +147,6 @@
       "alt": "动画贺图收藏",
       "preview": "previews/manga-cos-IMG_2491.webp",
       "large": "large/manga-cos-IMG_2491.webp",
-      "width": 320,
-      "height": 480
-    },
-    {
-      "original": "data/manga/cos/IMG_2492 (1).jpg",
-      "filename": "IMG_2492 (1).jpg",
-      "alt": "动画贺图收藏",
-      "preview": "previews/manga-cos-IMG_2492 (1).webp",
-      "large": "large/manga-cos-IMG_2492 (1).webp",
       "width": 320,
       "height": 480
     },
