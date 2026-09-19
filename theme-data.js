@@ -106,7 +106,7 @@ window.GALLERY_THEME_DATA = {
           alt: '童话立绘',
         },
         artTag: '档案 · NO.001',
-        note: '花璃&七君',
+        note: '冬川花璃',
         // 大标题的可调属性（键名 = CSS 变量名，不写就用 styles.css 的默认值）
         style: {
           '--hero-title-size': 'clamp(3.1rem, 5vw, 4.5rem)',  // 字号（桌面）；想让手机单独小一点再加 --hero-title-size-mobile
@@ -118,7 +118,8 @@ window.GALLERY_THEME_DATA = {
       },
       partitions: [
         { id: 'default', label: '默认区', manifest: 'stickers/manifest_whale-default.json' },
-        { id: 'cos', label: '表情墙', manifest: 'stickers/manifest_whale-cos.json' },
+        { id: 'cos', label: '番外篇', manifest: 'stickers/manifest_whale-cos.json' },
+        { id: 'ramune', label: '纯欲', manifest: 'stickers/manifest_whale-ramune.json' },
       ],
     },
   ],
