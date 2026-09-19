@@ -80,6 +80,7 @@ window.GALLERY_THEME_DATA = {
       partitions: [                                             // 该主题的分区（顶部分区条）
         { id: 'default', label: '默认区', manifest: 'stickers/manifest_manga-default.json' },
         { id: 'cos', label: 'Cos区', manifest: 'stickers/manifest_manga-cos.json' },
+        { id: 'meme', label: '表情墙', manifest: 'stickers/manifest_manga-meme.json' },
       ],
     },
     {
@@ -119,7 +120,6 @@ window.GALLERY_THEME_DATA = {
       partitions: [
         { id: 'default', label: '默认区', manifest: 'stickers/manifest_whale-default.json' },
         { id: 'cos', label: '番外篇', manifest: 'stickers/manifest_whale-cos.json' },
-        { id: 'ramune', label: '纯欲', manifest: 'stickers/manifest_whale-ramune.json' },
       ],
     },
   ],
